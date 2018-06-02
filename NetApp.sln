@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp", "NetApp\NetApp.csproj", "{BE9DA210-AED1-408F-A6F9-4E680DA9EF5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Model", "NetApp.Model\NetApp.Model.csproj", "{AE340DC7-67F7-4F64-B6B6-F72FF6919B8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Model", "NetApp.Model\NetApp.Model.csproj", "{AE340DC7-67F7-4F64-B6B6-F72FF6919B8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Test", "NetApp.Test\NetApp.Test.csproj", "{F2E97FAE-C7CD-4BCF-A986-726AB8A6D3F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Tests", "NetApp.Tests\NetApp.Tests.csproj", "{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{AE340DC7-67F7-4F64-B6B6-F72FF6919B8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE340DC7-67F7-4F64-B6B6-F72FF6919B8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE340DC7-67F7-4F64-B6B6-F72FF6919B8F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2E97FAE-C7CD-4BCF-A986-726AB8A6D3F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2E97FAE-C7CD-4BCF-A986-726AB8A6D3F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2E97FAE-C7CD-4BCF-A986-726AB8A6D3F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2E97FAE-C7CD-4BCF-A986-726AB8A6D3F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
