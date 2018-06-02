@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { connect } from "react-redux";
 
 class MyLibaray extends React.Component {
@@ -10,6 +10,7 @@ class MyLibaray extends React.Component {
     return (
       <div>
         <h1>Hello, World!</h1>
+        <p>提交新的代码，然后会发生什么?</p>
         <div className="progress">
           <div
             className="progress-bar progress-bar-success progress-bar-striped active"
