@@ -35,6 +35,8 @@ namespace NetApp.Tests
             var controller = new Controllers.SampleDataController(app);
             var res = controller.UserEntries(1);
             Assert.IsTrue(res.Count() > 0, "query mysql for learning_log");
+            var dtoRes = controller.UserTopics(1);
+            Assert.IsTrue(dtoRes.Any() && !string.IsNullOrEmpty(dtoRes.First().Name), "dto convert");
         }
     }
 }

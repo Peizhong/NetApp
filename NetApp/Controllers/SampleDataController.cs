@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NetApp.Entities.LearningLog;
 using NetApp.Business.Interfaces;
+using NetApp.Business.Interfaces.DTO;
 
 namespace NetApp.Controllers
 {
@@ -55,7 +56,7 @@ namespace NetApp.Controllers
 
 
         [HttpGet("[action]")]
-        public IEnumerable<Topic> UserTopics(int userId)
+        public IEnumerable<TopicDTO> UserTopics(int userId)
         {
             try
             {
