@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NetApp.Model\NetApp.Model.csproj" />
+    <ProjectReference Include="..\NetApp.Portal\NetApp.Portal.csproj" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

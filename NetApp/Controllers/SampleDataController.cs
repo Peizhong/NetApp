@@ -26,6 +26,20 @@ namespace NetApp.Controllers
             });
         }
 
+        [HttpGet("[action]")]
+        public async Task<string> WhatCanYouSee(string imgPath)
+        {
+            try
+            {
+                var res = await Portal.MachineLearning.Instance.GetComputerVisionResult(imgPath);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public class WeatherForecast
         {
             public string DateFormatted { get; set; }
