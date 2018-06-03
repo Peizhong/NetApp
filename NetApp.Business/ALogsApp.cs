@@ -17,12 +17,31 @@ namespace NetApp.Business
             learningLogRepo = llRepo;
         }
 
+        public IEnumerable<Topic> GetUserTopics(User user)
+        {
+            if (user == null || user.Id < 1)
+                return null;
+            //var res = learningLogRepo.GetTopics(user.Id).SelectMany(t => learningLogRepo.GetEntries(t.Id)).ToList();
+            var res = learningLogRepo.GetTopics(user.Id);
+            Console.Write(res.Count());
+            return res;
+        }
+
         public IEnumerable<Entry> GetUserEntries(User user)
         {
             if (user == null || user.Id < 1)
                 return null;
             //var res = learningLogRepo.GetTopics(user.Id).SelectMany(t => learningLogRepo.GetEntries(t.Id)).ToList();
             var res = learningLogRepo.GetTopics(user.Id).SelectMany(t => t.Entries);
+            Console.Write(res.Count());
+            return res;
+        }
+
+        public IEnumerable<Entry> GetTopicEntries(Topic topic)
+        {
+            if (topic == null || topic.Id < 1)
+                return null;
+            var res = learningLogRepo.GetEntries(topic.Id);
             Console.Write(res.Count());
             return res;
         }

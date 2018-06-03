@@ -53,6 +53,37 @@ namespace NetApp.Controllers
             }
         }
 
+
+        [HttpGet("[action]")]
+        public IEnumerable<Topic> UserTopics(int userId)
+        {
+            try
+            {
+                var res = logsapp.GetUserTopics(new User { Id = userId });
+                Console.Write(res.Count());
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<Entry> UserTopicEnries(int topicId)
+        {
+            try
+            {
+                var res = logsapp.GetTopicEntries(new Topic { Id = topicId });
+                Console.Write(res.Count());
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         [HttpGet("[action]")]
         public IEnumerable<Entry> UserEntries(int userId)
         {
