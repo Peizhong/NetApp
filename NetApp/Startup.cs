@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NetApp.Repository;
+using NetApp.Repository.Interfaces;
+using NetApp.Business;
+using NetApp.Business.Interfaces;
+
 namespace NetApp
 {
     public class Startup
@@ -22,6 +27,9 @@ namespace NetApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ILearningLogRepo, MQLearningLogRepo>();
+            services.AddSingleton<ILogsApp, ALogsApp>();
+
             services.AddMvc();
         }
 

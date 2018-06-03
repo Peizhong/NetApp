@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetApp.Business.Interfaces\NetApp.Business.Interfaces.csproj" />
+    <ProjectReference Include="..\NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>

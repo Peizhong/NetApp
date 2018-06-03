@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
   </ItemGroup>
 
@@ -21,8 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Model\NetApp.Model.csproj" />
+    <ProjectReference Include="..\NetApp.Business.Interfaces\NetApp.Business.Interfaces.csproj" />
+    <ProjectReference Include="..\NetApp.Business\NetApp.Business.csproj" />
+    <ProjectReference Include="..\NetApp.Entities\NetApp.Entities.csproj" />
     <ProjectReference Include="..\NetApp.Portal\NetApp.Portal.csproj" />
+    <ProjectReference Include="..\NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj" />
+    <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

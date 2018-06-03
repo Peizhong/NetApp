@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Model\NetApp.Model.csproj" />
+    <ProjectReference Include="..\NetApp.Business\NetApp.Business.csproj" />
+    <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
     <ProjectReference Include="..\NetApp\NetApp.csproj" />
   </ItemGroup>
 

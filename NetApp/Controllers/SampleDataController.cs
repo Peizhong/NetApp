@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NetApp.Entities.LearningLog;
+using NetApp.Business.Interfaces;
 
 namespace NetApp.Controllers
 {
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
+        ILogsApp logsapp;
+
+        public SampleDataController(ILogsApp lgapp)
+        {
+            logsapp = lgapp;
+        }
+
         private static string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -32,6 +41,25 @@ namespace NetApp.Controllers
             try
             {
                 var res = await Portal.MachineLearning.Instance.GetComputerVisionResult(imgPath);
+                if (string.IsNullOrEmpty(res))
+                {
+                    return string.Empty;
+                }
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<Entry> UserEntries(int userId)
+        {
+            try
+            {
+                var res = logsapp.GetUserEntries(new User { Id = userId });
+                Console.Write(res.Count());
                 return res;
             }
             catch (Exception ex)

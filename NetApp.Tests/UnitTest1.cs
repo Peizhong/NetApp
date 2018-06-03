@@ -1,7 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NetApp.Tests
@@ -12,7 +10,7 @@ namespace NetApp.Tests
         [TestMethod]
         public void TestMethod1()
         {
-            var controller = new Controllers.SampleDataController();
+            var controller = new Controllers.SampleDataController(null);
             var res = controller.WeatherForecasts(0);
             Assert.IsTrue(res.Any());
         }
@@ -20,30 +18,23 @@ namespace NetApp.Tests
         [TestMethod]
         public void TestComputerVision()
         {
-            string filePath = string.Empty;
+            string res = string.Empty;
             Task.Run(async () =>
             {
-                using (var client = new HttpClient())
-                {
-                    using (var fs = File.Create("tmp.jpg"))
-                    {
-                        var content = await client.GetStreamAsync(@"http://193.112.41.28/downloads/Snipaste_2018-05-04_00-13-13.jpg");
-                        await content.CopyToAsync(fs);
-                    }
-                }
+                var controller = new Controllers.SampleDataController(null);
+                res = await controller.WhatCanYouSee(@"http://193.112.41.28/downloads/Snipaste_2018-05-04_00-13-13.jpg");
             }).Wait();
+            Assert.IsTrue(!string.IsNullOrEmpty(res), "call microsoft machine learning api");
+        }
 
-            FileInfo tempfile = new FileInfo("tmp.jpg");
-
-            Assert.IsTrue(tempfile.Exists);
-
-            string res = string.Empty;
-
-            var controller = new Controllers.SampleDataController();
-            controller.WhatCanYouSee(tempfile.FullName).Wait();
-
-            tempfile.Delete();
-            Assert.IsTrue(!string.IsNullOrEmpty(res));
+        [TestMethod]
+        public void TestGetData()
+        {
+            var repo = new Repository.MQLearningLogRepo();
+            var app = new Business.ALogsApp(repo);
+            var controller = new Controllers.SampleDataController(app);
+            var res = controller.UserEntries(1);
+            Assert.IsTrue(res.Count() > 0, "query mysql for learning_log");
         }
     }
 }

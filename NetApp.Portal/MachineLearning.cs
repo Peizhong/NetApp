@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace NetApp.Portal
 {
@@ -17,15 +18,14 @@ namespace NetApp.Portal
 
         #region Computer Vision
         const string keyForCV = "e0f85ad136764fabb1fedc612f735d26";
-        const string urlForCV = @"https://westeurope.api.cognitive.microsoft.com/vision/v1.0/anaylze";
+        const string urlForCV = @"https://westeurope.api.cognitive.microsoft.com/vision/v1.0/analyze";
 
         static byte[] GetImageAsByteArray(string imageFilePath)
         {
-            using (FileStream fileStream =
-                new FileStream(imageFilePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read))
             {
-                BinaryReader binaryReader = new BinaryReader(fileStream);
-                return binaryReader.ReadBytes((int)fileStream.Length);
+                BinaryReader binaryReader = new BinaryReader(fs);
+                return binaryReader.ReadBytes((int)fs.Length);
             }
         }
 
@@ -34,9 +34,21 @@ namespace NetApp.Portal
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", keyForCV);
-                string requestParameters = "visualFeatures=Categories";
+                string requestParameters = "visualFeatures=Categories,Description,Color&language=en";
                 string uri = $"{urlForCV}?{requestParameters}";
+                var data = new Dictionary<string, string>()
+                {
+                    ["url"] = imgPath
+                };
+                var json = JsonConvert.SerializeObject(data);
                 HttpResponseMessage response;
+                using (var content = new ByteArrayContent(Encoding.UTF8.GetBytes(json)))
+                {
+                    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    // Make the REST API call.
+                    response = await client.PostAsync(uri, content);
+                }
+                /*
                 byte[] byteData = GetImageAsByteArray(imgPath);
                 using (var content = new ByteArrayContent(byteData))
                 {
@@ -44,8 +56,8 @@ namespace NetApp.Portal
 
                     // Make the REST API call.
                     response = await client.PostAsync(uri, content);
-                }
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                }*/
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
                     throw new Exception(response.ReasonPhrase);
                 }
@@ -56,9 +68,6 @@ namespace NetApp.Portal
 
         public async Task<string> GetComputerVisionResult(string imgPath)
         {
-            if (!File.Exists(imgPath))
-                return string.Empty;
-
             string result = await RequestComputerVisionAsync(imgPath);
             return result;
         }
