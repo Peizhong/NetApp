@@ -8,14 +8,6 @@ namespace NetApp.Tests
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
-        {
-            var controller = new Controllers.SampleDataController(null);
-            var res = controller.WeatherForecasts(0);
-            Assert.IsTrue(res.Any());
-        }
-
-        [TestMethod]
         public void TestComputerVision()
         {
             string res = string.Empty;
@@ -33,10 +25,12 @@ namespace NetApp.Tests
             var repo = new Repository.MQLearningLogRepo();
             var app = new Business.ALogsApp(repo);
             var controller = new Controllers.SampleDataController(app);
-            var res = controller.UserEntries(1);
+            var res = controller.UserTopics(1);
             Assert.IsTrue(res.Count() > 0, "query mysql for learning_log");
-            var dtoRes = controller.UserTopics(1);
-            Assert.IsTrue(dtoRes.Any() && !string.IsNullOrEmpty(dtoRes.First().Name), "dto convert");
+            var topicDto = controller.TopicDetail(1);
+            Assert.IsTrue(topicDto != null && topicDto.EntryHeaders.Any(), "get topic with entries, using dto");
+            var entryDto = controller.EntryDetail(1);
+            Assert.IsTrue(!string.IsNullOrEmpty(entryDto.Title), "get entry detail");
         }
     }
 }

@@ -5,30 +5,38 @@ import { stat } from 'fs';
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
-
-export interface Entry {
+export interface EntryHeader {
   id: number;
   title: string;
-  text: string;
-  link: string;
-  topicid: number;
 }
 
-export interface Topic {
+export interface Entry extends EntryHeader {
+  text: string;
+  link: string;
+  updateTime: Date;
+  topicId: number;
+}
+
+export interface TopicHeader {
   id: number;
   name: string;
-  ownerid: number;
+}
+
+export interface Topic extends TopicHeader {
+  updateTime: Date;
+  ownerId: number;
+  entryHeaders: EntryHeader[];
 }
 
 export interface LearningLogsState {
   isLoading: boolean;
   message: string;
-  ownerid: number;
-  topics: Topic[];
-  selectedtopic: number;
-  entries: Entry[];
-  selectedentry: number;
-  entrydetail: Entry;
+  ownerId: number;
+  topics: TopicHeader[];
+  selectedTopic?: Topic;
+  topicId: number;
+  selectedEntry?: Entry;
+  entryId: number;
 }
 
 // -----------------
@@ -37,46 +45,45 @@ export interface LearningLogsState {
 
 interface RequestTopicsAction {
   type: 'REQUEST_LEARNING_LOG_TOPICS';
-  ownerid: number;
+  ownerId: number;
 }
 
 interface ReceiveTopicsAction {
   type: 'RECEIVE_LEARNING_LOG_TOPICS';
-  ownerid: number;
-  topics: Topic[];
+  ownerId: number;
+  topics: TopicHeader[];
   message: string;
 }
 
 interface SelectTopicAction {
   type: 'SELECT_LEARNING_LOG_TOPIC';
-  selectedtopic: number;
+  topicId: number;
 }
 
-interface RequestEntriesAction {
-  type: 'REQUEST_TOPIC_ENTRIES';
-  selectedtopic: number;
+interface RequestTopicDetailAction {
+  type: 'REQUEST_TOPIC_DETAIL';
+  topicId: number;
 }
 
-interface ReciveEntriesAction {
-  type: 'RECEIVE_TOPIC_ENTRIES';
-  topicid: number;
-  entries: Entry[];
+interface ReciveTopicDetailAction {
+  type: 'RECEIVE_TOPIC_DETAIL';
+  topic: Topic;
   message: string;
 }
 
 interface SelectEntryAction {
   type: 'SELECT_TOPIC_ENTRY';
-  selectedentry: number;
+  entryId: number;
 }
 
 interface RequestEntryDetailAction {
   type: 'REQUEST_ENTRIY_DETAIL';
-  selectedentry: number;
+  entryId: number;
 }
 
 interface ReciveEntryDetailAction {
   type: 'RECEIVE_ENTRIE_DETAIL';
-  entrydetail: Entry;
+  entry: Entry;
   message: string;
 }
 
@@ -96,8 +103,8 @@ type KnownAction =
   | RequestTopicsAction
   | ReceiveTopicsAction
   | SelectTopicAction
-  | RequestEntriesAction
-  | ReciveEntriesAction
+  | RequestTopicDetailAction
+  | ReciveTopicDetailAction
   | SelectEntryAction
   | RequestEntryDetailAction
   | ReciveEntryDetailAction
@@ -109,64 +116,82 @@ type KnownAction =
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
 export const actionCreators = {
-  requestTopics: (ownerid: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
-    if (ownerid !== getState().learningLogs.ownerid) {
-      let fetchTask = fetch(`api/SampleData/UserTopics?userId=${ownerid}`)
-        .then(response => response.json() as Promise<Topic[]>)
+  //when mount compoment, or user changed
+  requestTopics: (ownerId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    if (ownerId !== getState().learningLogs.ownerId) {
+      let fetchTask = fetch(`api/SampleData/UserTopics?userId=${ownerId}`)
+        .then(response => response.json() as Promise<TopicHeader[]>)
         .then(data => {
           dispatch({
             type: 'RECEIVE_LEARNING_LOG_TOPICS',
             topics: data,
-            ownerid,
+            ownerId,
             message: '',
           });
         })
-        .catch(err => console.log(err.message));
+        .catch(err => {
+          dispatch({
+            type: 'RECEIVE_LEARNING_LOG_TOPICS',
+            topics: [],
+            ownerId,
+            message: err.message,
+          })
+        });
       addTask(fetchTask);
-      dispatch({ type: 'REQUEST_LEARNING_LOG_TOPICS', ownerid: ownerid });
+      dispatch({ type: 'REQUEST_LEARNING_LOG_TOPICS', ownerId });
     }
   },
-  requestEntries: (topicid: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
-    if (topicid !== getState().learningLogs.selectedtopic) {
-      let fetchTask = fetch(`api/SampleData/UserTopicEnries?topicId=${topicid}`)
-        .then(response => response.json() as Promise<Entry[]>)
+  //when click on topic header, load topic's entries or collaps topic
+  selectTopic: (topicId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    if (topicId !== getState().learningLogs.topicId) {
+      let fetchTask = fetch(`api/SampleData/TopicDetail?topicId=${topicId}`)
+        .then(response => response.json() as Promise<Topic>)
         .then(data => {
           dispatch({
-            type: 'RECEIVE_TOPIC_ENTRIES',
-            entries: data,
-            topicid,
+            type: 'RECEIVE_TOPIC_DETAIL',
+            topic: data,
             message: '',
           });
         })
         .catch(err => console.log(err.message));
       addTask(fetchTask);
-      dispatch({ type: 'REQUEST_TOPIC_ENTRIES', selectedtopic: topicid });
+      dispatch({ type: 'REQUEST_TOPIC_DETAIL', topicId });
+    }
+    else {
+      dispatch({ type: 'SELECT_LEARNING_LOG_TOPIC', topicId });
     }
   },
-  collapsTopic: (topicid: number) =>
-    <SelectTopicAction>{ type: 'SELECT_LEARNING_LOG_TOPIC', selectedtopic: topicid },
-  selectEntry: (entryid: number) =>
-    <SelectEntryAction>{ type: 'SELECT_TOPIC_ENTRY', selectedentry: entryid },
+  selectEntry: (entryId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    if (entryId !== getState().learningLogs.entryId) {
+      let fetchTask = fetch(`api/SampleData/EntryDetail?entryId=${entryId}`)
+        .then(response => response.json() as Promise<Entry>)
+        .then(data => {
+          dispatch({
+            type: 'RECEIVE_ENTRIE_DETAIL',
+            entry: data,
+            message: '',
+          });
+        })
+        .catch(err => console.log(err.message));
+      addTask(fetchTask);
+      dispatch({ type: 'REQUEST_ENTRIY_DETAIL', entryId });
+    }
+    else {
+      dispatch({ type: 'SELECT_TOPIC_ENTRY', entryId });
+    }
+  }
 };
 
 // ----------------
 // REDUCER - For a given state and action, returns the new state. To support time travel, this must not mutate the old state.
 
 const unloadedState: LearningLogsState = {
-  ownerid: -1,
+  ownerId: -1,
   isLoading: false,
   message: '',
   topics: [],
-  entries: [],
-  selectedentry: 0,
-  selectedtopic: 0,
-  entrydetail: {
-    id: 0,
-    title: '',
-    text: '',
-    link: '',
-    topicid: 0,
-  },
+  topicId: -1,
+  entryId: -1,
 };
 
 export const reducer: Reducer<LearningLogsState> = (
@@ -177,109 +202,88 @@ export const reducer: Reducer<LearningLogsState> = (
   switch (action.type) {
     case 'REQUEST_LEARNING_LOG_TOPICS':
       return {
-        ownerid: action.ownerid,
         isLoading: true,
         message: 'loading...',
+        ownerId: action.ownerId,
 
-        selectedtopic: state.selectedtopic,
-        selectedentry: state.selectedentry,
-        topics: state.topics,
-        entries: state.entries,
-        entrydetail: state.entrydetail,
+        //loading new owner info, clear old data
+        topics: [],
+        topicId: -1,
+        entryId: -1,
+        //selectedTopic: state.selectedTopic,
+        //selectedEntry: state.selectedEntry,
       };
     case 'RECEIVE_LEARNING_LOG_TOPICS':
       // Only accept the incoming data if it matches the most recent request. This ensures we correctly
       // handle out-of-order responses.
-      if (action.ownerid === state.ownerid) {
+      if (action.ownerId === state.ownerId) {
         return {
           isLoading: false,
+          message: action.message,
           topics: action.topics,
-          message: action.message,
 
-          ownerid: state.ownerid,
-          selectedtopic: state.selectedtopic,
-          selectedentry: state.selectedentry,
-          entries: state.entries,
-          entrydetail: state.entrydetail,
-        };
-      }
-      break;
-    case 'SELECT_TOPIC_ENTRY':
-      if (action.selectedentry !== state.selectedentry) {
-        return {
-          ownerid: state.ownerid,
-          topics: state.topics,
-          isLoading: state.isLoading,
-          message: state.message,
-          selectedtopic: state.selectedtopic,
-          selectedentry: action.selectedentry,
-          entries: state.entries,
-          entrydetail: state.entries.find(e => e.id == action.selectedentry) || {
-            id: 0,
-            title: '',
-            text: '',
-            link: '',
-            topicid: 0,
-          },
-        };
-      }
-      return {
-        ownerid: state.ownerid,
-        topics: state.topics,
-        isLoading: state.isLoading,
-        message: state.message,
-        selectedtopic: state.selectedtopic,
-        selectedentry: -1,
-        entries: state.entries,
-        entrydetail: {
-          id: 0,
-          title: '',
-          text: '',
-          link: '',
-          topicid: 0,
-        },
-      };
-    case 'REQUEST_TOPIC_ENTRIES':
-      return {
-        selectedtopic: action.selectedtopic,
-        isLoading: true,
-        message: 'loading...',
-
-        ownerid: state.ownerid,
-        selectedentry: state.selectedentry,
-        topics: state.topics,
-        entries: state.entries,
-        entrydetail: state.entrydetail,
-      };
-    case 'RECEIVE_TOPIC_ENTRIES':
-      if (action.topicid === state.selectedtopic) {
-        return {
-          isLoading: false,
-          entries: action.entries,
-          message: action.message,
-
-          ownerid: state.ownerid,
-          topics: state.topics,
-          selectedtopic: state.selectedtopic,
-          selectedentry: state.selectedentry,
-          entrydetail: state.entrydetail,
+          ownerId: state.ownerId,
+          topicId: -1,
+          entryId: -1,
+          //when recived new topics, selected topic and entry still unset
+          //selectedtopic: state.selectedtopic,
+          //selectedentry: state.selectedentry,
         };
       }
       break;
     case 'SELECT_LEARNING_LOG_TOPIC':
-      if (action.selectedtopic == state.selectedtopic) {
+      //wait for recive_topic_detail to update, or just hide
+      return {
+        //if click topic twice, collaps topic
+        topicId: state.topicId === action.topicId ? -1 : action.topicId,
+
+        ownerId: state.ownerId,
+        isLoading: state.isLoading,
+        message: state.message,
+        topics: state.topics,
+
+        //when update topic state, change entry info anyway
+        entryId: -1,
+      };
+    case 'REQUEST_TOPIC_DETAIL':
+      return {
+        isLoading: true,
+        message: 'loading...',
+        topicId: action.topicId,
+
+        ownerId: state.ownerId,
+        topics: state.topics,
+        //loading new topic info, clear old data
+        entryId: -1,
+        //selectedTopic: state.selectedTopic,
+        //selectedEntry: state.selectedEntry,
+      };
+    case 'RECEIVE_TOPIC_DETAIL':
+      if (action.topic.id === state.topicId) {
         return {
           isLoading: false,
-          ownerid: state.ownerid,
+          message: action.message,
+          selectedTopic: action.topic,
+
+          ownerId: state.ownerId,
           topics: state.topics,
-          entries: [],
-          message: state.message,
-          selectedtopic: -1,
-          selectedentry: state.selectedentry,
-          entrydetail: state.entrydetail,
-        };
+          topicId: state.topicId,
+          entryId: -1,
+        }
       }
       break;
+    case 'SELECT_TOPIC_ENTRY':
+      //no local entry data, wait for recive_entry to update, or just hide
+      return {
+        entryId: state.entryId === action.entryId ? -1 : action.entryId,
+
+        ownerId: state.ownerId,
+        isLoading: state.isLoading,
+        message: state.message,
+        topics: state.topics,
+        topicId: state.topicId,
+        selectedTopic: state.selectedTopic,
+      };
     case 'REQUEST_ENTRIY_DETAIL':
     case 'RECEIVE_ENTRIE_DETAIL':
     case 'POST_ENTRY_DETAIL':
@@ -287,13 +291,12 @@ export const reducer: Reducer<LearningLogsState> = (
       return {
         isLoading: false,
         message: '',
-
-        ownerid: state.ownerid,
+        ownerId: state.ownerId,
         topics: state.topics,
-        entries: state.entries,
-        selectedtopic: state.selectedtopic,
-        selectedentry: state.selectedentry,
-        entrydetail: state.entrydetail,
+        topicId: state.topicId,
+        entryId: state.entryId,
+        selectedEntry: state.selectedEntry,
+        selectedTopic: state.selectedTopic,
       };
     default:
       // The following line guarantees that every action in the KnownAction union has been covered by a case above

@@ -32,7 +32,7 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             </button>
           </form>
         </nav>
-        {this.props.isLoading && (
+        {false && this.props.isLoading && (
           <div className="progress">
             <div
               className="progress-bar progress-bar-info progress-bar-striped active"
@@ -51,18 +51,18 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
       <div className="list-group">
         {this.props.topics.map(
           topic =>
-            topic.id === this.props.selectedtopic ? (
-              this.expandTopic(topic)
+            topic.id === this.props.topicId ? (
+              this.props.selectedTopic && this.expandTopic(this.props.selectedTopic)
             ) : (
-              <button
-                className="list-group-item"
-                onClick={() => {
-                  this.props.requestEntries(topic.id);
-                }}
-              >
-                <h5>{topic.name}</h5>
-              </button>
-            ),
+                <button
+                  className="list-group-item"
+                  onClick={() => {
+                    this.props.selectTopic(topic.id);
+                  }}
+                >
+                  <h5>{topic.name}</h5>
+                </button>
+              ),
         )}
       </div>
     );
@@ -71,24 +71,24 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
   private expandTopic(topic: LearningLogsState.Topic) {
     return (
       <div className="panel panel-primary">
-        <div className="panel-heading" onClick={() => this.props.collapsTopic(topic.id)}>
+        <div className="panel-heading" onClick={() => this.props.selectTopic(topic.id)}>
           <h3 className="panel-title">{topic.name}</h3>
         </div>
         <div className="well well-sm">
-          {this.props.entries.map(
+          {topic.entryHeaders.map(
             entry =>
-              entry.id === this.props.selectedentry ? (
-                this.showEntry(entry)
+              entry.id === this.props.entryId ? (
+                this.props.selectedEntry && this.showEntry(this.props.selectedEntry)
               ) : (
-                <button
-                  className="list-group-item"
-                  onClick={() => {
-                    this.props.selectEntry(entry.id);
-                  }}
-                >
-                  {entry.title}
-                </button>
-              ),
+                  <button
+                    className="list-group-item"
+                    onClick={() => {
+                      this.props.selectEntry(entry.id);
+                    }}
+                  >
+                    {entry.title}
+                  </button>
+                ),
           )}
         </div>
       </div>

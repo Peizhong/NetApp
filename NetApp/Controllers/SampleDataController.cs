@@ -56,11 +56,11 @@ namespace NetApp.Controllers
 
 
         [HttpGet("[action]")]
-        public IEnumerable<TopicDTO> UserTopics(int userId)
+        public IEnumerable<TopicHeaderDTO> UserTopics(int userId)
         {
             try
             {
-                var res = logsapp.GetUserTopics(new User { Id = userId });
+                var res = logsapp.GetUserTopics(userId);
                 Console.Write(res.Count());
                 return res;
             }
@@ -71,12 +71,11 @@ namespace NetApp.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Entry> UserTopicEnries(int topicId)
+        public TopicDTO TopicDetail(int topicId)
         {
             try
             {
-                var res = logsapp.GetTopicEntries(new Topic { Id = topicId });
-                Console.Write(res.Count());
+                var res = logsapp.GetUserTopicDetail(topicId);
                 return res;
             }
             catch (Exception ex)
@@ -85,13 +84,11 @@ namespace NetApp.Controllers
             }
         }
 
-        [HttpGet("[action]")]
-        public IEnumerable<Entry> UserEntries(int userId)
+        public EntryDTO EntryDetail(int entryId)
         {
             try
             {
-                var res = logsapp.GetUserEntries(new User { Id = userId });
-                Console.Write(res.Count());
+                var res = logsapp.GetEntryDetail(entryId);
                 return res;
             }
             catch (Exception ex)

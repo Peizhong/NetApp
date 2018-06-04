@@ -18,34 +18,37 @@ namespace NetApp.Business
         {
             learningLogRepo = llRepo;
 
-            Mapper.Initialize(x => x.CreateMap<Topic, TopicDTO>());
+            Mapper.Initialize(x =>
+            {
+                x.CreateMap<Topic, TopicHeaderDTO>();
+                x.CreateMap<Topic, TopicDTO>().ForMember(d => d.EntryHeaders, o => o.MapFrom(s => s.Entries));
+                x.CreateMap<Entry, EntryHeaderDTO>();
+                x.CreateMap<Entry, EntryDTO>();
+            });
         }
-        
-        public IEnumerable<TopicDTO> GetUserTopics(User user)
+
+        public EntryDTO GetEntryDetail(int entryId)
         {
-            if (user == null || user.Id < 1)
-                return null;
-            var topics = learningLogRepo.GetTopics(user.Id);
-            var res = Mapper.Map<IEnumerable<TopicDTO>>(topics);
+            var entry = learningLogRepo.GetEntry(entryId);
+            var res = Mapper.Map<EntryDTO>(entry);
             return res;
         }
 
-        public IEnumerable<Entry> GetUserEntries(User user)
+        public TopicDTO GetUserTopicDetail(int topicId)
         {
-            if (user == null || user.Id < 1)
+            var topic = learningLogRepo.GetTopicWithEntries(topicId);
+            if (topic == null)
                 return null;
-            //var res = learningLogRepo.GetTopics(user.Id).SelectMany(t => learningLogRepo.GetEntries(t.Id)).ToList();
-            var res = learningLogRepo.GetTopics(user.Id).SelectMany(t => t.Entries);
-            Console.Write(res.Count());
-            return res;
+            var topicDTO = Mapper.Map<TopicDTO>(topic);
+            return topicDTO;
         }
 
-        public IEnumerable<Entry> GetTopicEntries(Topic topic)
+        public IEnumerable<TopicHeaderDTO> GetUserTopics(int userId)
         {
-            if (topic == null || topic.Id < 1)
-                return null;
-            var res = learningLogRepo.GetEntries(topic.Id);
-            Console.Write(res.Count());
+            if (userId < 1)
+                return new TopicHeaderDTO[] { };
+            var topics = learningLogRepo.GetTopics(userId);
+            var res = Mapper.Map<IEnumerable<TopicHeaderDTO>>(topics);
             return res;
         }
     }

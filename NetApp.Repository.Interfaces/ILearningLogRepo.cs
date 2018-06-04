@@ -9,7 +9,7 @@ namespace NetApp.Repository.Interfaces
     {
         IEnumerable<Topic> GetTopics(int userId);
 
-        Topic GetTopic(int topicId);
+        Topic GetTopicWithEntries(int topicId);
 
         int SaveTopic(Topic topic);
 
