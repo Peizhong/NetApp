@@ -84,6 +84,7 @@ namespace NetApp.Controllers
             }
         }
 
+        [HttpGet("[action]")]
         public EntryDTO EntryDetail(int entryId)
         {
             try

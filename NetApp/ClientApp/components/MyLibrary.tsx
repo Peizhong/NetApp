@@ -32,14 +32,15 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             </button>
           </form>
         </nav>
-        {false && this.props.isLoading && (
-          <div className="progress">
-            <div
-              className="progress-bar progress-bar-info progress-bar-striped active"
-              style={{ width: '100%' }}
-            />
-          </div>
-        )}
+        {false &&
+          this.props.isLoading && (
+            <div className="progress">
+              <div
+                className="progress-bar progress-bar-info progress-bar-striped active"
+                style={{ width: '100%' }}
+              />
+            </div>
+          )}
         {this.renderTopics()}
         <button className="btn btn-primary pull-left">Look Good</button>
       </div>
@@ -52,34 +53,36 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
         {this.props.topics.map(
           topic =>
             topic.id === this.props.topicId ? (
-              this.props.selectedTopic && this.expandTopic(this.props.selectedTopic)
+              this.expandTopic(topic)
             ) : (
-                <button
-                  className="list-group-item"
-                  onClick={() => {
-                    this.props.selectTopic(topic.id);
-                  }}
-                >
-                  <h5>{topic.name}</h5>
-                </button>
-              ),
+              <button
+                className="list-group-item"
+                onClick={() => {
+                  this.props.selectTopic(topic.id);
+                }}
+              >
+                <h5>{topic.name}</h5>
+              </button>
+            )
         )}
       </div>
     );
   }
 
-  private expandTopic(topic: LearningLogsState.Topic) {
+  private expandTopic(topic: LearningLogsState.TopicHeader) {
     return (
       <div className="panel panel-primary">
         <div className="panel-heading" onClick={() => this.props.selectTopic(topic.id)}>
           <h3 className="panel-title">{topic.name}</h3>
         </div>
         <div className="well well-sm">
-          {topic.entryHeaders.map(
-            entry =>
-              entry.id === this.props.entryId ? (
-                this.props.selectedEntry && this.showEntry(this.props.selectedEntry)
-              ) : (
+          {this.props.selectedTopic &&
+            this.props.selectedTopic.id === topic.id &&
+            this.props.selectedTopic.entryHeaders.map(
+              entry =>
+                entry.id === this.props.entryId ? (
+                  this.showEntry(entry)
+                ) : (
                   <button
                     className="list-group-item"
                     onClick={() => {
@@ -88,26 +91,30 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
                   >
                     {entry.title}
                   </button>
-                ),
-          )}
+                )
+            )}
         </div>
       </div>
     );
   }
 
-  private showEntry(entry: LearningLogsState.Entry) {
+  private showEntry(entry: LearningLogsState.EntryHeader) {
+    const selectedEntry = this.props.selectedEntry;
     return (
       <div className="panel panel-info">
         <div className="panel-heading" onClick={() => this.props.selectEntry(entry.id)}>
           <h4 className="panel-title">{entry.title}</h4>
         </div>
-        <div className="well">
-          <p>
-            {entry.title}
-            <br />
-            {entry.link}
-          </p>
-        </div>
+        {selectedEntry &&
+          selectedEntry.id == entry.id && (
+            <div className="well">
+              <p>
+                {selectedEntry.title}
+                <br />
+                {selectedEntry.link}
+              </p>
+            </div>
+          )}
       </div>
     );
   }
@@ -115,5 +122,5 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
 
 export default connect(
   (state: ApplicationState) => state.learningLogs,
-  LearningLogsState.actionCreators,
+  LearningLogsState.actionCreators
 )(MyLibaray) as typeof MyLibaray;

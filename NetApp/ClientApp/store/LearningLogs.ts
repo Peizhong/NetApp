@@ -126,7 +126,7 @@ export const actionCreators = {
             type: 'RECEIVE_LEARNING_LOG_TOPICS',
             topics: data,
             ownerId,
-            message: '',
+            message: ''
           });
         })
         .catch(err => {
@@ -134,8 +134,8 @@ export const actionCreators = {
             type: 'RECEIVE_LEARNING_LOG_TOPICS',
             topics: [],
             ownerId,
-            message: err.message,
-          })
+            message: err.message
+          });
         });
       addTask(fetchTask);
       dispatch({ type: 'REQUEST_LEARNING_LOG_TOPICS', ownerId });
@@ -150,14 +150,13 @@ export const actionCreators = {
           dispatch({
             type: 'RECEIVE_TOPIC_DETAIL',
             topic: data,
-            message: '',
+            message: ''
           });
         })
         .catch(err => console.log(err.message));
       addTask(fetchTask);
       dispatch({ type: 'REQUEST_TOPIC_DETAIL', topicId });
-    }
-    else {
+    } else {
       dispatch({ type: 'SELECT_LEARNING_LOG_TOPIC', topicId });
     }
   },
@@ -169,14 +168,13 @@ export const actionCreators = {
           dispatch({
             type: 'RECEIVE_ENTRIE_DETAIL',
             entry: data,
-            message: '',
+            message: ''
           });
         })
         .catch(err => console.log(err.message));
       addTask(fetchTask);
       dispatch({ type: 'REQUEST_ENTRIY_DETAIL', entryId });
-    }
-    else {
+    } else {
       dispatch({ type: 'SELECT_TOPIC_ENTRY', entryId });
     }
   }
@@ -191,12 +189,12 @@ const unloadedState: LearningLogsState = {
   message: '',
   topics: [],
   topicId: -1,
-  entryId: -1,
+  entryId: -1
 };
 
 export const reducer: Reducer<LearningLogsState> = (
   state: LearningLogsState,
-  incomingAction: Action,
+  incomingAction: Action
 ) => {
   const action = incomingAction as KnownAction;
   switch (action.type) {
@@ -209,7 +207,7 @@ export const reducer: Reducer<LearningLogsState> = (
         //loading new owner info, clear old data
         topics: [],
         topicId: -1,
-        entryId: -1,
+        entryId: -1
         //selectedTopic: state.selectedTopic,
         //selectedEntry: state.selectedEntry,
       };
@@ -224,7 +222,7 @@ export const reducer: Reducer<LearningLogsState> = (
 
           ownerId: state.ownerId,
           topicId: -1,
-          entryId: -1,
+          entryId: -1
           //when recived new topics, selected topic and entry still unset
           //selectedtopic: state.selectedtopic,
           //selectedentry: state.selectedentry,
@@ -243,7 +241,7 @@ export const reducer: Reducer<LearningLogsState> = (
         topics: state.topics,
 
         //when update topic state, change entry info anyway
-        entryId: -1,
+        entryId: -1
       };
     case 'REQUEST_TOPIC_DETAIL':
       return {
@@ -254,7 +252,7 @@ export const reducer: Reducer<LearningLogsState> = (
         ownerId: state.ownerId,
         topics: state.topics,
         //loading new topic info, clear old data
-        entryId: -1,
+        entryId: -1
         //selectedTopic: state.selectedTopic,
         //selectedEntry: state.selectedEntry,
       };
@@ -268,8 +266,8 @@ export const reducer: Reducer<LearningLogsState> = (
           ownerId: state.ownerId,
           topics: state.topics,
           topicId: state.topicId,
-          entryId: -1,
-        }
+          entryId: -1
+        };
       }
       break;
     case 'SELECT_TOPIC_ENTRY':
@@ -282,10 +280,39 @@ export const reducer: Reducer<LearningLogsState> = (
         message: state.message,
         topics: state.topics,
         topicId: state.topicId,
-        selectedTopic: state.selectedTopic,
+        selectedTopic: state.selectedTopic
       };
-    case 'REQUEST_ENTRIY_DETAIL':
-    case 'RECEIVE_ENTRIE_DETAIL':
+    case 'REQUEST_ENTRIY_DETAIL': {
+      return {
+        isLoading: true,
+        message: 'loading...',
+        entryId: action.entryId,
+
+        topicId: state.topicId,
+        ownerId: state.ownerId,
+        topics: state.topics,
+        selectedTopic: state.selectedTopic
+        //loading new topic info, clear old data
+        //selectedTopic: state.selectedTopic,
+        //selectedEntry: state.selectedEntry,
+      };
+    }
+    case 'RECEIVE_ENTRIE_DETAIL': {
+      if (action.entry.id === state.entryId) {
+        return {
+          isLoading: false,
+          message: action.message,
+          selectedEntry: action.entry,
+
+          ownerId: state.ownerId,
+          topics: state.topics,
+          topicId: state.topicId,
+          entryId: state.entryId,
+          selectedTopic: state.selectedTopic
+        };
+      }
+      break;
+    }
     case 'POST_ENTRY_DETAIL':
     case 'RECEIVE_POST_ENTRIE_DETAIL':
       return {
@@ -296,7 +323,7 @@ export const reducer: Reducer<LearningLogsState> = (
         topicId: state.topicId,
         entryId: state.entryId,
         selectedEntry: state.selectedEntry,
-        selectedTopic: state.selectedTopic,
+        selectedTopic: state.selectedTopic
       };
     default:
       // The following line guarantees that every action in the KnownAction union has been covered by a case above
