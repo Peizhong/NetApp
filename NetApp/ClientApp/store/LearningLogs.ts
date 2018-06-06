@@ -87,6 +87,13 @@ interface ReciveEntryDetailAction {
   message: string;
 }
 
+interface EditEntryDetailAction {
+  type: 'EDIT_ENTRY_DETAIL';
+  entryId: number;
+  field: string;
+  value: string;
+}
+
 interface PostEntryDetailAction {
   type: 'POST_ENTRY_DETAIL';
   entrydetail: Entry;
@@ -108,6 +115,7 @@ type KnownAction =
   | SelectEntryAction
   | RequestEntryDetailAction
   | ReciveEntryDetailAction
+  | EditEntryDetailAction
   | PostEntryDetailAction
   | RecivePostEntryDetailAction;
 
@@ -177,7 +185,9 @@ export const actionCreators = {
     } else {
       dispatch({ type: 'SELECT_TOPIC_ENTRY', entryId });
     }
-  }
+  },
+  editedEntry: (entryId: number, field: string, value: string) =>
+    <EditEntryDetailAction>{ type: 'EDIT_ENTRY_DETAIL', entryId, field, value }
 };
 
 // ----------------
@@ -313,6 +323,37 @@ export const reducer: Reducer<LearningLogsState> = (
       }
       break;
     }
+    case 'EDIT_ENTRY_DETAIL':
+      if (!state.selectedEntry || state.selectedEntry.id !== action.entryId) break;
+      const editedEntry = <Entry>{
+        id: state.selectedEntry.id,
+        title: state.selectedEntry.title,
+        text: state.selectedEntry.text,
+        link: state.selectedEntry.link,
+        updateTime: state.selectedEntry.updateTime,
+        topicId: state.selectedEntry.topicId
+      };
+      switch (action.field) {
+        case 'text':
+          editedEntry.text = action.value;
+          break;
+        case 'link':
+          editedEntry.link = action.value;
+          break;
+        default:
+          break;
+      }
+      return {
+        isLoading: false,
+        selectedEntry: editedEntry,
+
+        message: state.message,
+        ownerId: state.ownerId,
+        topics: state.topics,
+        topicId: state.topicId,
+        entryId: state.entryId,
+        selectedTopic: state.selectedTopic
+      };
     case 'POST_ENTRY_DETAIL':
     case 'RECEIVE_POST_ENTRIE_DETAIL':
       return {

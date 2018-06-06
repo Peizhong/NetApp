@@ -1,14 +1,12 @@
 import * as WeatherForecasts from './WeatherForecasts';
 import * as Counter from './Counter';
 import * as LearningLogs from './LearningLogs';
-import { reducer as formReducer, FormReducer } from 'redux-form'
 
 // The top-level state object
 export interface ApplicationState {
   counter: Counter.CounterState;
   weatherForecasts: WeatherForecasts.WeatherForecastsState;
   learningLogs: LearningLogs.LearningLogsState;
-  form: FormReducer
 }
 
 // Whenever an action is dispatched, Redux will update each top-level application state property using
@@ -17,8 +15,7 @@ export interface ApplicationState {
 export const reducers = {
   counter: Counter.reducer,
   weatherForecasts: WeatherForecasts.reducer,
-  learningLogs: LearningLogs.reducer,
-  form: formReducer
+  learningLogs: LearningLogs.reducer
 };
 
 // This type can be used as a hint on action creators so that its 'dispatch' and 'getState' params are

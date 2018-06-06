@@ -56,16 +56,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             topic.id === this.props.topicId ? (
               this.expandTopic(topic)
             ) : (
-                <button
-                  className="list-group-item"
-                  key={topic.id}
-                  onClick={() => {
-                    this.props.selectTopic(topic.id);
-                  }}
-                >
-                  <h5>{topic.name}</h5>
-                </button>
-              )
+              <button
+                className="list-group-item"
+                key={topic.id}
+                onClick={() => {
+                  this.props.selectTopic(topic.id);
+                }}
+              >
+                <h5>{topic.name}</h5>
+              </button>
+            )
         )}
       </div>
     );
@@ -85,24 +85,20 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
                 entry.id === this.props.entryId ? (
                   this.showEntry(entry)
                 ) : (
-                    <button
-                      className="list-group-item"
-                      key={entry.id}
-                      onClick={() => {
-                        this.props.selectEntry(entry.id);
-                      }}
-                    >
-                      {entry.title}
-                    </button>
-                  )
+                  <button
+                    className="list-group-item"
+                    key={entry.id}
+                    onClick={() => {
+                      this.props.selectEntry(entry.id);
+                    }}
+                  >
+                    {entry.title}
+                  </button>
+                )
             )}
         </div>
       </div>
     );
-  }
-
-  private getSubmit(value: any) {
-    console.log(value)
   }
 
   private showEntry(entry: LearningLogsState.EntryHeader) {
@@ -115,7 +111,7 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
         {selectedEntry &&
           selectedEntry.id == entry.id && (
             <div>
-              <EntryForm selectedEntry={selectedEntry} />
+              <EntryForm {...selectedEntry} editedEntry={this.props.editedEntry} />
             </div>
           )}
       </div>
