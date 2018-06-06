@@ -23,7 +23,7 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Search" />
             </div>
-            <button type="submit" className="btn btn-default">
+            <button className="btn btn-default">
               Submit
             </button>
           </form>
@@ -97,7 +97,7 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
   }
 
   private showEntry(entry: LearningLogsState.EntryHeader) {
-    const selectedEntry = this.props.selectedEntry;
+    const { selectedEntry, editedEntry, saveEntry } = this.props;
     return (
       <div className="panel panel-info">
         <div className="panel-heading" onClick={() => this.props.selectEntry(entry.id)}>
@@ -106,7 +106,7 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
         {selectedEntry &&
           selectedEntry.id == entry.id && (
             <div>
-              <EntryForm {...selectedEntry} editedEntry={this.props.editedEntry} />
+              <EntryForm {...selectedEntry} editedEntry={editedEntry} saveEntry={saveEntry} />
             </div>
           )}
       </div>

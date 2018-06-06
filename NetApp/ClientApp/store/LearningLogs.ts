@@ -110,7 +110,7 @@ interface EditEntryDetailAction {
 
 interface PostEntryDetailAction {
   type: 'POST_ENTRY_DETAIL';
-  entrydetail: Entry;
+  entryId: number;
 }
 
 interface RecivePostEntryDetailAction {
@@ -201,7 +201,24 @@ export const actionCreators = {
     }
   },
   editedEntry: (entryId: number, field: string, value: string) =>
-    <EditEntryDetailAction>{ type: 'EDIT_ENTRY_DETAIL', entryId, field, value }
+    <EditEntryDetailAction>{ type: 'EDIT_ENTRY_DETAIL', entryId, field, value },
+  saveEntry: (entryId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    const currentEntry = getState().learningLogs.selectedEntry;
+    if (currentEntry && entryId == currentEntry.id) {
+      let postTask = fetch('api/SampleData/Entry/', {
+        method: 'POST',
+        //credentials: "include",
+        body: JSON.stringify(currentEntry)
+      })
+        .then(response => {
+          console.log(response);
+          dispatch({ type: 'RECEIVE_POST_ENTRIE_DETAIL', message: '保存成功' });
+        })
+        .catch(err => console.log(err.message));;
+      addTask(postTask);
+      dispatch({ type: 'POST_ENTRY_DETAIL', entryId });
+    }
+  }
 };
 
 // ----------------

@@ -30,5 +30,9 @@ namespace NetApp.Business.Interfaces.DTO
         public string Text { get; set; }
 
         public string Link { get; set; }
+
+        public string UpdateTime { get; set; }
+
+        public int TopicId { get; set; }
     }
 }
