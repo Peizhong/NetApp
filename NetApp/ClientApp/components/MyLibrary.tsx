@@ -3,6 +3,7 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ApplicationState } from '../store';
 import * as LearningLogsState from '../store/LearningLogs';
+import EntryForm from './EntryForm';
 
 type MyLibarayProps = LearningLogsState.LearningLogsState &
   typeof LearningLogsState.actionCreators &
@@ -55,15 +56,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             topic.id === this.props.topicId ? (
               this.expandTopic(topic)
             ) : (
-              <button
-                className="list-group-item"
-                onClick={() => {
-                  this.props.selectTopic(topic.id);
-                }}
-              >
-                <h5>{topic.name}</h5>
-              </button>
-            )
+                <button
+                  className="list-group-item"
+                  key={topic.id}
+                  onClick={() => {
+                    this.props.selectTopic(topic.id);
+                  }}
+                >
+                  <h5>{topic.name}</h5>
+                </button>
+              )
         )}
       </div>
     );
@@ -83,19 +85,24 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
                 entry.id === this.props.entryId ? (
                   this.showEntry(entry)
                 ) : (
-                  <button
-                    className="list-group-item"
-                    onClick={() => {
-                      this.props.selectEntry(entry.id);
-                    }}
-                  >
-                    {entry.title}
-                  </button>
-                )
+                    <button
+                      className="list-group-item"
+                      key={entry.id}
+                      onClick={() => {
+                        this.props.selectEntry(entry.id);
+                      }}
+                    >
+                      {entry.title}
+                    </button>
+                  )
             )}
         </div>
       </div>
     );
+  }
+
+  private getSubmit(value: any) {
+    console.log(value)
   }
 
   private showEntry(entry: LearningLogsState.EntryHeader) {
@@ -107,12 +114,8 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
         </div>
         {selectedEntry &&
           selectedEntry.id == entry.id && (
-            <div className="well">
-              <p>
-                {selectedEntry.title}
-                <br />
-                {selectedEntry.link}
-              </p>
+            <div>
+              <EntryForm selectedEntry={selectedEntry} />
             </div>
           )}
       </div>
