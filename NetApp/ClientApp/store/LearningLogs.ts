@@ -5,6 +5,11 @@ import { stat } from 'fs';
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
+export interface UserInfo {
+  id: string;
+  userName: string;
+}
+
 export interface EntryHeader {
   id: number;
   title: string;
@@ -42,6 +47,15 @@ export interface LearningLogsState {
 // -----------------
 // ACTIONS - These are serializable (hence replayable) descriptions of state transitions.
 // They do not themselves have any side-effects; they just describe something that is going to happen.
+
+interface RequestUserInfoAtion {
+  type: 'REQUEST_USER_INFO',
+}
+
+interface ReciveUserInfoAction {
+  type: 'RECEIVE_USER_INFO',
+  user: UserInfo;
+}
 
 interface RequestTopicsAction {
   type: 'REQUEST_LEARNING_LOG_TOPICS';

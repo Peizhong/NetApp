@@ -11,13 +11,8 @@ type MyLibarayProps = LearningLogsState.LearningLogsState &
 
 class MyLibaray extends React.Component<MyLibarayProps, {}> {
   componentWillMount() {
-    let ownerid = this.props.match.params.ownerid || 1;
-    this.props.requestTopics(ownerid);
-  }
-
-  componentWillReceiveProps(nextProps: MyLibarayProps) {
-    let ownerid = this.props.match.params.ownerid || 1;
-    this.props.requestTopics(ownerid);
+    let ownerid = this.props.ownerId || 1;
+    this.props.requestTopics(1);
   }
 
   public render() {
@@ -56,16 +51,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             topic.id === this.props.topicId ? (
               this.expandTopic(topic)
             ) : (
-              <button
-                className="list-group-item"
-                key={topic.id}
-                onClick={() => {
-                  this.props.selectTopic(topic.id);
-                }}
-              >
-                <h5>{topic.name}</h5>
-              </button>
-            )
+                <button
+                  className="list-group-item"
+                  key={topic.id}
+                  onClick={() => {
+                    this.props.selectTopic(topic.id);
+                  }}
+                >
+                  <h5>{topic.name}</h5>
+                </button>
+              )
         )}
       </div>
     );
@@ -85,16 +80,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
                 entry.id === this.props.entryId ? (
                   this.showEntry(entry)
                 ) : (
-                  <button
-                    className="list-group-item"
-                    key={entry.id}
-                    onClick={() => {
-                      this.props.selectEntry(entry.id);
-                    }}
-                  >
-                    {entry.title}
-                  </button>
-                )
+                    <button
+                      className="list-group-item"
+                      key={entry.id}
+                      onClick={() => {
+                        this.props.selectEntry(entry.id);
+                      }}
+                    >
+                      {entry.title}
+                    </button>
+                  )
             )}
         </div>
       </div>

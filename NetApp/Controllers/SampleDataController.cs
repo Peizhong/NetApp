@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NetApp.Entities.LearningLog;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+
 using NetApp.Business.Interfaces;
 using NetApp.Business.Interfaces.DTO;
 
@@ -13,11 +15,15 @@ namespace NetApp.Controllers
     public class SampleDataController : Controller
     {
         ILogsApp logsapp;
+        UserManager<IdentityUser> userManager;
 
-        public SampleDataController(ILogsApp lgapp)
+        public SampleDataController(ILogsApp lgapp, UserManager<IdentityUser> user)
         {
             logsapp = lgapp;
+            userManager = user;
         }
+
+        private Task<IdentityUser> GetCurrentUserAsync() => userManager.GetUserAsync(HttpContext.User);
 
         private static string[] Summaries = new[]
         {
@@ -25,8 +31,12 @@ namespace NetApp.Controllers
         };
 
         [HttpGet("[action]")]
-        public IEnumerable<WeatherForecast> WeatherForecasts(int startDateIndex)
+        [Authorize]
+        public async Task<IEnumerable<WeatherForecast>> WeatherForecasts(int startDateIndex)
         {
+            var user = await GetCurrentUserAsync();
+            var userId = user?.Id;
+
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
@@ -54,6 +64,14 @@ namespace NetApp.Controllers
             }
         }
 
+        [HttpGet("action")]
+        [Authorize]
+        public async Task<string> WhoAmI()
+        {
+            var user = await GetCurrentUserAsync();
+            var userId = user?.Id;
+            return userId ?? "";
+        }
 
         [HttpGet("[action]")]
         public IEnumerable<TopicHeaderDTO> UserTopics(int userId)
