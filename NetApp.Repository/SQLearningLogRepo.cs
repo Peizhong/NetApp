@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NetApp.Entities.LearningLog;
 using NetApp.Repository.Interfaces;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using Dapper;
 
 namespace NetApp.Repository
 {
     public class SQLearningLogRepo : ILearningLogRepo
     {
-        static string connStr = @"Data Source=mydev.db;Version=3;Cache Size=3000;Pooling=False;Max Pool Size=100;";
+        static string connStr = @"Data Source=mydev.db;";
 
         public int DeleteEntry(int entryId)
         {
@@ -24,7 +24,7 @@ namespace NetApp.Repository
 
         public IEnumerable<Entry> GetEntries(int topicId)
         {
-            using (var conn = new SQLiteConnection(connStr))
+            using (var conn = new SqliteConnection(connStr))
             {
                 conn.Open();
                 var res = conn.Query<Entry>("SELECT id,title,text,link,date_add as updatetime,topic_id as topicid FROM learning_logs_entry where topic_id=@topicid;", new { topicid = topicId });
@@ -35,7 +35,7 @@ namespace NetApp.Repository
 
         public Entry GetEntry(int entryId)
         {
-            using (var conn = new SQLiteConnection(connStr))
+            using (var conn = new SqliteConnection(connStr))
             {
                 conn.Open();
                 var res = conn.QueryFirstOrDefault<Entry>("SELECT id,title,text,link,date_add as updatetime,topic_id as topicid FROM learning_logs_entry where id=@entryid;", new { entryid = entryId });
@@ -45,7 +45,7 @@ namespace NetApp.Repository
 
         public IEnumerable<Topic> GetTopics(int userId)
         {
-            using (var conn = new SQLiteConnection(connStr))
+            using (var conn = new SqliteConnection(connStr))
             {
                 conn.Open();
                 var res = conn.Query<Topic>("SELECT id,topic as name,date_add as updatetime,owner_id as ownerid FROM learning_logs_topic where owner_id=@userid;", new { userid = userId });
@@ -56,7 +56,7 @@ namespace NetApp.Repository
 
         public Topic GetTopicWithEntries(int topicId)
         {
-            using (var conn = new SQLiteConnection(connStr))
+            using (var conn = new SqliteConnection(connStr))
             {
                 conn.Open();
                 Topic topic = null;

@@ -28,12 +28,25 @@ def setData(length):
     c.execute('delete from learning_logs_topic;')
     c.execute('delete from learning_logs_entry;')
     for t in gp.items():
-        sql = "replace into learning_logs_topic (id,topic,date_add,owner_id) values(%r, %r, datetime('now'), 1)"%(index0,"TOPIC"+str(t[0]))
+        if random.randint(0,t[0]+5) % 2 ==1:
+            topic = "主题 "+str(t[0])
+        else:
+            topic = "Topic "+str(t[0])
+        sql = "replace into learning_logs_topic (id,topic,date_add,owner_id) values(%r, %r, datetime('now'), 1)"%(index0,topic)
         print(sql)
         c.execute(sql)
         index0+=1
         for e in range(t[1]):
-            sql= "replace into learning_logs_entry (id,title,text,link,date_add,topic_id) values(%r, %r, %r, %r, datetime('now'), %r);"%(index1,"ENTRY"+str(e),"TEXT"+str(e),"LINK"+str(e),t[0])
+            if random.randint(0,e) % 3 ==1:
+                entry = "标题 "+str(e)
+            else:
+                entry = "Entry "+str(e)
+            
+            if random.randint(0,e+5) % 2 ==1:
+                text = "内容 "+str(e)
+            else:
+                text = "TEXT "+str(e)
+            sql= "replace into learning_logs_entry (id,title,text,link,date_add,topic_id) values(%r, %r, %r, %r, datetime('now'), %r);"%(index1,entry,text,"LINK"+str(e),t[0])
             index1+=1
             c.execute(sql)
             print(sql)
