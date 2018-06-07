@@ -1,5 +1,5 @@
-import * as React from "react";
-import { NavLink, Link } from "react-router-dom";
+import * as React from 'react';
+import { NavLink, Link } from 'react-router-dom';
 
 export class NavMenu extends React.Component<{}, {}> {
   public render() {
@@ -18,7 +18,7 @@ export class NavMenu extends React.Component<{}, {}> {
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <Link className="navbar-brand" to={"/"}>
+            <Link className="navbar-brand" to={'/'}>
               NetApp
             </Link>
           </div>
@@ -26,25 +26,58 @@ export class NavMenu extends React.Component<{}, {}> {
           <div className="navbar-collapse collapse">
             <ul className="nav navbar-nav">
               <li>
-                <NavLink exact to={"/"} activeClassName="active">
+                <NavLink exact to={'/'} activeClassName="active">
                   <span className="glyphicon glyphicon-home" /> Home
                 </NavLink>
               </li>
               <li>
-                <NavLink to={"/counter"} activeClassName="active">
+                <NavLink to={'/counter'} activeClassName="active">
                   <span className="glyphicon glyphicon-education" /> Counter
                 </NavLink>
               </li>
               <li>
-                <NavLink to={"/fetchdata"} activeClassName="active">
+                <NavLink to={'/fetchdata'} activeClassName="active">
                   <span className="glyphicon glyphicon-th-list" /> Fetch data
                 </NavLink>
               </li>
               <li>
-                <NavLink to={"/mylibrary"} activeClassName="active">
-                  <span className="glyphicon glyphicon-folder-open" /> My
-                  Library
+                <NavLink to={'/mylibrary'} activeClassName="active">
+                  <span className="glyphicon glyphicon-folder-open" /> My Library
                 </NavLink>
+              </li>
+              <li className="dropdown">
+                <a
+                  href="#"
+                  className="dropdown-toggle"
+                  data-toggle="dropdown"
+                  role="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span className="glyphicon glyphicon-user" /> 王培仲 <span className="caret" />
+                </a>
+                <ul className="dropdown-menu">
+                  <li>
+                    <a href="">Info</a>
+                  </li>
+                  <li>
+                    <a href="Identity/Account/manage">Settings</a>
+                  </li>
+                  <li role="separator" className="divider" />
+                  <li>
+                    <button
+                      type="submit"
+                      onClick={() => {
+                        const signout = fetch('Account/LogOut', {
+                          method: 'POST',
+                          credentials: 'include'
+                        });
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  </li>
+                </ul>
               </li>
             </ul>
           </div>

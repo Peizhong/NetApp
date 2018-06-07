@@ -11,8 +11,7 @@ type MyLibarayProps = LearningLogsState.LearningLogsState &
 
 class MyLibaray extends React.Component<MyLibarayProps, {}> {
   componentWillMount() {
-    let ownerid = this.props.ownerId || 1;
-    this.props.requestTopics(1);
+    this.props.requestTopics();
   }
 
   public render() {
@@ -23,20 +22,19 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             <div className="form-group">
               <input type="text" className="form-control" placeholder="Search" />
             </div>
-            <button className="btn btn-default">
+            <button type="button" className="btn btn-default">
               Submit
             </button>
           </form>
         </nav>
-        {false &&
-          this.props.isLoading && (
-            <div className="progress">
-              <div
-                className="progress-bar progress-bar-info progress-bar-striped active"
-                style={{ width: '100%' }}
-              />
-            </div>
-          )}
+        {this.props.isLoading && (
+          <div className="progress">
+            <div
+              className="progress-bar progress-bar-info progress-bar-striped active"
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
         {this.renderTopics()}
         <button className="btn btn-primary pull-left">Look Good</button>
       </div>
@@ -51,16 +49,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
             topic.id === this.props.topicId ? (
               this.expandTopic(topic)
             ) : (
-                <button
-                  className="list-group-item"
-                  key={topic.id}
-                  onClick={() => {
-                    this.props.selectTopic(topic.id);
-                  }}
-                >
-                  <h5>{topic.name}</h5>
-                </button>
-              )
+              <button
+                className="list-group-item"
+                key={topic.id}
+                onClick={() => {
+                  this.props.selectTopic(topic.id);
+                }}
+              >
+                <h5>{topic.name}</h5>
+              </button>
+            )
         )}
       </div>
     );
@@ -80,16 +78,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
                 entry.id === this.props.entryId ? (
                   this.showEntry(entry)
                 ) : (
-                    <button
-                      className="list-group-item"
-                      key={entry.id}
-                      onClick={() => {
-                        this.props.selectEntry(entry.id);
-                      }}
-                    >
-                      {entry.title}
-                    </button>
-                  )
+                  <button
+                    className="list-group-item"
+                    key={entry.id}
+                    onClick={() => {
+                      this.props.selectEntry(entry.id);
+                    }}
+                  >
+                    {entry.title}
+                  </button>
+                )
             )}
         </div>
       </div>

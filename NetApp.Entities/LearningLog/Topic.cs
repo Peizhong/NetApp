@@ -12,7 +12,7 @@ namespace NetApp.Entities.LearningLog
 
         public DateTime UpdateTime { get; set; }
 
-        public int OwnerId { get; set; }
+        public string OwnerId { get; set; }
 
         public List<Entry> Entries { get; set; }
     }

@@ -1,7 +1,6 @@
 import { fetch, addTask } from 'domain-task';
 import { Action, Reducer, ActionCreator } from 'redux';
 import { AppThunkAction } from './';
-import { stat } from 'fs';
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
@@ -25,11 +24,11 @@ export interface Entry extends EntryHeader {
 export interface TopicHeader {
   id: number;
   name: string;
+  ownerId: number;
 }
 
 export interface Topic extends TopicHeader {
   updateTime: Date;
-  ownerId: number;
   entryHeaders: EntryHeader[];
 }
 
@@ -49,17 +48,16 @@ export interface LearningLogsState {
 // They do not themselves have any side-effects; they just describe something that is going to happen.
 
 interface RequestUserInfoAtion {
-  type: 'REQUEST_USER_INFO',
+  type: 'REQUEST_USER_INFO';
 }
 
 interface ReciveUserInfoAction {
-  type: 'RECEIVE_USER_INFO',
+  type: 'RECEIVE_USER_INFO';
   user: UserInfo;
 }
 
 interface RequestTopicsAction {
   type: 'REQUEST_LEARNING_LOG_TOPICS';
-  ownerId: number;
 }
 
 interface ReceiveTopicsAction {
@@ -139,34 +137,38 @@ type KnownAction =
 
 export const actionCreators = {
   //when mount compoment, or user changed
-  requestTopics: (ownerId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
-    if (ownerId !== getState().learningLogs.ownerId) {
-      let fetchTask = fetch(`api/SampleData/UserTopics?userId=${ownerId}`)
-        .then(response => response.json() as Promise<TopicHeader[]>)
-        .then(data => {
-          dispatch({
-            type: 'RECEIVE_LEARNING_LOG_TOPICS',
-            topics: data,
-            ownerId,
-            message: ''
-          });
-        })
-        .catch(err => {
-          dispatch({
-            type: 'RECEIVE_LEARNING_LOG_TOPICS',
-            topics: [],
-            ownerId,
-            message: err.message
-          });
+  requestTopics: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    let fetchTask = fetch('api/LearningLog/Topics', {
+      method: 'GET',
+      credentials: 'include'
+    })
+      .then(response => response.json() as Promise<TopicHeader[]>)
+      .then(data => {
+        dispatch({
+          type: 'RECEIVE_LEARNING_LOG_TOPICS',
+          topics: data,
+          ownerId: data.length > 0 ? data[0].ownerId : -1,
+          message: ''
         });
-      addTask(fetchTask);
-      dispatch({ type: 'REQUEST_LEARNING_LOG_TOPICS', ownerId });
-    }
+      })
+      .catch(err => {
+        dispatch({
+          type: 'RECEIVE_LEARNING_LOG_TOPICS',
+          topics: [],
+          ownerId: -1,
+          message: err.message
+        });
+      });
+    addTask(fetchTask);
+    dispatch({ type: 'REQUEST_LEARNING_LOG_TOPICS' });
   },
   //when click on topic header, load topic's entries or collaps topic
   selectTopic: (topicId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
     if (topicId !== getState().learningLogs.topicId) {
-      let fetchTask = fetch(`api/SampleData/TopicDetail?topicId=${topicId}`)
+      let fetchTask = fetch(`api/LearningLog/Topic/${topicId}`, {
+        method: 'GET',
+        credentials: 'include'
+      })
         .then(response => response.json() as Promise<Topic>)
         .then(data => {
           dispatch({
@@ -184,7 +186,10 @@ export const actionCreators = {
   },
   selectEntry: (entryId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
     if (entryId !== getState().learningLogs.entryId) {
-      let fetchTask = fetch(`api/SampleData/EntryDetail?entryId=${entryId}`)
+      let fetchTask = fetch(`api/LearningLog/Entry/${entryId}`, {
+        method: 'GET',
+        credentials: 'include'
+      })
         .then(response => response.json() as Promise<Entry>)
         .then(data => {
           dispatch({
@@ -205,16 +210,22 @@ export const actionCreators = {
   saveEntry: (entryId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
     const currentEntry = getState().learningLogs.selectedEntry;
     if (currentEntry && entryId == currentEntry.id) {
-      let postTask = fetch('api/SampleData/Entry/', {
+      let postTask = fetch('api/LearningLog/Entry', {
         method: 'POST',
-        //credentials: "include",
+        credentials: 'include',
+        headers: new Headers({
+          'Content-Type': 'application/json'
+        }),
         body: JSON.stringify(currentEntry)
       })
-        .then(response => {
-          console.log(response);
-          dispatch({ type: 'RECEIVE_POST_ENTRIE_DETAIL', message: '保存成功' });
-        })
-        .catch(err => console.log(err.message));;
+        .then(response => response.json() as Promise<EntryHeader>)
+        .then(data =>
+          dispatch({
+            type: 'RECEIVE_POST_ENTRIE_DETAIL',
+            message: data.id > 0 ? '保存成功' : '保存失败'
+          })
+        )
+        .catch(err => console.log(err.message));
       addTask(postTask);
       dispatch({ type: 'POST_ENTRY_DETAIL', entryId });
     }
@@ -243,9 +254,9 @@ export const reducer: Reducer<LearningLogsState> = (
       return {
         isLoading: true,
         message: 'loading...',
-        ownerId: action.ownerId,
 
         //loading new owner info, clear old data
+        ownerId: -1,
         topics: [],
         topicId: -1,
         entryId: -1
@@ -255,21 +266,18 @@ export const reducer: Reducer<LearningLogsState> = (
     case 'RECEIVE_LEARNING_LOG_TOPICS':
       // Only accept the incoming data if it matches the most recent request. This ensures we correctly
       // handle out-of-order responses.
-      if (action.ownerId === state.ownerId) {
-        return {
-          isLoading: false,
-          message: action.message,
-          topics: action.topics,
+      return {
+        isLoading: false,
+        message: action.message,
+        topics: action.topics,
+        ownerId: action.ownerId,
 
-          ownerId: state.ownerId,
-          topicId: -1,
-          entryId: -1
-          //when recived new topics, selected topic and entry still unset
-          //selectedtopic: state.selectedtopic,
-          //selectedentry: state.selectedentry,
-        };
-      }
-      break;
+        topicId: -1,
+        entryId: -1
+        //when recived new topics, selected topic and entry still unset
+        //selectedtopic: state.selectedtopic,
+        //selectedentry: state.selectedentry,
+      };
     case 'SELECT_LEARNING_LOG_TOPIC':
       //wait for recive_topic_detail to update, or just hide
       return {

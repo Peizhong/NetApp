@@ -21,9 +21,12 @@ namespace NetApp.Business
             Mapper.Initialize(x =>
             {
                 x.CreateMap<Topic, TopicHeaderDTO>();
-                x.CreateMap<Topic, TopicDTO>().ForMember(d => d.EntryHeaders, o => o.MapFrom(s => s.Entries));
+                x.CreateMap<Topic, TopicDTO>()
+                    .ForMember(d => d.EntryHeaders, o => o.MapFrom(s => s.Entries));
                 x.CreateMap<Entry, EntryHeaderDTO>();
                 x.CreateMap<Entry, EntryDTO>();
+                x.CreateMap<EntryDTO, Entry>()
+                    .ForMember(d => d.UpdateTime, o => o.Ignore());
             });
         }
 
@@ -43,12 +46,18 @@ namespace NetApp.Business
             return topicDTO;
         }
 
-        public IEnumerable<TopicHeaderDTO> GetUserTopics(int userId)
+        public IEnumerable<TopicHeaderDTO> GetUserTopics(string userId)
         {
-            if (userId < 1)
-                return new TopicHeaderDTO[] { };
             var topics = learningLogRepo.GetTopics(userId);
             var res = Mapper.Map<IEnumerable<TopicHeaderDTO>>(topics);
+            return res;
+        }
+
+        public int SaveEntry(EntryDTO dto)
+        {
+            Entry entry = Mapper.Map<Entry>(dto);
+            entry.UpdateTime = DateTime.Now;
+            int res = learningLogRepo.SaveEntry(entry);
             return res;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NetApp.Entities.LearningLog;
 using NetApp.Repository.Interfaces;
 using Microsoft.Data.Sqlite;
@@ -26,8 +27,7 @@ namespace NetApp.Repository
         {
             using (var conn = new SqliteConnection(connStr))
             {
-                conn.Open();
-                var res = conn.Query<Entry>("SELECT id,title,text,link,date_add as updatetime,topic_id as topicid FROM learning_logs_entry where topic_id=@topicid;", new { topicid = topicId });
+                var res = conn.Query<Entry>("SELECT id,title,text,link,updatetime,topicid FROM Entries where topicid=@topicid;", new { topicid = topicId });
                 int count = res.Count();
                 return res;
             }
@@ -37,18 +37,16 @@ namespace NetApp.Repository
         {
             using (var conn = new SqliteConnection(connStr))
             {
-                conn.Open();
-                var res = conn.QueryFirstOrDefault<Entry>("SELECT id,title,text,link,date_add as updatetime,topic_id as topicid FROM learning_logs_entry where id=@entryid;", new { entryid = entryId });
+                var res = conn.QueryFirstOrDefault<Entry>("SELECT id,title,text,link,updatetime,topicid FROM Entries where id=@entryid;", new { entryid = entryId });
                 return res;
             }
         }
 
-        public IEnumerable<Topic> GetTopics(int userId)
+        public IEnumerable<Topic> GetTopics(string userId)
         {
             using (var conn = new SqliteConnection(connStr))
             {
-                conn.Open();
-                var res = conn.Query<Topic>("SELECT id,topic as name,date_add as updatetime,owner_id as ownerid FROM learning_logs_topic where owner_id=@userid;", new { userid = userId });
+                var res = conn.Query<Topic>("SELECT id,name,updatetime, ownerid FROM Topics where OwnerId=@userid;", new { userid = userId });
                 int count = res.Count();
                 return res;
             }
@@ -58,9 +56,8 @@ namespace NetApp.Repository
         {
             using (var conn = new SqliteConnection(connStr))
             {
-                conn.Open();
                 Topic topic = null;
-                var sql = @"select t.id,t.topic as name,t.date_add as updatetime,t.owner_id,e.id,e.title,e.text,e.link,e.date_add as updatetime,e.topic_id as topicid from learning_logs_topic t left join learning_logs_entry e on t.id = e.topic_id where t.id=@topicid";
+                var sql = @"select t.id,t.name,t.updatetime,t.ownerid,e.id,e.title,e.text,e.link,e.updatetime,e.topicid from Topics t left join Entries e on t.id = e.topicid where t.id=@topicid";
                 var list = conn.Query<Topic, Entry, Topic>(sql, (t, e) =>
                 {
                     if (topic == null)
@@ -70,14 +67,19 @@ namespace NetApp.Repository
                     }
                     topic.Entries.Add(e);
                     return topic;
-                }, new { topicid = topicId }, splitOn: "owner_id");
+                }, new { topicid = topicId }, splitOn: "ownerid");
                 return topic;
             }
         }
 
         public int SaveEntry(Entry entry)
         {
-            throw new NotImplementedException();
+            using (var conn = new SqliteConnection(connStr))
+            {
+                var sql = @"replace into Entries (id,title,text,link,updatetime,topicid) values(@Id,@Title,@Text,@Link,@UpdateTime,@TopicId)";
+                int result = conn.Execute(sql, entry);
+                return result;
+            }
         }
 
         public int SaveTopic(Topic topic)

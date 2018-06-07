@@ -7,7 +7,7 @@ namespace NetApp.Repository.Interfaces
 {
     public interface ILearningLogRepo
     {
-        IEnumerable<Topic> GetTopics(int userId);
+        IEnumerable<Topic> GetTopics(string userId);
 
         Topic GetTopicWithEntries(int topicId);
 

@@ -65,7 +65,7 @@ namespace NetApp.Repository
             }
         }
 
-        public IEnumerable<Topic> GetTopics(int userId)
+        public IEnumerable<Topic> GetTopics(string userId)
         {
             using (var conn = new MySqlConnection(connStr))
             {

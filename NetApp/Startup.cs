@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
+using NetApp.Entities;
 using NetApp.Repository;
 using NetApp.Repository.Interfaces;
 using NetApp.Business;
@@ -41,7 +42,7 @@ namespace NetApp
             services.AddSingleton<ILearningLogRepo, SQLearningLogRepo>();
             services.AddSingleton<ILogsApp, ALogsApp>();
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options => options.Stores.MaxLengthForKeys = 128)
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => options.Stores.MaxLengthForKeys = 128)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
