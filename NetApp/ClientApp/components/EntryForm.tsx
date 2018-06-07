@@ -12,9 +12,20 @@ type EntryFormProps = LearningLogsState.Entry & typeof actions;
 
 class EntryForm extends React.Component<EntryFormProps, {}> {
   public render() {
-    const { id, link, text, editedEntry, saveEntry } = this.props;
+    const { id, title, link, text, editedEntry, saveEntry } = this.props;
     return (
       <form className="form-horizontal">
+        <div className="form-group">
+          <label className="col-sm-2 control-label">Title</label>
+          <div className="col-sm-10">
+            <input
+              className="form-control"
+              type="text"
+              value={title}
+              onChange={v => editedEntry(id, 'title', v.target.value)}
+            />
+          </div>
+        </div>
         <div className="form-group">
           <label className="col-sm-2 control-label">Link</label>
           <div className="col-sm-10">

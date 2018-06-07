@@ -373,6 +373,9 @@ export const reducer: Reducer<LearningLogsState> = (
         topicId: state.selectedEntry.topicId
       };
       switch (action.field) {
+        case 'title':
+          editedEntry.title = action.value;
+          break;
         case 'text':
           editedEntry.text = action.value;
           break;

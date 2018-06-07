@@ -1,6 +1,17 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Sqlite;
+using Moq;
+
+using NetApp.Entities.LearningLog;
+using NetApp.Business;
+using NetApp.Repository;
+using NetApp.Repository.Interfaces;
+
+using NetApp.Tests.Repository;
 
 namespace NetApp.Tests
 {
@@ -13,24 +24,41 @@ namespace NetApp.Tests
             string res = string.Empty;
             Task.Run(async () =>
             {
-                var controller = new Controllers.SampleDataController(null);
+                var controller = new Controllers.SampleDataController();
                 res = await controller.WhatCanYouSee(@"http://193.112.41.28/downloads/Snipaste_2018-05-04_00-13-13.jpg");
             }).Wait();
             Assert.IsTrue(!string.IsNullOrEmpty(res), "call microsoft machine learning api");
         }
 
         [TestMethod]
-        public void TestGetData()
+        public void TestBusinessALogsApp()
         {
-            var repo = new Repository.MQLearningLogRepo();
-            var app = new Business.ALogsApp(repo);
-            var controller = new Controllers.SampleDataController(app);
-            var res = controller.UserTopics(1);
-            Assert.IsTrue(res.Count() > 0, "query mysql for learning_log");
-            var topicDto = controller.TopicDetail(1);
-            Assert.IsTrue(topicDto != null && topicDto.EntryHeaders.Any(), "get topic with entries, using dto");
-            var entryDto = controller.EntryDetail(1);
-            Assert.IsTrue(!string.IsNullOrEmpty(entryDto.Title), "get entry detail");
+            var mock = new Mock<ILearningLogRepo>();
+
+            string userId = "test";
+            mock.Setup(r => r.GetTopics(It.Is<string>(s => s == userId))).Returns(new[] { new Topic { OwnerId = userId } });
+            mock.Setup(r => r.GetTopics(It.Is<string>(s => s != userId))).Returns(new Topic[] { });
+
+            var bll = new ALogsApp(mock.Object);
+            var userTopic = bll.GetUserTopics(userId);
+            var noUserTopic = bll.GetUserTopics("mock");
+
+            Assert.IsTrue(userTopic.Any());
+            Assert.IsFalse(noUserTopic.Any());
+        }
+
+        [TestMethod]
+        public void TestRepositorySQLite()
+        {
+            var option = new DbContextOptionsBuilder<TestDbContext>();
+            option.UseSqlite("Data Source=mydev.db");
+            var context = new TestDbContext(option.Options);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            var repo = new SQLearningLogRepo(connectionString: "Data Source=mydev.db");
+            var topic = repo.SaveTopic(new Topic { Id = 1, OwnerId = "test" });
+            var entry = repo.SaveEntry(new Entry { Id = 1, Title = "1", Text = "1", Link = "1", TopicId = 1, UpdateTime = DateTime.Now });
+            Assert.IsTrue(entry > 0);
         }
     }
 }

@@ -11,7 +11,12 @@ namespace NetApp.Repository
 {
     public class SQLearningLogRepo : ILearningLogRepo
     {
-        static string connStr = @"Data Source=mydev.db;";
+        static string connStr;
+
+        public SQLearningLogRepo(string connectionString = "Data Source=mydev.db;")
+        {
+            connStr = connectionString;
+        }
 
         public int DeleteEntry(int entryId)
         {
@@ -84,7 +89,12 @@ namespace NetApp.Repository
 
         public int SaveTopic(Topic topic)
         {
-            throw new NotImplementedException();
+            using (var conn = new SqliteConnection(connStr))
+            {
+                var sql = @"replace into Topics (id,name,updatetime,ownerid) values(@Id,@Name,@UpdateTime,@OwnerId)";
+                int result = conn.Execute(sql, topic);
+                return result;
+            }
         }
     }
 }

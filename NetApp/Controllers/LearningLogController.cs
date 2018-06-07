@@ -36,6 +36,10 @@ namespace NetApp.Controllers
                 if (user == null)
                     return new TopicHeaderDTO[] { };
                 IEnumerable<TopicHeaderDTO> res = logsApp.GetUserTopics(user.Id);
+                if (!res.Any())
+                {
+                    return new[] { new TopicHeaderDTO { Id = 0, Name = "新建主题" } };
+                }
                 return res;
             }
             catch (Exception ex)
@@ -54,7 +58,7 @@ namespace NetApp.Controllers
                     return new TopicDTO();
                 TopicDTO res = logsApp.GetUserTopicDetail(topicId);
                 if (res == null)
-                    return new TopicDTO();
+                    return new TopicDTO { Id = 0, Name = "新建主题", EntryHeaders = new[] { new EntryHeaderDTO { Id = 0, Title = "新建文章" } } };
                 return res;
             }
             catch (Exception ex)
@@ -73,7 +77,7 @@ namespace NetApp.Controllers
                     return new EntryDTO();
                 EntryDTO res = logsApp.GetEntryDetail(entryId);
                 if (res == null)
-                    return new EntryDTO();
+                    return new EntryDTO { Id = 0, Title = "新建文章" };
                 return res;
             }
             catch (Exception ex)
