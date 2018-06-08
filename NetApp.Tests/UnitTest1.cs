@@ -1,13 +1,17 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
 using Moq;
 
+using NetApp.Entities;
 using NetApp.Entities.LearningLog;
+using NetApp.Controllers;
 using NetApp.Business;
+using NetApp.Business.Interfaces;
+using NetApp.Business.Interfaces.DTO;
 using NetApp.Repository;
 using NetApp.Repository.Interfaces;
 
@@ -48,17 +52,45 @@ namespace NetApp.Tests
         }
 
         [TestMethod]
-        public void TestRepositorySQLite()
+        public void TestBussinessWithRepository()
         {
             var option = new DbContextOptionsBuilder<TestDbContext>();
             option.UseSqlite("Data Source=mydev.db");
             var context = new TestDbContext(option.Options);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
-            var repo = new SQLearningLogRepo(connectionString: "Data Source=mydev.db");
-            var topic = repo.SaveTopic(new Topic { Id = 1, OwnerId = "test" });
-            var entry = repo.SaveEntry(new Entry { Id = 1, Title = "1", Text = "1", Link = "1", TopicId = 1, UpdateTime = DateTime.Now });
-            Assert.IsTrue(entry > 0);
+
+            var bll = new ALogsApp(new SQLearningLogRepo(connectionString: "Data Source=mydev.db"));
+            int saveTopicResult = bll.SaveTopic(new TopicDTO { Id = 1, OwnerId = "testOwner", Name = "testTopic", EntryHeaders = new[] { new EntryHeaderDTO() } });
+            int saveEntryResult = bll.SaveEntry(new EntryDTO { Id = 1, Title = "testEntry", Text = "1", Link = "1", TopicId = 1 });
+            Assert.IsTrue(saveTopicResult == 1 && saveEntryResult == 1, "save topic & entry dto to repo");
+
+            IEnumerable<TopicHeaderDTO> topics = bll.GetUserTopics("testOwner");
+            Assert.IsTrue(topics.Count() == 1, "get user topics dto from repo");
+
+            TopicDTO topic = bll.GetUserTopicDetail(1);
+            Assert.IsTrue(topic != null && topic.OwnerId == "testOwner" && topic.Name == "testTopic" && topic.EntryHeaders.Count() == 1, "get topic dto from repo");
+
+            EntryDTO entry = bll.GetEntryDetail(1);
+            Assert.IsTrue(entry != null && entry.TopicId == 1 && entry.Title == "testEntry", "get entry dto from repo");
+        }
+
+        [TestMethod]
+        public void TestLearningLogController()
+        {
+            ApplicationUser testUser = new ApplicationUser { Id = Guid.NewGuid().ToString(), UserName = "testUser" };
+
+            var bll = new ALogsApp(new SQLearningLogRepo(connectionString: "Data Source=mydev.db"));
+            var mockUserManager = new Mock<Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>>();
+            mockUserManager.Setup(r => r.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>())).Returns(Task.FromResult(testUser));
+
+            var controller = new LearningLogController(bll, null);
+
+            Task.Factory.StartNew(async () =>
+            {
+                var topic = await controller.Topics();
+                Assert.IsTrue(topic.Any() && topic.First().Name == "新建主题", "get new user's topics");
+            }).Wait();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace NetApp.Business.Interfaces
         IEnumerable<TopicHeaderDTO> GetUserTopics(string userId);
         TopicDTO GetUserTopicDetail(int topicId);
         EntryDTO GetEntryDetail(int entryId);
+        int SaveTopic(TopicDTO dto);
         int SaveEntry(EntryDTO dto);
     }
 }

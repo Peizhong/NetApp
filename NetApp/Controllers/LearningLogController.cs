@@ -19,11 +19,13 @@ namespace NetApp.Controllers
         private ILogsApp logsApp;
         private UserManager<ApplicationUser> userManager;
 
-        private Task<ApplicationUser> GetCurrentUserAsync() => userManager.GetUserAsync(HttpContext.User);
+        private Task<ApplicationUser> GetCurrentUserAsync() => userManager == null ? Task.FromResult(new ApplicationUser()) : userManager.GetUserAsync(HttpContext.User);
 
         public LearningLogController(ILogsApp lgapp, UserManager<ApplicationUser> umanager)
         {
             logsApp = lgapp;
+
+            //todo: in unittest, don't know what does usermanager need, maybe not a good idea to use it in controller..
             userManager = umanager;
         }
 
@@ -64,6 +66,27 @@ namespace NetApp.Controllers
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<TopicHeaderDTO> Topic([FromBody] TopicDTO topic)
+        {
+            try
+            {
+                ApplicationUser user = await GetCurrentUserAsync();
+                if (user == null)
+                    return new TopicHeaderDTO();
+                int res = logsApp.SaveTopic(topic);
+                if (res == 1)
+                {
+                    return topic as TopicHeaderDTO;
+                }
+                return new TopicHeaderDTO();
+            }
+            catch (Exception ex)
+            {
+                return new TopicHeaderDTO();
             }
         }
 

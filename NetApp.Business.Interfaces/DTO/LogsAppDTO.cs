@@ -13,9 +13,9 @@ namespace NetApp.Business.Interfaces.DTO
 
     public class TopicDTO : TopicHeaderDTO
     {
-        public DateTime UpdateTime { get; set; }
-
         public IEnumerable<EntryHeaderDTO> EntryHeaders { get; set; }
+
+        public string OwnerId { get; set; }
     }
 
     public class EntryHeaderDTO

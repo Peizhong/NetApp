@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NetApp.Business.Interfaces\NetApp.Business.Interfaces.csproj" />
     <ProjectReference Include="..\NetApp.Business\NetApp.Business.csproj" />
+    <ProjectReference Include="..\NetApp.Entities\NetApp.Entities.csproj" />
     <ProjectReference Include="..\NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj" />
     <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
     <ProjectReference Include="..\NetApp\NetApp.csproj" />

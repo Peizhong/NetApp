@@ -23,6 +23,10 @@ namespace NetApp.Business
                 x.CreateMap<Topic, TopicHeaderDTO>();
                 x.CreateMap<Topic, TopicDTO>()
                     .ForMember(d => d.EntryHeaders, o => o.MapFrom(s => s.Entries));
+                x.CreateMap<TopicDTO, Topic>()
+                    .ForMember(d => d.Entries, o => o.Ignore())
+                    .ForMember(d => d.UpdateTime, o => o.Ignore());
+
                 x.CreateMap<Entry, EntryHeaderDTO>();
                 x.CreateMap<Entry, EntryDTO>();
                 x.CreateMap<EntryDTO, Entry>()
@@ -58,6 +62,14 @@ namespace NetApp.Business
             Entry entry = Mapper.Map<Entry>(dto);
             entry.UpdateTime = DateTime.Now;
             int res = learningLogRepo.SaveEntry(entry);
+            return res;
+        }
+
+        public int SaveTopic(TopicDTO dto)
+        {
+            Topic topic = Mapper.Map<Topic>(dto);
+            topic.UpdateTime = DateTime.Now;
+            int res = learningLogRepo.SaveTopic(topic);
             return res;
         }
     }
