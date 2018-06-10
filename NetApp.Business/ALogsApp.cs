@@ -20,40 +20,28 @@ namespace NetApp.Business
 
             Mapper.Initialize(x =>
             {
-                x.CreateMap<Topic, TopicHeaderDTO>();
-                x.CreateMap<Topic, TopicDTO>()
-                    .ForMember(d => d.EntryHeaders, o => o.MapFrom(s => s.Entries));
+                x.CreateMap<Topic, TopicDTO>();
                 x.CreateMap<TopicDTO, Topic>()
                     .ForMember(d => d.Entries, o => o.Ignore())
                     .ForMember(d => d.UpdateTime, o => o.Ignore());
 
-                x.CreateMap<Entry, EntryHeaderDTO>();
                 x.CreateMap<Entry, EntryDTO>();
                 x.CreateMap<EntryDTO, Entry>()
                     .ForMember(d => d.UpdateTime, o => o.Ignore());
             });
         }
 
-        public EntryDTO GetEntryDetail(int entryId)
+        public IEnumerable<TopicDTO> GetUserTopics(string userId)
         {
-            var entry = learningLogRepo.GetEntry(entryId);
-            var res = Mapper.Map<EntryDTO>(entry);
+            var topics = learningLogRepo.GetTopics(userId);
+            var res = Mapper.Map<IEnumerable<TopicDTO>>(topics);
             return res;
         }
 
-        public TopicDTO GetUserTopicDetail(int topicId)
+        public IEnumerable<EntryDTO> GetTopicEntries(int topicId)
         {
-            var topic = learningLogRepo.GetTopicWithEntries(topicId);
-            if (topic == null)
-                return null;
-            var topicDTO = Mapper.Map<TopicDTO>(topic);
-            return topicDTO;
-        }
-
-        public IEnumerable<TopicHeaderDTO> GetUserTopics(string userId)
-        {
-            var topics = learningLogRepo.GetTopics(userId);
-            var res = Mapper.Map<IEnumerable<TopicHeaderDTO>>(topics);
+            var entries = learningLogRepo.GetEntries(topicId);
+            var res = Mapper.Map<IEnumerable<EntryDTO>>(entries);
             return res;
         }
 

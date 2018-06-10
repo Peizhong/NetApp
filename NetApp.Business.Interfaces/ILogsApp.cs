@@ -7,9 +7,9 @@ namespace NetApp.Business.Interfaces
 {
     public interface ILogsApp
     {
-        IEnumerable<TopicHeaderDTO> GetUserTopics(string userId);
-        TopicDTO GetUserTopicDetail(int topicId);
-        EntryDTO GetEntryDetail(int entryId);
+        IEnumerable<TopicDTO> GetUserTopics(string userId);
+        IEnumerable<EntryDTO>  GetTopicEntries(int topicId);
+
         int SaveTopic(TopicDTO dto);
         int SaveEntry(EntryDTO dto);
     }

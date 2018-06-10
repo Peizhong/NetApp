@@ -1,18 +1,24 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { ApplicationState } from '../store';
-import * as LearningLogsState from '../store/LearningLogs';
+import * as React from "react";
+import { connect } from "react-redux";
+import { ApplicationState } from "../store";
+import * as LearningLogsState from "../store/LearningLogs";
+
+interface states {
+  selectedEntry?: LearningLogsState.Entry;
+}
 
 const actions = {
   editedEntry: LearningLogsState.actionCreators.editedEntry,
   saveEntry: LearningLogsState.actionCreators.saveEntry
 };
 
-type EntryFormProps = LearningLogsState.Entry & typeof actions;
+type EntryFormProps = states & typeof actions;
 
 class EntryForm extends React.Component<EntryFormProps, {}> {
   public render() {
-    const { id, title, link, text, editedEntry, saveEntry } = this.props;
+    const { selectedEntry, editedEntry, saveEntry } = this.props;
+    if (!selectedEntry) return <div />;
+    const { id, title, link, text } = selectedEntry;
     return (
       <form className="form-horizontal">
         <div className="form-group">
@@ -22,7 +28,7 @@ class EntryForm extends React.Component<EntryFormProps, {}> {
               className="form-control"
               type="text"
               value={title}
-              onChange={v => editedEntry(id, 'title', v.target.value)}
+              onChange={v => editedEntry(id, "title", v.target.value)}
             />
           </div>
         </div>
@@ -33,7 +39,7 @@ class EntryForm extends React.Component<EntryFormProps, {}> {
               className="form-control"
               type="text"
               value={link}
-              onChange={v => editedEntry(id, 'link', v.target.value)}
+              onChange={v => editedEntry(id, "link", v.target.value)}
             />
           </div>
         </div>
@@ -44,17 +50,18 @@ class EntryForm extends React.Component<EntryFormProps, {}> {
               className="form-control"
               type="text"
               value={text}
-              onChange={v => editedEntry(id, 'text', v.target.value)}
+              onChange={v => editedEntry(id, "text", v.target.value)}
             />
           </div>
         </div>
         <div className="form-group">
           <div className="col-sm-offset-2 col-sm-10">
             <div className="btn-group" role="group">
-              <button type='button' className="btn btn-info" onClick={() => {
-                saveEntry(id);
-                return;
-              }}>
+              <button
+                type="button"
+                className="btn btn-info"
+                onClick={() => saveEntry(id)}
+              >
                 Update
               </button>
               <button type="submit" className="btn btn-danger">
@@ -68,7 +75,4 @@ class EntryForm extends React.Component<EntryFormProps, {}> {
   }
 }
 
-export default connect(
-  (state: ApplicationState) => state.learningLogs.selectedEntry, // Selects which state properties are merged into the component's props
-  LearningLogsState.actionCreators // Selects which action creators are merged into the component's props
-)(EntryForm) as typeof EntryForm;
+export default EntryForm;

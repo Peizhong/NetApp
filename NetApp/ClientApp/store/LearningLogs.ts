@@ -1,6 +1,6 @@
-import { fetch, addTask } from 'domain-task';
-import { Action, Reducer, ActionCreator } from 'redux';
-import { AppThunkAction } from './';
+import { fetch, addTask } from "domain-task";
+import { Action, Reducer, ActionCreator } from "redux";
+import { AppThunkAction } from "./";
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
@@ -24,7 +24,7 @@ export interface Entry extends EntryHeader {
 export interface TopicHeader {
   id: number;
   name: string;
-  ownerId: number;
+  ownerId: string;
 }
 
 export interface Topic extends TopicHeader {
@@ -48,71 +48,88 @@ export interface LearningLogsState {
 // They do not themselves have any side-effects; they just describe something that is going to happen.
 
 interface RequestUserInfoAtion {
-  type: 'REQUEST_USER_INFO';
+  type: "REQUEST_USER_INFO";
 }
 
 interface ReciveUserInfoAction {
-  type: 'RECEIVE_USER_INFO';
+  type: "RECEIVE_USER_INFO";
   user: UserInfo;
 }
 
 interface RequestTopicsAction {
-  type: 'REQUEST_LEARNING_LOG_TOPICS';
+  type: "REQUEST_LEARNING_LOG_TOPICS";
 }
 
 interface ReceiveTopicsAction {
-  type: 'RECEIVE_LEARNING_LOG_TOPICS';
-  ownerId: number;
+  type: "RECEIVE_LEARNING_LOG_TOPICS";
   topics: TopicHeader[];
   message: string;
 }
 
 interface SelectTopicAction {
-  type: 'SELECT_LEARNING_LOG_TOPIC';
+  type: "SELECT_LEARNING_LOG_TOPIC";
   topicId: number;
 }
 
 interface RequestTopicDetailAction {
-  type: 'REQUEST_TOPIC_DETAIL';
+  type: "REQUEST_TOPIC_DETAIL";
   topicId: number;
 }
 
 interface ReciveTopicDetailAction {
-  type: 'RECEIVE_TOPIC_DETAIL';
+  type: "RECEIVE_TOPIC_DETAIL";
   topic: Topic;
   message: string;
 }
 
 interface SelectEntryAction {
-  type: 'SELECT_TOPIC_ENTRY';
+  type: "SELECT_TOPIC_ENTRY";
   entryId: number;
 }
 
 interface RequestEntryDetailAction {
-  type: 'REQUEST_ENTRIY_DETAIL';
+  type: "REQUEST_ENTRIY_DETAIL";
   entryId: number;
 }
 
 interface ReciveEntryDetailAction {
-  type: 'RECEIVE_ENTRIE_DETAIL';
+  type: "RECEIVE_ENTRIE_DETAIL";
   entry: Entry;
   message: string;
 }
 
 interface EditEntryDetailAction {
-  type: 'EDIT_ENTRY_DETAIL';
+  type: "EDIT_ENTRY_DETAIL";
   entryId: number;
   field: string;
   value: string;
 }
 
 interface PostEntryDetailAction {
-  type: 'POST_ENTRY_DETAIL';
+  type: "POST_ENTRY_DETAIL";
   entryId: number;
 }
 
 interface RecivePostEntryDetailAction {
-  type: 'RECEIVE_POST_ENTRIE_DETAIL';
+  type: "RECEIVE_POST_ENTRIE_DETAIL";
+  message: string;
+}
+
+interface EditTopicDetailAction {
+  type: "EDIT_TOPIC_DETAIL";
+  topicId: number;
+  field: string;
+  value: string;
+}
+
+interface PostTopicDetailAction {
+  type: "POST_TOPIC_DETAIL";
+  topicId: number;
+}
+
+interface RecivePostTopicDetailAction {
+  type: "RECEIVE_POST_TOPIC_DETAIL";
+  topic: Topic;
   message: string;
 }
 
@@ -129,7 +146,10 @@ type KnownAction =
   | ReciveEntryDetailAction
   | EditEntryDetailAction
   | PostEntryDetailAction
-  | RecivePostEntryDetailAction;
+  | RecivePostEntryDetailAction
+  | EditTopicDetailAction
+  | PostTopicDetailAction
+  | RecivePostTopicDetailAction;
 
 // ----------------
 // ACTION CREATORS - These are functions exposed to UI components that will trigger a state transition.
@@ -138,96 +158,132 @@ type KnownAction =
 export const actionCreators = {
   //when mount compoment, or user changed
   requestTopics: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
-    let fetchTask = fetch('api/LearningLog/Topics', {
-      method: 'GET',
-      credentials: 'include'
+    let fetchTask = fetch("api/LearningLog/Topics", {
+      method: "GET",
+      credentials: "include"
     })
       .then(response => response.json() as Promise<TopicHeader[]>)
       .then(data => {
         dispatch({
-          type: 'RECEIVE_LEARNING_LOG_TOPICS',
+          type: "RECEIVE_LEARNING_LOG_TOPICS",
           topics: data,
-          ownerId: data.length > 0 ? data[0].ownerId : -1,
-          message: ''
+          message: ""
         });
       })
       .catch(err => {
         dispatch({
-          type: 'RECEIVE_LEARNING_LOG_TOPICS',
+          type: "RECEIVE_LEARNING_LOG_TOPICS",
           topics: [],
-          ownerId: -1,
           message: err.message
         });
       });
     addTask(fetchTask);
-    dispatch({ type: 'REQUEST_LEARNING_LOG_TOPICS' });
+    dispatch({ type: "REQUEST_LEARNING_LOG_TOPICS" });
   },
   //when click on topic header, load topic's entries or collaps topic
-  selectTopic: (topicId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+  selectTopic: (topicId: number): AppThunkAction<KnownAction> => (
+    dispatch,
+    getState
+  ) => {
     if (topicId !== getState().learningLogs.topicId) {
       let fetchTask = fetch(`api/LearningLog/Topic/${topicId}`, {
-        method: 'GET',
-        credentials: 'include'
+        method: "GET",
+        credentials: "include"
       })
         .then(response => response.json() as Promise<Topic>)
         .then(data => {
           dispatch({
-            type: 'RECEIVE_TOPIC_DETAIL',
+            type: "RECEIVE_TOPIC_DETAIL",
             topic: data,
-            message: ''
+            message: ""
           });
         })
         .catch(err => console.log(err.message));
       addTask(fetchTask);
-      dispatch({ type: 'REQUEST_TOPIC_DETAIL', topicId });
+      dispatch({ type: "REQUEST_TOPIC_DETAIL", topicId });
     } else {
-      dispatch({ type: 'SELECT_LEARNING_LOG_TOPIC', topicId });
+      dispatch({ type: "SELECT_LEARNING_LOG_TOPIC", topicId });
     }
   },
-  selectEntry: (entryId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+  selectEntry: (entryId: number): AppThunkAction<KnownAction> => (
+    dispatch,
+    getState
+  ) => {
     if (entryId !== getState().learningLogs.entryId) {
       let fetchTask = fetch(`api/LearningLog/Entry/${entryId}`, {
-        method: 'GET',
-        credentials: 'include'
+        method: "GET",
+        credentials: "include"
       })
         .then(response => response.json() as Promise<Entry>)
         .then(data => {
           dispatch({
-            type: 'RECEIVE_ENTRIE_DETAIL',
+            type: "RECEIVE_ENTRIE_DETAIL",
             entry: data,
-            message: ''
+            message: ""
           });
         })
         .catch(err => console.log(err.message));
       addTask(fetchTask);
-      dispatch({ type: 'REQUEST_ENTRIY_DETAIL', entryId });
+      dispatch({ type: "REQUEST_ENTRIY_DETAIL", entryId });
     } else {
-      dispatch({ type: 'SELECT_TOPIC_ENTRY', entryId });
+      dispatch({ type: "SELECT_TOPIC_ENTRY", entryId });
     }
   },
   editedEntry: (entryId: number, field: string, value: string) =>
-    <EditEntryDetailAction>{ type: 'EDIT_ENTRY_DETAIL', entryId, field, value },
-  saveEntry: (entryId: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    <EditEntryDetailAction>{ type: "EDIT_ENTRY_DETAIL", entryId, field, value },
+  saveEntry: (entryId: number): AppThunkAction<KnownAction> => (
+    dispatch,
+    getState
+  ) => {
     const currentEntry = getState().learningLogs.selectedEntry;
     if (currentEntry && entryId == currentEntry.id) {
-      let postTask = fetch('api/LearningLog/Entry', {
-        method: 'POST',
-        credentials: 'include',
+      let postTask = fetch("api/LearningLog/Entry", {
+        method: "POST",
+        credentials: "include",
         headers: new Headers({
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         }),
         body: JSON.stringify(currentEntry)
       })
         .then(response => response.json() as Promise<EntryHeader>)
         .then(data =>
           dispatch({
-            type: 'RECEIVE_POST_ENTRIE_DETAIL',
-            message: data.id > 0 ? '保存成功' : '保存失败'
+            type: "RECEIVE_POST_ENTRIE_DETAIL",
+            message: data.id > 0 ? "保存成功" : "保存失败"
           })
         )
         .catch(err => console.log(err.message));
       addTask(postTask);
-      dispatch({ type: 'POST_ENTRY_DETAIL', entryId });
+      dispatch({ type: "POST_ENTRY_DETAIL", entryId });
+    }
+  },
+  editedTopic: (topicId: number, field: string, value: string) =>
+    <EditTopicDetailAction>{ type: "EDIT_TOPIC_DETAIL", topicId, field, value },
+  saveTopic: (topicId: number): AppThunkAction<KnownAction> => (
+    dispatch,
+    getState
+  ) => {
+    const currentTopic = getState().learningLogs.selectedTopic;
+    if (currentTopic && topicId == currentTopic.id) {
+      let postTask = fetch("api/LearningLog/Topic", {
+        method: "POST",
+        credentials: "include",
+        headers: new Headers({
+          "Content-Type": "application/json"
+        }),
+        body: JSON.stringify(currentTopic)
+      })
+        .then(response => response.json() as Promise<Topic>)
+        .then(data =>
+          dispatch({
+            type: "RECEIVE_POST_TOPIC_DETAIL",
+            message: data.id > 0 ? "保存成功" : "保存失败",
+            topic: data
+          })
+        )
+        .catch(err => console.log(err.message));
+      addTask(postTask);
+      dispatch({ type: "POST_TOPIC_DETAIL", topicId });
     }
   }
 };
@@ -238,7 +294,7 @@ export const actionCreators = {
 const unloadedState: LearningLogsState = {
   ownerId: -1,
   isLoading: false,
-  message: '',
+  message: "",
   topics: [],
   topicId: -1,
   entryId: -1
@@ -250,10 +306,10 @@ export const reducer: Reducer<LearningLogsState> = (
 ) => {
   const action = incomingAction as KnownAction;
   switch (action.type) {
-    case 'REQUEST_LEARNING_LOG_TOPICS':
+    case "REQUEST_LEARNING_LOG_TOPICS":
       return {
         isLoading: true,
-        message: 'loading...',
+        message: "loading...",
 
         //loading new owner info, clear old data
         ownerId: -1,
@@ -263,22 +319,22 @@ export const reducer: Reducer<LearningLogsState> = (
         //selectedTopic: state.selectedTopic,
         //selectedEntry: state.selectedEntry,
       };
-    case 'RECEIVE_LEARNING_LOG_TOPICS':
+    case "RECEIVE_LEARNING_LOG_TOPICS":
       // Only accept the incoming data if it matches the most recent request. This ensures we correctly
       // handle out-of-order responses.
       return {
         isLoading: false,
         message: action.message,
         topics: action.topics,
-        ownerId: action.ownerId,
 
         topicId: -1,
-        entryId: -1
+        entryId: -1,
+        ownerId: state.ownerId
         //when recived new topics, selected topic and entry still unset
         //selectedtopic: state.selectedtopic,
         //selectedentry: state.selectedentry,
       };
-    case 'SELECT_LEARNING_LOG_TOPIC':
+    case "SELECT_LEARNING_LOG_TOPIC":
       //wait for recive_topic_detail to update, or just hide
       return {
         //if click topic twice, collaps topic
@@ -292,10 +348,10 @@ export const reducer: Reducer<LearningLogsState> = (
         //when update topic state, change entry info anyway
         entryId: -1
       };
-    case 'REQUEST_TOPIC_DETAIL':
+    case "REQUEST_TOPIC_DETAIL":
       return {
         isLoading: true,
-        message: 'loading...',
+        message: "loading...",
         topicId: action.topicId,
 
         ownerId: state.ownerId,
@@ -305,7 +361,7 @@ export const reducer: Reducer<LearningLogsState> = (
         //selectedTopic: state.selectedTopic,
         //selectedEntry: state.selectedEntry,
       };
-    case 'RECEIVE_TOPIC_DETAIL':
+    case "RECEIVE_TOPIC_DETAIL":
       if (action.topic.id === state.topicId) {
         return {
           isLoading: false,
@@ -319,7 +375,7 @@ export const reducer: Reducer<LearningLogsState> = (
         };
       }
       break;
-    case 'SELECT_TOPIC_ENTRY':
+    case "SELECT_TOPIC_ENTRY":
       //no local entry data, wait for recive_entry to update, or just hide
       return {
         entryId: state.entryId === action.entryId ? -1 : action.entryId,
@@ -331,10 +387,10 @@ export const reducer: Reducer<LearningLogsState> = (
         topicId: state.topicId,
         selectedTopic: state.selectedTopic
       };
-    case 'REQUEST_ENTRIY_DETAIL': {
+    case "REQUEST_ENTRIY_DETAIL": {
       return {
         isLoading: true,
-        message: 'loading...',
+        message: "loading...",
         entryId: action.entryId,
 
         topicId: state.topicId,
@@ -346,7 +402,7 @@ export const reducer: Reducer<LearningLogsState> = (
         //selectedEntry: state.selectedEntry,
       };
     }
-    case 'RECEIVE_ENTRIE_DETAIL': {
+    case "RECEIVE_ENTRIE_DETAIL": {
       if (action.entry.id === state.entryId) {
         return {
           isLoading: false,
@@ -362,8 +418,9 @@ export const reducer: Reducer<LearningLogsState> = (
       }
       break;
     }
-    case 'EDIT_ENTRY_DETAIL':
-      if (!state.selectedEntry || state.selectedEntry.id !== action.entryId) break;
+    case "EDIT_ENTRY_DETAIL":
+      if (!state.selectedEntry || state.selectedEntry.id !== action.entryId)
+        break;
       const editedEntry = <Entry>{
         id: state.selectedEntry.id,
         title: state.selectedEntry.title,
@@ -373,13 +430,13 @@ export const reducer: Reducer<LearningLogsState> = (
         topicId: state.selectedEntry.topicId
       };
       switch (action.field) {
-        case 'title':
+        case "title":
           editedEntry.title = action.value;
           break;
-        case 'text':
+        case "text":
           editedEntry.text = action.value;
           break;
-        case 'link':
+        case "link":
           editedEntry.link = action.value;
           break;
         default:
@@ -396,13 +453,65 @@ export const reducer: Reducer<LearningLogsState> = (
         entryId: state.entryId,
         selectedTopic: state.selectedTopic
       };
-    case 'POST_ENTRY_DETAIL':
-    case 'RECEIVE_POST_ENTRIE_DETAIL':
+    case "POST_ENTRY_DETAIL":
+    case "RECEIVE_POST_ENTRIE_DETAIL":
       return {
         isLoading: false,
-        message: '',
+        message: "",
         ownerId: state.ownerId,
         topics: state.topics,
+        topicId: state.topicId,
+        entryId: state.entryId,
+        selectedEntry: state.selectedEntry,
+        selectedTopic: state.selectedTopic
+      };
+    case "EDIT_TOPIC_DETAIL":
+      if (!state.selectedTopic || state.selectedTopic.id !== action.topicId)
+        break;
+      const editedTopic = <Topic>{
+        id: state.selectedTopic.id,
+        name: state.selectedTopic.name,
+        updateTime: state.selectedTopic.updateTime,
+        ownerId: state.selectedTopic.ownerId,
+        entryHeaders: state.selectedTopic.entryHeaders
+      };
+      switch (action.field) {
+        case "name":
+          editedTopic.name = action.value;
+          break;
+        default:
+          break;
+      }
+      return {
+        isLoading: false,
+        selectedTopic: editedTopic,
+
+        message: state.message,
+        ownerId: state.ownerId,
+        topics: state.topics,
+        topicId: state.topicId,
+        entryId: state.entryId,
+        selectedEntry: state.selectedEntry
+      };
+    case "POST_TOPIC_DETAIL":
+      return {
+        isLoading: true,
+        message: "正在保存",
+        ownerId: state.ownerId,
+        topics: state.topics,
+        topicId: state.topicId,
+        entryId: state.entryId,
+        selectedEntry: state.selectedEntry,
+        selectedTopic: state.selectedTopic
+      };
+    case "RECEIVE_POST_TOPIC_DETAIL":
+      return {
+        isLoading: false,
+        message: "",
+        ownerId: state.ownerId,
+        topics: state.topics.map(
+          t => (t.id == action.topic.id ? action.topic : t)
+        ),
         topicId: state.topicId,
         entryId: state.entryId,
         selectedEntry: state.selectedEntry,

@@ -30,103 +30,84 @@ namespace NetApp.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IEnumerable<TopicHeaderDTO>> Topics()
+        public async Task<IEnumerable<TopicDTO>> Topics()
         {
             try
             {
                 ApplicationUser user = await GetCurrentUserAsync();
                 if (user == null)
-                    return new TopicHeaderDTO[] { };
-                IEnumerable<TopicHeaderDTO> res = logsApp.GetUserTopics(user.Id);
+                    return new TopicDTO[] { };
+                IEnumerable<TopicDTO> res = logsApp.GetUserTopics(user.Id);
                 if (!res.Any())
                 {
-                    return new[] { new TopicHeaderDTO { Id = 0, Name = "新建主题" } };
+                    return new TopicDTO[] { };
                 }
                 return res;
             }
             catch (Exception ex)
             {
-                return null;
+                return new TopicDTO[] { };
             }
         }
 
         [HttpGet("[action]/{topicId}")]
-        public async Task<TopicDTO> Topic(int topicId)
+        public async Task<IEnumerable<EntryDTO>> TopicEntries(int topicId)
+        {
+            try
+            {
+                ApplicationUser user = await GetCurrentUserAsync();
+                if (user == null)
+                    return new EntryDTO[] { };
+                IEnumerable<EntryDTO> res = logsApp.GetTopicEntries(topicId);
+                if (res == null)
+                    return new EntryDTO[] { };
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new EntryDTO[] { };
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<TopicDTO> Topic([FromBody] TopicDTO topic)
         {
             try
             {
                 ApplicationUser user = await GetCurrentUserAsync();
                 if (user == null)
                     return new TopicDTO();
-                TopicDTO res = logsApp.GetUserTopicDetail(topicId);
-                if (res == null)
-                    return new TopicDTO { Id = 0, Name = "新建主题", EntryHeaders = new[] { new EntryHeaderDTO { Id = 0, Title = "新建文章" } } };
-                return res;
+                int res = logsApp.SaveTopic(topic);
+                if (res == 1)
+                {
+                    return topic;
+                }
+                return new TopicDTO();
             }
             catch (Exception ex)
             {
-                return null;
+                return new TopicDTO();
             }
         }
 
         [HttpPost("[action]")]
-        public async Task<TopicHeaderDTO> Topic([FromBody] TopicDTO topic)
-        {
-            try
-            {
-                ApplicationUser user = await GetCurrentUserAsync();
-                if (user == null)
-                    return new TopicHeaderDTO();
-                int res = logsApp.SaveTopic(topic);
-                if (res == 1)
-                {
-                    return topic as TopicHeaderDTO;
-                }
-                return new TopicHeaderDTO();
-            }
-            catch (Exception ex)
-            {
-                return new TopicHeaderDTO();
-            }
-        }
-
-        [HttpGet("[action]/{entryId}")]
-        public async Task<EntryDTO> Entry(int entryId)
+        public async Task<EntryDTO> Entry([FromBody] EntryDTO entry)
         {
             try
             {
                 ApplicationUser user = await GetCurrentUserAsync();
                 if (user == null)
                     return new EntryDTO();
-                EntryDTO res = logsApp.GetEntryDetail(entryId);
-                if (res == null)
-                    return new EntryDTO { Id = 0, Title = "新建文章" };
-                return res;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        [HttpPost("[action]")]
-        public async Task<EntryHeaderDTO> Entry([FromBody] EntryDTO entry)
-        {
-            try
-            {
-                ApplicationUser user = await GetCurrentUserAsync();
-                if (user == null)
-                    return new EntryHeaderDTO();
                 int res = logsApp.SaveEntry(entry);
                 if (res == 1)
                 {
-                    return entry as EntryHeaderDTO;
+                    return entry;
                 }
-                return new EntryHeaderDTO();
+                return new EntryDTO();
             }
             catch (Exception ex)
             {
-                return new EntryHeaderDTO();
+                return new EntryDTO();
             }
         }
     }

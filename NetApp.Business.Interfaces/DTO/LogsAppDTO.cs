@@ -4,29 +4,21 @@ using System.Text;
 
 namespace NetApp.Business.Interfaces.DTO
 {
-    public class TopicHeaderDTO
+    public class TopicDTO
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
-    }
-
-    public class TopicDTO : TopicHeaderDTO
-    {
-        public IEnumerable<EntryHeaderDTO> EntryHeaders { get; set; }
 
         public string OwnerId { get; set; }
     }
-
-    public class EntryHeaderDTO
+    
+    public class EntryDTO
     {
         public int Id { get; set; }
 
         public string Title { get; set; }
-    }
 
-    public class EntryDTO : EntryHeaderDTO
-    {
         public string Text { get; set; }
 
         public string Link { get; set; }

@@ -1,9 +1,10 @@
-﻿import * as React from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { ApplicationState } from '../store';
-import * as LearningLogsState from '../store/LearningLogs';
-import EntryForm from './EntryForm';
+﻿import * as React from "react";
+import { Link, RouteComponentProps } from "react-router-dom";
+import { connect } from "react-redux";
+import { ApplicationState } from "../store";
+import * as LearningLogsState from "../store/LearningLogs";
+import TopicForm from "./TopicForm";
+import EntryForm from "./EntryForm";
 
 type MyLibarayProps = LearningLogsState.LearningLogsState &
   typeof LearningLogsState.actionCreators &
@@ -20,7 +21,11 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
         <nav className="navbar" role="search">
           <form className="navbar-form navbar-right">
             <div className="form-group">
-              <input type="text" className="form-control" placeholder="Search" />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search"
+              />
             </div>
             <button type="button" className="btn btn-default">
               Submit
@@ -31,7 +36,7 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
           <div className="progress">
             <div
               className="progress-bar progress-bar-info progress-bar-striped active"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </div>
         )}
@@ -42,9 +47,19 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
   }
 
   private renderTopics() {
+    const topics: LearningLogsState.TopicHeader[] = [...this.props.topics];
+    if (!topics.find(t => t.id == 0)) {
+      const netTopic: LearningLogsState.TopicHeader = {
+        id: 0,
+        name: "新建主题",
+        ownerId: "0"
+      };
+      topics.push(netTopic);
+    }
+
     return (
       <div className="list-group">
-        {this.props.topics.map(
+        {topics.map(
           topic =>
             topic.id === this.props.topicId ? (
               this.expandTopic(topic)
@@ -65,17 +80,37 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
   }
 
   private expandTopic(topic: LearningLogsState.TopicHeader) {
+    const { selectedTopic, editedTopic, saveTopic, entryId } = this.props;
+    let entryHeaders: LearningLogsState.EntryHeader[] = [];
+    const enwEntry: LearningLogsState.EntryHeader = {
+      id: 0,
+      title: "新建文章"
+    };
+    if (selectedTopic && selectedTopic.entryHeaders.length > 0) {
+      entryHeaders = [...selectedTopic.entryHeaders];
+    }
+    entryHeaders.push(enwEntry);
     return (
       <div className="panel panel-primary">
-        <div className="panel-heading" onClick={() => this.props.selectTopic(topic.id)}>
-          <h3 className="panel-title">{topic.name}</h3>
+        <div
+          className="panel-heading"
+          onClick={() => this.props.selectTopic(topic.id)}
+        >
+          <h3 className="panel-title">
+            {(selectedTopic && selectedTopic.name) || topic.name}
+          </h3>
         </div>
+        <TopicForm
+          selectedTopic={selectedTopic}
+          editedTopic={editedTopic}
+          saveTopic={saveTopic}
+        />
         <div className="well well-sm">
-          {this.props.selectedTopic &&
-            this.props.selectedTopic.id === topic.id &&
-            this.props.selectedTopic.entryHeaders.map(
+          {selectedTopic &&
+            selectedTopic.id === topic.id &&
+            entryHeaders.map(
               entry =>
-                entry.id === this.props.entryId ? (
+                entry.id === entryId ? (
                   this.showEntry(entry)
                 ) : (
                   <button
@@ -98,14 +133,21 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
     const { selectedEntry, editedEntry, saveEntry } = this.props;
     return (
       <div className="panel panel-info">
-        <div className="panel-heading" onClick={() => this.props.selectEntry(entry.id)}>
-          <h4 className="panel-title">{entry.title}</h4>
+        <div
+          className="panel-heading"
+          onClick={() => this.props.selectEntry(entry.id)}
+        >
+          <h4 className="panel-title">
+            {(selectedEntry && selectedEntry.title) || entry.title}
+          </h4>
         </div>
         {selectedEntry &&
           selectedEntry.id == entry.id && (
-            <div>
-              <EntryForm {...selectedEntry} editedEntry={editedEntry} saveEntry={saveEntry} />
-            </div>
+            <EntryForm
+              selectedEntry={selectedEntry}
+              editedEntry={editedEntry}
+              saveEntry={saveEntry}
+            />
           )}
       </div>
     );
