@@ -81,7 +81,9 @@ namespace NetApp.Repository
         {
             using (var conn = new SqliteConnection(connStr))
             {
-                var sql = @"replace into Entries (id,title,text,link,updatetime,topicid) values(@Id,@Title,@Text,@Link,@UpdateTime,@TopicId)";
+                var sql = entry.Id == 0 ?
+                @"replace into Entries (title,text,link,updatetime,topicid) values(@Title,@Text,@Link,@UpdateTime,@TopicId)" :
+                @"replace into Entries (id,title,text,link,updatetime,topicid) values(@Id,@Title,@Text,@Link,@UpdateTime,@TopicId)";
                 int result = conn.Execute(sql, entry);
                 return result;
             }
@@ -91,7 +93,10 @@ namespace NetApp.Repository
         {
             using (var conn = new SqliteConnection(connStr))
             {
-                var sql = @"replace into Topics (id,name,updatetime,ownerid) values(@Id,@Name,@UpdateTime,@OwnerId)";
+                var sql = topic.Id == 0 ?
+                @"replace into Topics (name,updatetime,ownerid) values(@Name,@UpdateTime,@OwnerId)" :
+                @"replace into Topics (id,name,updatetime,ownerid) values(@Id, @Name,@UpdateTime,@OwnerId)";
+
                 int result = conn.Execute(sql, topic);
                 return result;
             }

@@ -61,18 +61,15 @@ namespace NetApp.Tests
             context.Database.EnsureCreated();
 
             var bll = new ALogsApp(new SQLearningLogRepo(connectionString: "Data Source=mydev.db"));
-            int saveTopicResult = bll.SaveTopic(new TopicDTO { Id = 1, OwnerId = "testOwner", Name = "testTopic", EntryHeaders = new[] { new EntryHeaderDTO() } });
+            int saveTopicResult = bll.SaveTopic(new TopicDTO { Id = 1, OwnerId = "testOwner", Name = "testTopic" });
             int saveEntryResult = bll.SaveEntry(new EntryDTO { Id = 1, Title = "testEntry", Text = "1", Link = "1", TopicId = 1 });
             Assert.IsTrue(saveTopicResult == 1 && saveEntryResult == 1, "save topic & entry dto to repo");
 
-            IEnumerable<TopicHeaderDTO> topics = bll.GetUserTopics("testOwner");
+            IEnumerable<TopicDTO> topics = bll.GetUserTopics("testOwner");
             Assert.IsTrue(topics.Count() == 1, "get user topics dto from repo");
 
-            TopicDTO topic = bll.GetUserTopicDetail(1);
-            Assert.IsTrue(topic != null && topic.OwnerId == "testOwner" && topic.Name == "testTopic" && topic.EntryHeaders.Count() == 1, "get topic dto from repo");
-
-            EntryDTO entry = bll.GetEntryDetail(1);
-            Assert.IsTrue(entry != null && entry.TopicId == 1 && entry.Title == "testEntry", "get entry dto from repo");
+            IEnumerable<EntryDTO> entries = bll.GetTopicEntries(1);
+            Assert.IsTrue(entries != null && entries.Count() == 1, "get entry dto from repo");
         }
 
         [TestMethod]

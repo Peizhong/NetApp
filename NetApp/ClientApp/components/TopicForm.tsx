@@ -1,6 +1,4 @@
 import * as React from "react";
-import { connect } from "react-redux";
-import { ApplicationState } from "../store";
 import * as LearningLogsState from "../store/LearningLogs";
 
 interface states {

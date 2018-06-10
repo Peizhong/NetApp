@@ -70,44 +70,37 @@ namespace NetApp.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<TopicDTO> Topic([FromBody] TopicDTO topic)
+        public async Task<IEnumerable<TopicDTO>> Topic([FromBody] TopicDTO topic)
         {
             try
             {
                 ApplicationUser user = await GetCurrentUserAsync();
                 if (user == null)
-                    return new TopicDTO();
+                    return new TopicDTO[] { };
+                topic.OwnerId = user.Id;
                 int res = logsApp.SaveTopic(topic);
-                if (res == 1)
-                {
-                    return topic;
-                }
-                return new TopicDTO();
+                return logsApp.GetUserTopics(user.Id);
             }
             catch (Exception ex)
             {
-                return new TopicDTO();
+                return new TopicDTO[] { };
             }
         }
 
         [HttpPost("[action]")]
-        public async Task<EntryDTO> Entry([FromBody] EntryDTO entry)
+        public async Task<IEnumerable<EntryDTO>> Entry([FromBody] EntryDTO entry)
         {
             try
             {
                 ApplicationUser user = await GetCurrentUserAsync();
                 if (user == null)
-                    return new EntryDTO();
+                    return new EntryDTO[] { };
                 int res = logsApp.SaveEntry(entry);
-                if (res == 1)
-                {
-                    return entry;
-                }
-                return new EntryDTO();
+                return logsApp.GetTopicEntries(entry.TopicId);
             }
             catch (Exception ex)
             {
-                return new EntryDTO();
+                return new EntryDTO[] { };
             }
         }
     }

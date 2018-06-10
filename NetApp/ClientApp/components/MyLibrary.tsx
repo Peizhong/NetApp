@@ -47,49 +47,30 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
   }
 
   private renderTopics() {
-    const topics: LearningLogsState.TopicHeader[] = [...this.props.topics];
-    if (!topics.find(t => t.id == 0)) {
-      const netTopic: LearningLogsState.TopicHeader = {
-        id: 0,
-        name: "新建主题",
-        ownerId: "0"
-      };
-      topics.push(netTopic);
-    }
-
     return (
       <div className="list-group">
-        {topics.map(
+        {this.props.topics.map(
           topic =>
             topic.id === this.props.topicId ? (
               this.expandTopic(topic)
             ) : (
-              <button
-                className="list-group-item"
-                key={topic.id}
-                onClick={() => {
-                  this.props.selectTopic(topic.id);
-                }}
-              >
-                <h5>{topic.name}</h5>
-              </button>
-            )
+                <button
+                  className="list-group-item"
+                  key={topic.id}
+                  onClick={() => {
+                    this.props.selectTopic(topic.id);
+                  }}
+                >
+                  <h5>{topic.name}</h5>
+                </button>
+              )
         )}
       </div>
     );
   }
 
-  private expandTopic(topic: LearningLogsState.TopicHeader) {
-    const { selectedTopic, editedTopic, saveTopic, entryId } = this.props;
-    let entryHeaders: LearningLogsState.EntryHeader[] = [];
-    const enwEntry: LearningLogsState.EntryHeader = {
-      id: 0,
-      title: "新建文章"
-    };
-    if (selectedTopic && selectedTopic.entryHeaders.length > 0) {
-      entryHeaders = [...selectedTopic.entryHeaders];
-    }
-    entryHeaders.push(enwEntry);
+  private expandTopic(topic: LearningLogsState.Topic) {
+    const { entries, editedTopic, saveTopic, entryId } = this.props;
     return (
       <div className="panel panel-primary">
         <div
@@ -97,22 +78,20 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
           onClick={() => this.props.selectTopic(topic.id)}
         >
           <h3 className="panel-title">
-            {(selectedTopic && selectedTopic.name) || topic.name}
+            {topic.name}
           </h3>
         </div>
         <TopicForm
-          selectedTopic={selectedTopic}
+          selectedTopic={topic}
           editedTopic={editedTopic}
           saveTopic={saveTopic}
         />
         <div className="well well-sm">
-          {selectedTopic &&
-            selectedTopic.id === topic.id &&
-            entryHeaders.map(
-              entry =>
-                entry.id === entryId ? (
-                  this.showEntry(entry)
-                ) : (
+          {topic.id > 0 && entries.map(
+            entry =>
+              entry.id === entryId ? (
+                this.showEntry(entry)
+              ) : (
                   <button
                     className="list-group-item"
                     key={entry.id}
@@ -123,14 +102,14 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
                     {entry.title}
                   </button>
                 )
-            )}
+          )}
         </div>
       </div>
     );
   }
 
-  private showEntry(entry: LearningLogsState.EntryHeader) {
-    const { selectedEntry, editedEntry, saveEntry } = this.props;
+  private showEntry(entry: LearningLogsState.Entry) {
+    const { entryId, editedEntry, saveEntry } = this.props;
     return (
       <div className="panel panel-info">
         <div
@@ -138,17 +117,16 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
           onClick={() => this.props.selectEntry(entry.id)}
         >
           <h4 className="panel-title">
-            {(selectedEntry && selectedEntry.title) || entry.title}
+            {entry.title}
           </h4>
         </div>
-        {selectedEntry &&
-          selectedEntry.id == entry.id && (
-            <EntryForm
-              selectedEntry={selectedEntry}
-              editedEntry={editedEntry}
-              saveEntry={saveEntry}
-            />
-          )}
+        {entry.id == entryId && (
+          <EntryForm
+            selectedEntry={entry}
+            editedEntry={editedEntry}
+            saveEntry={saveEntry}
+          />
+        )}
       </div>
     );
   }

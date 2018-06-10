@@ -14,10 +14,8 @@ namespace NetApp.Business
     {
         ILearningLogRepo learningLogRepo;
 
-        public ALogsApp(ILearningLogRepo llRepo)
+        static ALogsApp()
         {
-            learningLogRepo = llRepo;
-
             Mapper.Initialize(x =>
             {
                 x.CreateMap<Topic, TopicDTO>();
@@ -29,6 +27,11 @@ namespace NetApp.Business
                 x.CreateMap<EntryDTO, Entry>()
                     .ForMember(d => d.UpdateTime, o => o.Ignore());
             });
+        }
+
+        public ALogsApp(ILearningLogRepo llRepo)
+        {
+            learningLogRepo = llRepo;
         }
 
         public IEnumerable<TopicDTO> GetUserTopics(string userId)
