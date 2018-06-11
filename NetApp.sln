@@ -9,15 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Tests", "NetApp.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Portal", "NetApp.Portal\NetApp.Portal.csproj", "{301B17E7-9DD9-4D03-B9B1-DE67FAEEDEA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Entities", "NetApp.Entities\NetApp.Entities.csproj", "{8A9344EE-5F31-47B4-925E-7C92B28635BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Entities", "NetApp.Entities\NetApp.Entities.csproj", "{8A9344EE-5F31-47B4-925E-7C92B28635BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Repository", "NetApp.Repository\NetApp.Repository.csproj", "{39D31323-9DBF-42BA-B880-50F3400412D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Repository", "NetApp.Repository\NetApp.Repository.csproj", "{39D31323-9DBF-42BA-B880-50F3400412D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Business.Interfaces", "NetApp.Business.Interfaces\NetApp.Business.Interfaces.csproj", "{41AE8FD9-07BB-4C83-A923-589F0BE22FC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Business.Interfaces", "NetApp.Business.Interfaces\NetApp.Business.Interfaces.csproj", "{41AE8FD9-07BB-4C83-A923-589F0BE22FC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Repository.Interfaces", "NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj", "{FFA2CDD2-396F-49AD-9D81-9C0D77B292F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Repository.Interfaces", "NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj", "{FFA2CDD2-396F-49AD-9D81-9C0D77B292F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Business", "NetApp.Business\NetApp.Business.csproj", "{8E81FEC7-4398-4947-9CD9-7BA351B483E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Business", "NetApp.Business\NetApp.Business.csproj", "{8E81FEC7-4398-4947-9CD9-7BA351B483E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Play", "NetApp.Play\NetApp.Play.csproj", "{46BED184-4366-4E09-B03F-0FA0B5A7243B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{8E81FEC7-4398-4947-9CD9-7BA351B483E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E81FEC7-4398-4947-9CD9-7BA351B483E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E81FEC7-4398-4947-9CD9-7BA351B483E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

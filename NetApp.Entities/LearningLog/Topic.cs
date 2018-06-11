@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace NetApp.Entities.LearningLog
 {
@@ -8,6 +9,7 @@ namespace NetApp.Entities.LearningLog
     {
         public int Id { get; set; }
 
+        [Required, StringLength(100)]
         public string Name { get; set; }
 
         public DateTime UpdateTime { get; set; }

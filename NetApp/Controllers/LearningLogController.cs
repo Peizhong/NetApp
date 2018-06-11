@@ -14,6 +14,7 @@ namespace NetApp.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class LearningLogController : ControllerBase
     {
         private ILogsApp logsApp;
@@ -78,7 +79,10 @@ namespace NetApp.Controllers
                 if (user == null)
                     return new TopicDTO[] { };
                 topic.OwnerId = user.Id;
-                int res = logsApp.SaveTopic(topic);
+                if (ModelState.IsValid)
+                {
+                    int res = logsApp.SaveTopic(topic);
+                }
                 return logsApp.GetUserTopics(user.Id);
             }
             catch (Exception ex)
