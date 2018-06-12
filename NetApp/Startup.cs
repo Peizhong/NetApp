@@ -30,16 +30,8 @@ namespace NetApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            /*
-            services.AddDbContext<ApplicationDbContext>(
-                options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                x => x.MigrationsAssembly("IdentitySample.DefaultUI")));
-            */
-
-            services.AddDbContext<ApplicationDbContext>(
-                options => options.UseSqlite("Data Source=mydev.db;",
-                x => x.MigrationsAssembly("IdentitySample.DefaultUI")));
-            services.AddSingleton<ILearningLogRepo, SQLearningLogRepo>();
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=mydev.db;"));
+            services.AddSingleton<ILearningLogRepo, MQLearningLogRepo>();
             services.AddSingleton<ILogsApp, ALogsApp>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options => options.Stores.MaxLengthForKeys = 128)
@@ -85,6 +77,8 @@ namespace NetApp
             // Adds a default in-memory implementation of IDistributedCache.
             services.AddDistributedMemoryCache();
 
+            services.AddHttpClient();
+
             services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
@@ -100,11 +94,13 @@ namespace NetApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                /*
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
                     ReactHotModuleReplacement = true
                 });
+                */
             }
             else
             {

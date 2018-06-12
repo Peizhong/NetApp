@@ -27,7 +27,6 @@ namespace NetApp.Repository
         {
             using (var conn = new MySqlConnection(connStr))
             {
-                conn.Open();
                 var res = conn.Query<Entry>("SELECT id,title,text,link,date_add as updatetime,topic_id as topicid FROM learning_logs_entry where topic_id=@topicid;", new { topicid = topicId });
                 int count = res.Count();
                 return res;
@@ -38,7 +37,6 @@ namespace NetApp.Repository
         {
             using (var conn = new MySqlConnection(connStr))
             {
-                conn.Open();
                 var res = conn.QueryFirstOrDefault<Entry>("SELECT id,title,text,link,date_add as updatetime,topic_id as topicid FROM learning_logs_entry where id=@entryid;", new { entryid = entryId });
                 return res;
             }
@@ -48,7 +46,6 @@ namespace NetApp.Repository
         {
             using (var conn = new MySqlConnection(connStr))
             {
-                conn.Open();
                 Topic topic = null;
                 var sql = @"select t.id,t.topic as name,t.date_add as updatetime,t.owner_id,e.id,e.title,e.text,e.link,e.date_add as updatetime,e.topic_id as topicid from learning_logs_topic t left join learning_logs_entry e on t.id = e.topic_id where t.id=@topicid";
                 var list = conn.Query<Topic, Entry, Topic>(sql, (t, e) =>

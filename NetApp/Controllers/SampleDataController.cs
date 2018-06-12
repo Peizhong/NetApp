@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
 
 namespace NetApp.Controllers
 {
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
+        private readonly IHttpClientFactory _clientFactory;
+        public SampleDataController(IHttpClientFactory clientFactory)
+        {
+            _clientFactory = clientFactory;
+            var client = _clientFactory.CreateClient();
+        }
+
         private static string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -31,6 +39,7 @@ namespace NetApp.Controllers
         {
             try
             {
+                var client = _clientFactory.CreateClient();
                 var res = await Portal.MachineLearning.Instance.GetComputerVisionResult(imgPath);
                 if (string.IsNullOrEmpty(res))
                 {
