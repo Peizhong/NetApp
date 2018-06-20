@@ -68,10 +68,10 @@ export class NavMenu extends React.Component<{}, {}> {
                     <button
                       type="submit"
                       onClick={() => {
-                        const signout = fetch('Account/LogOut', {
+                        const signout = fetch('home/LogOut', {
                           method: 'POST',
                           credentials: 'include'
-                        });
+                        }).then(r => (window.location.href = 'Identity/Account/Login'));
                       }}
                     >
                       Sign Out

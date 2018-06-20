@@ -35,6 +35,18 @@ namespace NetApp.Controllers
         }
 
         [HttpGet("[action]")]
+        public IEnumerable<LineHeadUserVO> LineHeadUsers(string bearuCode)
+        {
+            return Enumerable.Range(1, 10).Select(index => new LineHeadUserVO
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                User = $"用户 {index}",
+                Department = $"厂家 {index}",
+                UserCode = Guid.NewGuid().ToString("N")
+            });
+        }
+
+        [HttpGet("[action]")]
         public async Task<string> WhatCanYouSee(string imgPath)
         {
             try
@@ -66,6 +78,26 @@ namespace NetApp.Controllers
                     return 32 + (int)(TemperatureC / 0.5556);
                 }
             }
+        }
+
+        public class LineHeadUserVO
+        {
+            public string Id { get; set; }
+
+            /// <summary>
+            /// 施工单位
+            /// </summary>
+            public string Department { get; set; }
+
+            /// <summary>
+            /// 施工人员
+            /// </summary>
+            public string User { get; set; }
+
+            /// <summary>
+            /// 施工人员资格编号
+            /// </summary>
+            public string UserCode { get; set; }
         }
     }
 }
