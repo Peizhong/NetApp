@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Buffers;
 
 namespace NetApp.Play
 {
@@ -14,24 +16,13 @@ namespace NetApp.Play
         }
     }
 
-    /// <summary>
-    /// 泛型
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class GenericList<T>
-    {
-        public void Add(T input)
-        {
-            ;
-        }
-    }
-
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            learnArray();
+            Book.Chap12 chap10 = new Book.Chap12();
+            chap10.DoQuery();
+            Console.WriteLine("done");
             Console.ReadKey();
         }
 
@@ -60,6 +51,30 @@ namespace NetApp.Play
             //ex.learnDynamic(1, 3, 4);
             dyEx.learnDynamic(1, 3, 4);
             dyEx.dome(1, 3);
+        }
+
+        static void learnSpan()
+        {
+            int[] arr1 = { 1, 2, 3, 4, 5, 6, 7, 8 };
+            var span1 = new Span<int>(arr1);
+            span1.Clear();
+            span1.Fill(43);
+            arr1[1] = 2;
+            span1[2] = 1;
+            var span2 = span1.Slice(start: 2, length: 3);
+            ReadOnlySpan<int> readSpan = new ReadOnlySpan<int>(arr1);
+
+            ArrayPool<int> customPool = ArrayPool<int>.Create(maxArrayLength: 1024 * 1024, maxArraysPerBucket: 3);
+
+            foreach (var n in Enumerable.Range(1, 10))
+            {
+                int length = n << 2;
+                int[] arr = customPool.Rent(length);
+                var span3 = new Span<int>(arr);
+                span3.Fill(n);
+                Console.WriteLine($"request {length} and get {arr.Length}");
+                customPool.Return(arr, clearArray: false);
+            }
         }
     }
 }

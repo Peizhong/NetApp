@@ -31,7 +31,7 @@ namespace NetApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=mydev.db;"));
-            services.AddSingleton<ILearningLogRepo, MQLearningLogRepo>();
+            services.AddSingleton<ILearningLogRepo, SQLearningLogRepo>();
             services.AddSingleton<ILogsApp, ALogsApp>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options => options.Stores.MaxLengthForKeys = 128)
@@ -94,13 +94,11 @@ namespace NetApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                /*
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
                     ReactHotModuleReplacement = true
                 });
-                */
             }
             else
             {
