@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using NetApp.Repository;
+using NetApp.Entities.Avmt;
 
 namespace NetApp.Play.Book
 {
@@ -39,6 +41,21 @@ namespace NetApp.Play.Book
                 }
             }
             Console.WriteLine($"took {DateTime.Now - start} to query all cache baseinfoconfg");
+        }
+
+        public void DoGroup()
+        {
+            var repo = new SQBaseInfoRepo();
+            var basicInfoConfigs = repo.GetAllBasicInfoConfigs();
+            var configs = from bc in basicInfoConfigs
+                          group bc by bc.BaseInfoTypeId into gid
+                          orderby gid.Key
+                          select new
+                          {
+                              BaseinfoTypeId = gid.Key,
+                              Configs = from c in gid select c
+                          };
+            var d2 = configs.ToDictionary(d => d.BaseinfoTypeId, d => d.Configs);
         }
     }
 }

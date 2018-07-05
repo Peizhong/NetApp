@@ -20,8 +20,10 @@ namespace NetApp.Play
     {
         static void Main(string[] args)
         {
-            Book.Chap12 chap10 = new Book.Chap12();
-            chap10.DoQuery();
+            var chap = new Book.Chap15();
+            chap.DoSomething();
+            var word = new Portal.Words();
+            word.GetWordDefine("王");
             Console.WriteLine("done");
             Console.ReadKey();
         }

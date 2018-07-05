@@ -9,9 +9,9 @@ using NetApp.Entities.Avmt;
 
 namespace NetApp.Repository
 {
-    public class BaseInfoConetext : DbContext
+    public class BaseInfoContext : DbContext
     {
-        public BaseInfoConetext(DbContextOptions<BaseInfoConetext> options)
+        public BaseInfoContext(DbContextOptions<BaseInfoContext> options)
             : base(options)
         {
         }
@@ -25,11 +25,11 @@ namespace NetApp.Repository
 
     public class SQBaseInfoRepo
     {
-        private DbContextOptionsBuilder<BaseInfoConetext> dbConfig;
+        private DbContextOptionsBuilder<BaseInfoContext> dbConfig;
 
         public SQBaseInfoRepo(string connectionString = @"Data Source=D:\Source\Repos\Comtop\Comtop.YTH\Comtop.YTH.App\bin\Debug\DB\avmt.db;")
         {
-            dbConfig = new DbContextOptionsBuilder<BaseInfoConetext>();
+            dbConfig = new DbContextOptionsBuilder<BaseInfoContext>();
             dbConfig.UseSqlite(connectionString);
         }
 
@@ -39,7 +39,7 @@ namespace NetApp.Repository
         {
             if (allClassifies == null)
             {
-                using (var context = new BaseInfoConetext(dbConfig.Options))
+                using (var context = new BaseInfoContext(dbConfig.Options))
                 {
                     allClassifies = context.Classifies.AsNoTracking().Where(c => c.IsShow == 1).ToList();
                 }
@@ -47,9 +47,51 @@ namespace NetApp.Repository
             return allClassifies;
         }
 
+        public List<BasicInfoConfig> GetAllBasicInfoConfigs()
+        {
+            using (var context = new BaseInfoContext(dbConfig.Options))
+            {
+                var start = DateTime.Now;
+                var m3 = from b in context.BasicinfoConfigs.AsNoTracking()
+                         where b.IsDisplay == 1
+                         group b by b.BaseInfoTypeId into bids
+                         orderby bids.Key
+                         select new
+                         {
+                             typeId = bids.Key,
+                             bcs = from bid in bids
+                                   join d in context.BasicInfoDictConfigs.AsNoTracking()
+                                   on bid.DictionaryId equals d.DictionaryId into temp
+                                   orderby bid.SortNo
+                                   select new
+                                   {
+                                       bc = bid,
+                                       dicts = temp.OrderBy(d => d.SortNo)
+                                   }
+                         };
+                start = DateTime.Now;
+                Dictionary<string, List<BasicInfoConfig>> dicts2 = new Dictionary<string, List<BasicInfoConfig>>();
+                foreach (var m in m3)
+                {
+                    List<BasicInfoConfig> configs = new List<BasicInfoConfig>();
+                    foreach (var bd in m.bcs)
+                    {
+                        if (bd.dicts?.Any() == true)
+                        {
+                            bd.bc.BaseinfoDict = bd.dicts.ToList();
+                        }
+                        configs.Add(bd.bc);
+                    }
+                    dicts2.Add(m.typeId, configs);
+                }
+                Console.WriteLine($"took {DateTime.Now - start} to foreach");
+                return dicts2.SelectMany(d => d.Value).ToList();
+            }
+        }
+
         public List<BasicInfoConfig> GetBasicInfoConfigs(string classifyId)
         {
-            using (var context = new BaseInfoConetext(dbConfig.Options))
+            using (var context = new BaseInfoContext(dbConfig.Options))
             {
                 var match = from c in context.Classifies
                             join b in context.BasicinfoConfigs.AsNoTracking()
@@ -71,7 +113,7 @@ namespace NetApp.Repository
                 return new List<BasicInfoConfig>();
             if (allBasicInfoConfigs == null)
             {
-                using (var context = new BaseInfoConetext(dbConfig.Options))
+                using (var context = new BaseInfoContext(dbConfig.Options))
                 {
                     var match = from c in context.Classifies
                                 join b in context.BasicinfoConfigs.AsNoTracking()
@@ -96,7 +138,7 @@ namespace NetApp.Repository
             if (allBasicInfoConfigDict == null)
             {
                 allBasicInfoConfigDict = new Dictionary<string, List<BasicInfoConfig>>();
-                using (var context = new BaseInfoConetext(dbConfig.Options))
+                using (var context = new BaseInfoContext(dbConfig.Options))
                 {
                     var match = from c in context.Classifies
                                 join b in context.BasicinfoConfigs.AsNoTracking()
