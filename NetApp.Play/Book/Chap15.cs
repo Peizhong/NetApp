@@ -59,7 +59,7 @@ namespace NetApp.Play.Book
 
         public string Changes { get; }
 
-        public string Issues { get; set }
+        public string Issues { get; set; }
 
         public LastModifiedAttribute(string dateModified, string changes)
         {
