@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +30,10 @@ namespace NetApp
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// configure services in the dependency injection container
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=mydev.db;"));
@@ -88,7 +94,11 @@ namespace NetApp
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">add middleware to the HTTP request pipeline</param>
+        /// <param name="env">access the name of the environment, root path...</param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -121,6 +131,12 @@ namespace NetApp
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
+            
+        }
+
+        public static string GetRequestInfo(HttpRequest request)
+        {
+            StringBuilder
         }
     }
 }

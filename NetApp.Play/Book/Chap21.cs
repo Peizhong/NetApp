@@ -125,5 +125,14 @@ namespace NetApp.Play.Book
             wordForLine.LinkTo(display);
             return fileNamesForPath;
         }
+
+        object _lock = new object();
+        int b = 0;
+        void AddSomething()
+        {
+            Interlocked.Increment(ref b);
+            Monitor.TryEnter(_lock, 100);
+            var semaphore = new SemaphoreSlim(10);
+        }
     }
 }

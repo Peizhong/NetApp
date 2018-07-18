@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Buffers;
+using System.Text;
 
 namespace NetApp.Play
 {
@@ -8,8 +9,13 @@ namespace NetApp.Play
     {
         static void Main(string[] args)
         {
-            var chap = new Book.Chap21();
-            chap.DoSomething();
+            EncodingProvider provider = CodePagesEncodingProvider.Instance;
+            Encoding.RegisterProvider(provider);
+
+            var chap = new Book.Chap23();
+            var task = chap.TcpHttpClient();
+            Console.WriteLine("now getting something...");
+            task.Wait();
             Console.WriteLine("done");
             Console.ReadKey();
         }
