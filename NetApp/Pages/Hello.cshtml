@@ -1,0 +1,43 @@
+﻿@page
+@model InlinePageModel
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using NetApp.Repository
+@using NetApp.Entities.Avmt
+@inject ApplicationDbContext _context
+@{
+    ViewBag.Title = "Inline";
+    Layout = "/Views/Shared/_Layout2.cshtml";
+}
+
+@functions
+{
+public class InlinePageModel : PageModel
+{
+    private readonly ApplicationDbContext _dbContext;
+    public InlinePageModel(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+        _dbContext.Database.EnsureCreated();
+    }
+
+    public IEnumerable<FunctionLocation> FunctionLocations { get; set; }
+
+    /// <summary>
+    /// OnGet method is invoked on every GET request of the page
+    /// </summary>
+    public void OnGet()
+    {
+        FunctionLocations = _dbContext.FunctionLocation.Take(100).ToArray();
+    }
+}
+}
+
+<h2>This is in line demo page</h2>
+
+<ul>
+    @foreach (var f in Model.FunctionLocations)
+    {
+
+        <li>@f.FlName</li>
+    }
+</ul>
