@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Repository.Interface
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Business", "NetApp.Business\NetApp.Business.csproj", "{8E81FEC7-4398-4947-9CD9-7BA351B483E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Play", "NetApp.Play\NetApp.Play.csproj", "{46BED184-4366-4E09-B03F-0FA0B5A7243B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Play", "NetApp.Play\NetApp.Play.csproj", "{46BED184-4366-4E09-B03F-0FA0B5A7243B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

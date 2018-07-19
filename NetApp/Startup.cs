@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
+using NetApp.Middlewares;
 using NetApp.Entities;
 using NetApp.Repository;
 using NetApp.Repository.Interfaces;
@@ -104,11 +105,13 @@ namespace NetApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                /*
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
                     ReactHotModuleReplacement = true
                 });
+                */
             }
             else
             {
@@ -120,6 +123,8 @@ namespace NetApp
             app.UseAuthentication();
 
             app.UseSession();
+
+            app.UseStartTimeHeader();
 
             app.UseMvc(routes =>
             {
@@ -134,9 +139,5 @@ namespace NetApp
             
         }
 
-        public static string GetRequestInfo(HttpRequest request)
-        {
-            StringBuilder
-        }
     }
 }

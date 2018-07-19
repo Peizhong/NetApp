@@ -1,8 +1,16 @@
-﻿
-@{
+﻿@{
+    Layout = "/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Index2";
+    string dtNow = DateTime.Now.ToString();
 }
 
 <h2>@ViewData["Title"]</h2>
 <h2>@ViewData["Text"]</h2>
+@dtNow
+<ul>
+    @foreach (var d in ViewBag.Bills)
+    {
+        <li>@d</li>
+    }
+</ul>
 

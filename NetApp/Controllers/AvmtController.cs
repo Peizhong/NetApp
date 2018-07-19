@@ -4,16 +4,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using NetApp.Entities.Avmt;
 
 namespace NetApp.Controllers
 {
     public class AvmtController : Controller
     {
-        // GET: Avmt
-        public ActionResult Index()
+        private readonly IDistributedCache _cache;
+        public AvmtController(IDistributedCache cache)
         {
+            _cache = cache;
+        }
+
+        // GET: Avmt
+        public async Task<ActionResult> Index()
+        {
+            await _cache.SetStringAsync("lastServerStartTime", DateTime.Now.ToString());
             ViewBag.Title = "mimi";
             ViewBag.Text = "alalal";
+            ViewBag.Bills = new[] { "2017", "2018", "2019" };
             return View();
         }
 
@@ -22,6 +32,12 @@ namespace NetApp.Controllers
         {
             return View();
         }
+
+        private IEnumerable<FunctionLocation> FunctionLocations
+            => Enumerable.Range(1, 10).Select(n =>
+              new FunctionLocation { Id = Guid.NewGuid().ToString("N"), Name = $"FL{n}" }).ToList();
+
+        public IActionResult DetailsAsModel() => View(FunctionLocations);
 
         // GET: Avmt/Create
         public ActionResult Create()
@@ -90,6 +106,11 @@ namespace NetApp.Controllers
             {
                 return View();
             }
+        }
+
+        public IActionResult RedirectDemo()
+        {
+            return Redirect("http://www.baidu.com");
         }
     }
 }
