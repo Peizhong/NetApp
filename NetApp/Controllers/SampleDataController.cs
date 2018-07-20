@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using NetApp.Business.Interfaces;
 
 namespace NetApp.Controllers
 {
@@ -11,10 +12,12 @@ namespace NetApp.Controllers
     public class SampleDataController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
-        public SampleDataController(IHttpClientFactory clientFactory)
+        private readonly IAvmtApp _avmtApp;
+        public SampleDataController(IHttpClientFactory clientFactory,IAvmtApp avmtApp)
         {
             _clientFactory = clientFactory;
             var client = _clientFactory.CreateClient();
+            _avmtApp = avmtApp;
         }
 
         private static string[] Summaries = new[]
@@ -25,6 +28,7 @@ namespace NetApp.Controllers
         [HttpGet("[action]")]
         public IEnumerable<WeatherForecast> WeatherForecasts(int startDateIndex)
         {
+            var head = Request.Headers;
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
@@ -33,19 +37,7 @@ namespace NetApp.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             });
         }
-
-        [HttpGet("[action]")]
-        public IEnumerable<LineHeadUserVO> LineHeadUsers(string bearuCode)
-        {
-            return Enumerable.Range(1, 10).Select(index => new LineHeadUserVO
-            {
-                Id = Guid.NewGuid().ToString("N"),
-                User = $"用户 {index}",
-                Department = $"厂家 {index}",
-                UserCode = Guid.NewGuid().ToString("N")
-            });
-        }
-
+        
         [HttpGet("[action]")]
         public async Task<string> WhatCanYouSee(string imgPath)
         {
@@ -65,6 +57,17 @@ namespace NetApp.Controllers
             }
         }
 
+        [HttpGet("[action]")]
+        public async Task<string> Avmt()
+        {
+            var functionLocations = await _avmtApp.AllFunctionLocations();
+            foreach (var f in functionLocations)
+            {
+                await _avmtApp.UpdateFunctionLocation(f);
+            }
+            return "Ok";
+        }
+
         public class WeatherForecast
         {
             public string DateFormatted { get; set; }
@@ -78,26 +81,6 @@ namespace NetApp.Controllers
                     return 32 + (int)(TemperatureC / 0.5556);
                 }
             }
-        }
-
-        public class LineHeadUserVO
-        {
-            public string Id { get; set; }
-
-            /// <summary>
-            /// 施工单位
-            /// </summary>
-            public string Department { get; set; }
-
-            /// <summary>
-            /// 施工人员
-            /// </summary>
-            public string User { get; set; }
-
-            /// <summary>
-            /// 施工人员资格编号
-            /// </summary>
-            public string UserCode { get; set; }
         }
     }
 }

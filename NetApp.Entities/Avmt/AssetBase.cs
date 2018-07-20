@@ -6,7 +6,7 @@ namespace NetApp.Entities.Avmt
 {
     public class AssetBase : AccountBase
     {
-        public int AssetState => State;
+        public int AssetState { get; set; }
 
         public int IsShareAsset { get; set; }
         public DateTime LeaveFactoryDate { get; set; }
@@ -17,13 +17,13 @@ namespace NetApp.Entities.Avmt
 
     public class Device : AssetBase
     {
-        public string DeviceName => Name;
+        public string DeviceName { get; set; }
         public string DeviceCode { get; set; }
     }
 
     public class Parts : AssetBase
     {
-        public string PartsName => Name;
+        public string PartsName { get; set; }
         public string PartsCode { get; set; }
         public string AssetId { get; set; }
     }

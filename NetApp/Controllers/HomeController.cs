@@ -19,7 +19,6 @@ namespace NetApp.Controllers
             _signInManager = signInManager;
         }
 
-        [Authorize]
         public IActionResult Index()
         {
             HttpContext.Session.SetString("_Name", "Rick");

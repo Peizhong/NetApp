@@ -35,7 +35,7 @@ namespace NetApp.Controllers
 
         private IEnumerable<FunctionLocation> FunctionLocations
             => Enumerable.Range(1, 10).Select(n =>
-              new FunctionLocation { Id = Guid.NewGuid().ToString("N"), Name = $"FL{n}" }).ToList();
+              new FunctionLocation { Id = Guid.NewGuid().ToString("N"), FlName = $"FL{n}" }).ToList();
 
         public IActionResult DetailsAsModel() => View(FunctionLocations);
 

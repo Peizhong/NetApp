@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 using NetApp.Entities;
 using NetApp.Entities.LearningLog;
-using NetApp.Entities.Avmt;
 
 namespace NetApp.Repository
 {
@@ -22,7 +21,5 @@ namespace NetApp.Repository
         public DbSet<Entry> Entries { get; set; }
 
         public DbSet<Topic> Topics { get; set; }
-
-        public DbSet<NetApp.Entities.Avmt.FunctionLocation> FunctionLocation { get; set; }
     }
 }

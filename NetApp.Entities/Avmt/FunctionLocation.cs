@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NetApp.Entities.Avmt
 {
+    [Table("dm_function_location")]
     public class FunctionLocation : AccountBase
     {
-        public string FlName => Name;
-        public int FlType => ObjectType;
-        public int RunningState => State;
+        [Column("fl_name")]
+        public string FlName { get; set; }
 
+        [Column("fl_type")]
+        public int FlType { get; set; }
+
+        [Column("running_state")]
+        public int RunningState { get; set; }
+
+        [Column("fl_code")]
         public string FlCode { get; set; }
+
+        [Column("sort_no")]
         public int SortNo { get; set; }
     }
 

@@ -28,7 +28,7 @@
                 @Html.DisplayNameFor(model => model.WorkspaceId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.FlName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ProvinceCode)
@@ -37,7 +37,7 @@
                 @Html.DisplayNameFor(model => model.BureauCode)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ObjectType)
+                @Html.DisplayNameFor(model => model.FlType)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ClassifyId)
@@ -46,7 +46,7 @@
                 @Html.DisplayNameFor(model => model.VoltageId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.State)
+                @Html.DisplayNameFor(model => model.RunningState)
             </th>
             <th></th>
         </tr>
@@ -64,7 +64,7 @@
                 @Html.DisplayFor(modelItem => item.WorkspaceId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.FlName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ProvinceCode)
@@ -73,7 +73,7 @@
                 @Html.DisplayFor(modelItem => item.BureauCode)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ObjectType)
+                @Html.DisplayFor(modelItem => item.FlType)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ClassifyId)
@@ -82,7 +82,7 @@
                 @Html.DisplayFor(modelItem => item.VoltageId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.State)
+                @Html.DisplayFor(modelItem => item.RunningState)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

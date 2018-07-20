@@ -28,7 +28,7 @@ namespace NetApp.Tests
             string res = string.Empty;
             Task.Run(async () =>
             {
-                var controller = new Controllers.SampleDataController();
+                var controller = new Controllers.SampleDataController(null);
                 res = await controller.WhatCanYouSee(@"http://193.112.41.28/downloads/Snipaste_2018-05-04_00-13-13.jpg");
             }).Wait();
             Assert.IsTrue(!string.IsNullOrEmpty(res), "call microsoft machine learning api");
