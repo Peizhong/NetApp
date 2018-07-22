@@ -56,21 +56,21 @@ namespace NetApp.Business
 
         public Task UpdateFunctionLocation(FunctionLocation functionLocation)
         {
-            Console.WriteLine($"Post: Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
+            Console.WriteLine($"Post {functionLocation.Id}: Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
             _dataInPipeline.Post(functionLocation);
             return Task.FromResult(true);
         }
 
         private FunctionLocation saveToCache(FunctionLocation functionLocation)
         {
-            Console.WriteLine($"saveToCache: Thread: {Thread.CurrentThread?.ManagedThreadId}, Task: {Task.CurrentId}");
+            Console.WriteLine($"saveToCache {functionLocation.Id}: Thread: {Thread.CurrentThread?.ManagedThreadId}, Task: {Task.CurrentId}");
             //_cacheAvmt?.UpdateFunctionLocation(functionLocation);
             return functionLocation;
         }
 
         private FunctionLocation saveToPersist(FunctionLocation functionLocation)
         {
-            Console.WriteLine($"saveToPersist: Thread: {Thread.CurrentThread?.ManagedThreadId}, Task: {Task.CurrentId}");
+            Console.WriteLine($"saveToPersist {functionLocation.Id}: Thread: {Thread.CurrentThread?.ManagedThreadId}, Task: {Task.CurrentId}");
             //_persistAvmt?.UpdateFunctionLocation(functionLocation);
             return functionLocation;
         }
@@ -79,7 +79,7 @@ namespace NetApp.Business
         {
             var toCache = new TransformBlock<FunctionLocation, FunctionLocation>(f => saveToCache(f));
             var toPersist = new TransformBlock<FunctionLocation, FunctionLocation>(f => saveToPersist(f));
-            var end = new ActionBlock<FunctionLocation>(f => Console.WriteLine($"in {f.FlName}"));
+            var end = new ActionBlock<FunctionLocation>(null);
             toCache.LinkTo(toPersist);
             toPersist.LinkTo(end);
             return toCache;

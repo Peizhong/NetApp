@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using NetApp.Business.Interfaces;
 
@@ -13,11 +14,15 @@ namespace NetApp.Controllers
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IAvmtApp _avmtApp;
-        public SampleDataController(IHttpClientFactory clientFactory,IAvmtApp avmtApp)
+        private readonly ILogger<SampleDataController> _logger;
+        public SampleDataController(IHttpClientFactory clientFactory,IAvmtApp avmtApp, ILogger<SampleDataController> logger)
         {
             _clientFactory = clientFactory;
             var client = _clientFactory.CreateClient();
             _avmtApp = avmtApp;
+            _logger = logger;
+
+            _logger.LogInformation(1, "aa");
         }
 
         private static string[] Summaries = new[]
@@ -60,12 +65,17 @@ namespace NetApp.Controllers
         [HttpGet("[action]")]
         public async Task<string> Avmt()
         {
-            var functionLocations = await _avmtApp.AllFunctionLocations();
-            foreach (var f in functionLocations)
+            using (_logger.BeginScope("sample Avmt pipeling"))
             {
-                await _avmtApp.UpdateFunctionLocation(f);
+                _logger.LogInformation("start");
+                var functionLocations = await _avmtApp.AllFunctionLocations();
+                foreach (var f in functionLocations)
+                {
+                    await _avmtApp.UpdateFunctionLocation(f);
+                }
+                _logger.LogInformation("done");
+                return "Ok";
             }
-            return "Ok";
         }
 
         public class WeatherForecast

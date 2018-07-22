@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.EntityFrameworkCore;
 
 using NetApp.Middlewares;
@@ -26,6 +28,9 @@ namespace NetApp
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            var con = Configuration.GetConnectionString("DefaultConnection");
+            var sec = Configuration.GetSection("Logging");
+            con = sec.GetSection("LogLevel")["Default"];
         }
 
         public IConfiguration Configuration { get; }
@@ -38,6 +43,16 @@ namespace NetApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=mydev.db;"));
+            services.AddLogging(builder =>
+            {
+                builder.AddConfiguration(Configuration.GetSection("Logging"));
+                builder.AddConsole(options => options.IncludeScopes = true);
+#if DEBUG
+                builder.AddDebug();
+#endif
+                builder.AddFilter<ConsoleLoggerProvider>("SampleDataController", LogLevel.Information);
+            });
+
             services.AddSingleton<ILearningLogRepo, SQLearningLogRepo>();
             services.AddSingleton<ILogsApp, ALogsApp>();
             services.AddSingleton<IAvmtRepo, InMemoryAvmtRepo>();

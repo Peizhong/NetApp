@@ -36,7 +36,7 @@ namespace NetApp.Repository
     {
         private BaseInfoContext _baseInfoContext;
 
-        public SQBaseInfoRepo(string connectionString = @"Data Source=D:\Source\Repos\Comtop\Comtop.YTH\Comtop.YTH.App\bin\Debug\DB\avmt.db;")
+        public SQBaseInfoRepo(string connectionString = @"Data Source=avmt.db;")
         {
             var dbConfig = new DbContextOptionsBuilder<BaseInfoContext>();
             dbConfig.UseSqlite(connectionString);
