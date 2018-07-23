@@ -16,9 +16,11 @@ namespace NetApp.Entities.Avmt
 
         [Column("bureau_code")]
         public string BureauCode { get; set; }
-        
+
         [Column("update_time")]
         public DateTime UpdateTime { get; set; }
+
+        public virtual ICollection<Workspace> Workspaces { get; set; }
     }
 
     [Table("dm_main_transfer")]

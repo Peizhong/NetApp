@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
-using NetApp.Business.Interfaces;
 using NetApp.Entities.Avmt;
+using NetApp.Business.Interfaces;
 
 namespace NetApp.Controllers
 {
@@ -59,6 +60,40 @@ namespace NetApp.Controllers
             {
                 return string.Empty;
             }
+        }
+
+        /// <summary>
+        /// When a request comes in, ASP.NET takes one of its thread pool threads and assigns it to that request. 
+        /// This time the request handler will call that external resource asynchronously. 
+        /// This returns the request thread to the thread pool until the call to the external resource returns
+        /// While the thread is in the thread pool, it’s no longer associated with that request
+        /// when the external resource call returns, ASP.NET takes one of its thread pool threads and reassigns it to that request
+        /// with synchronous handlers, the same thread is used for the lifetime of the request
+        /// with asynchronous handlers, different threads may be assigned to the same request (at different times)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public async Task<IActionResult> DoAsync()
+        {
+            Console.WriteLine($"before await thread {Thread.CurrentThread?.ManagedThreadId}, task {Task.CurrentId}");
+            await Task.Run(async () =>
+            {
+                Console.WriteLine($"in await thread {Thread.CurrentThread?.ManagedThreadId}, task {Task.CurrentId}");
+                await Task.Delay(1000);
+            }).ConfigureAwait(false);
+
+            Console.WriteLine($"after await thread{Thread.CurrentThread?.ManagedThreadId}, task{Task.CurrentId}");
+            return Ok("haha");
+        }
+
+        [HttpGet("[action]")]
+        public async Task<string> DoSync()
+        {
+            Console.WriteLine($"before await thread {Thread.CurrentThread?.ManagedThreadId}, task {Task.CurrentId}");
+            Thread.Sleep(1000);
+
+            Console.WriteLine($"after await thread{Thread.CurrentThread?.ManagedThreadId}, task{Task.CurrentId}");
+            return "hhaha";
         }
 
         [HttpGet("[action]")]

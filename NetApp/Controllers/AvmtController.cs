@@ -2,35 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using NetApp.Entities.Avmt;
+using NetApp.Business.Interfaces;
 
 namespace NetApp.Controllers
 {
     public class AvmtController : Controller
     {
         private readonly IDistributedCache _cache;
-        public AvmtController(IDistributedCache cache)
+        private readonly IAvmtApp _avmtApp;
+        public AvmtController(IDistributedCache cache, IAvmtApp avmtApp)
         {
             _cache = cache;
+            _avmtApp = avmtApp;
         }
 
         // GET: Avmt
-        public async Task<ActionResult> Index()
+        public async Task<ViewResult> Index()
         {
             await _cache.SetStringAsync("lastServerStartTime", DateTime.Now.ToString());
-            ViewBag.Title = "mimi";
-            ViewBag.Text = "alalal";
-            ViewBag.Bills = new[] { "2017", "2018", "2019" };
-            return View();
+            var bills = await _avmtApp.Bills();
+            return View(bills);
         }
+        
 
-        // GET: Avmt/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> MainTransferDetail(string id)
         {
-            return View();
+            var bills = await _avmtApp.Bills();
+            return View(bills.First(b => b.Id == id));
         }
 
         private IEnumerable<FunctionLocation> FunctionLocations

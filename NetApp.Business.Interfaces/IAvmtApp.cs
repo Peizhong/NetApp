@@ -8,7 +8,7 @@ namespace NetApp.Business.Interfaces
 {
     public interface IAvmtApp
     {
-        Task<IEnumerable<FunctionLocation>> FunctionLocations(int startIndex, int pageSize);
+        Task<List<FunctionLocation>> FunctionLocations(int startIndex, int pageSize);
         Task<FunctionLocation> FindFunctionLocation(string id);
         Task UpdateFunctionLocation(FunctionLocation functionLocation);
 

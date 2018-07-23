@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.Concurrent;
+using System.Linq;
 using NetApp.Entities.Avmt;
 using NetApp.Entities.Attributes;
 using NetApp.Repository.Interfaces;
+using System.Threading.Tasks;
 
 namespace NetApp.Repository
 {
@@ -38,22 +40,27 @@ namespace NetApp.Repository
             return f;
         }
 
-        public IEnumerable<ChangeBill> GetChangeBills()
+        public Task<List<ChangeBill>> GetChangeBillsAsync()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DisTransferBill> GetDisTransfersBills()
+        public Task<List<DisTransferBill>> GetDisTransfersBillsAsync()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
+        public List<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
         {
-            return _functionLocations.Values;
+            throw new NotImplementedException();
         }
 
-        public IEnumerable<MainTransferBill> GetMainTransfersBills()
+        public Task<List<FunctionLocation>> GetFunctionLocationsAsync(int startIndex, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<MainTransferBill>> GetMainTransfersBillsAsync()
         {
             throw new NotImplementedException();
         }

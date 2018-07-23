@@ -44,10 +44,9 @@ namespace NetApp.Business
         public bool HasCache => _cacheAvmt != null;
         public bool HasPersist => _persistAvmt != null;
 
-        public Task<IEnumerable<FunctionLocation>> FunctionLocations(int startIndex, int pageSize)
+        public Task<List<FunctionLocation>> FunctionLocations(int startIndex, int pageSize)
         {
-            var functionLocations = _persistAvmt.GetFunctionLocations(startIndex, pageSize);
-            return Task.FromResult(functionLocations);
+            return _persistAvmt.GetFunctionLocationsAsync(startIndex, pageSize);
         }
 
         public Task<FunctionLocation> FindFunctionLocation(string id)
@@ -86,13 +85,16 @@ namespace NetApp.Business
             return toCache;
         }
 
-        public Task<IEnumerable<BillBase>> Bills()
+        public async Task<IEnumerable<BillBase>> Bills()
         {
-            var main = _persistAvmt.GetMainTransfersBills();
-            var dis = _persistAvmt.GetDisTransfersBills();
-            var change = _persistAvmt.GetChangeBills();
-            var mix = main.Cast<BillBase>().Concat(dis.Cast<BillBase>()).Concat(change.Cast<BillBase>());
-            return Task.FromResult(mix);
+            var allBills = new List<BillBase>();
+            var main = await _persistAvmt.GetMainTransfersBillsAsync();
+            var dis = await _persistAvmt.GetDisTransfersBillsAsync();
+            var change = await _persistAvmt.GetChangeBillsAsync();
+            allBills.AddRange(main);
+            allBills.AddRange(dis);
+            allBills.AddRange(change);
+            return allBills;
         }
     }
 }

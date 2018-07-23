@@ -23,12 +23,17 @@ namespace NetApp.Repository
         public DbSet<DisTransferBill> DisTransferBills { get; set; }
         public DbSet<ChangeBill> ChangeBills { get; set; }
 
+        public DbSet<Workspace> Workspaces { get; set; }
+
         public DbSet<FunctionLocation> FunctionLocations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<FunctionLocation>().HasKey(f => new { f.Id, f.WorkspaceId });
+
+            modelBuilder.Entity<MainTransferBill>().HasMany(b => b.Workspaces);
         }
     }
 

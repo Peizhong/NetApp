@@ -161,23 +161,23 @@ namespace NetApp.Repository
             throw new NotImplementedException();
         }
 
-        public IEnumerable<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
+        public List<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
         {
             if (startIndex > 0)
             {
                 if (pageSize > 0)
                 {
-                    return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).Take(pageSize).ToArray();
+                    return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).Take(pageSize).ToList();
                 }
-                return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).ToArray();
+                return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).ToList();
             }
             else
             {
                 if (pageSize > 0)
                 {
-                    return _baseInfoContext.FunctionLocations.AsNoTracking().Take(pageSize).ToArray();
+                    return _baseInfoContext.FunctionLocations.AsNoTracking().Take(pageSize).ToList();
                 }
-                return _baseInfoContext.FunctionLocations.AsNoTracking().ToArray();
+                return _baseInfoContext.FunctionLocations.AsNoTracking().ToList();
             }
         }
 
@@ -217,24 +217,24 @@ namespace NetApp.Repository
             return existFunctionLocation;
         }
 
-        public IEnumerable<MainTransferBill> GetMainTransfersBills()
+        public Task<List<MainTransferBill>> GetMainTransfersBillsAsync()
         {
-            return _baseInfoContext.MainTransferBills.AsNoTracking().ToArray();
+            return _baseInfoContext.MainTransferBills.AsNoTracking().ToListAsync();
         }
 
-        public IEnumerable<DisTransferBill> GetDisTransfersBills()
+        public Task<List<DisTransferBill>> GetDisTransfersBillsAsync()
         {
-            return _baseInfoContext.DisTransferBills.AsNoTracking().ToArray();
+            return _baseInfoContext.DisTransferBills.AsNoTracking().ToListAsync();
         }
 
-        public IEnumerable<ChangeBill> GetChangeBills()
+        public Task<List<ChangeBill>> GetChangeBillsAsync()
         {
-            return _baseInfoContext.ChangeBills.AsNoTracking().ToArray();
+            return _baseInfoContext.ChangeBills.AsNoTracking().ToListAsync();
         }
 
-        public Task<IEnumerable<FunctionLocation>> GetFunctionLocationsAsync(int startIndex, int pageSize)
+        public Task<List<FunctionLocation>> GetFunctionLocationsAsync(int startIndex, int pageSize)
         {
-            return _baseInfoContext.FunctionLocations.AsNoTracking().ToArrayAsync();
+            return _baseInfoContext.FunctionLocations.AsNoTracking().ToListAsync();
         }
     }
 }

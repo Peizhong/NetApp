@@ -1,16 +1,31 @@
-﻿@{
+﻿@using NetApp.Entities.Avmt
+@model IEnumerable<BillBase>
+@{
     Layout = "/Views/Shared/_Layout2.cshtml";
-    ViewData["Title"] = "Index2";
-    string dtNow = DateTime.Now.ToString();
+    ViewData["Title"] = "单据";
 }
 
-<h2>@ViewData["Title"]</h2>
-<h2>@ViewData["Text"]</h2>
-@dtNow
 <ul>
-    @foreach (var d in ViewBag.Bills)
+    @foreach (var b in Model)
     {
-        <li>@d</li>
+        @if (b is MainTransferBill main)
+        {
+            <li>
+                <a asp-action="MainTransferDetail" asp-route-id="@main.Id">主网移交 @main.BusinessBillCode</a>
+            </li>
+        }
+        else if (b is DisTransferBill dis)
+        {
+            <li>
+                <a asp-action="Edit" asp-route-id="@dis.Id">配网网移交 @dis.BusinessCode</a>
+            </li>
+        }
+        else if (b is ChangeBill change)
+        {
+            <li>
+                <a asp-action="Edit" asp-route-id="@change.Id">变更 @change.ChangeCode</a>
+            </li>
+        }
     }
 </ul>
 
