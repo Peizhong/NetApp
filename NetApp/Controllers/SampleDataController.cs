@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using NetApp.Business.Interfaces;
+using NetApp.Entities.Avmt;
 
 namespace NetApp.Controllers
 {
@@ -15,14 +16,12 @@ namespace NetApp.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly IAvmtApp _avmtApp;
         private readonly ILogger<SampleDataController> _logger;
-        public SampleDataController(IHttpClientFactory clientFactory,IAvmtApp avmtApp, ILogger<SampleDataController> logger)
+        public SampleDataController(IHttpClientFactory clientFactory, IAvmtApp avmtApp, ILogger<SampleDataController> logger)
         {
             _clientFactory = clientFactory;
             var client = _clientFactory.CreateClient();
             _avmtApp = avmtApp;
             _logger = logger;
-
-            _logger.LogInformation(1, "aa");
         }
 
         private static string[] Summaries = new[]
@@ -42,7 +41,7 @@ namespace NetApp.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             });
         }
-        
+
         [HttpGet("[action]")]
         public async Task<string> WhatCanYouSee(string imgPath)
         {
@@ -68,7 +67,7 @@ namespace NetApp.Controllers
             using (_logger.BeginScope("sample Avmt pipeling"))
             {
                 _logger.LogInformation("start");
-                var functionLocations = await _avmtApp.AllFunctionLocations();
+                var functionLocations = await _avmtApp.FunctionLocations(0, 100);
                 foreach (var f in functionLocations)
                 {
                     await _avmtApp.UpdateFunctionLocation(f);
@@ -76,6 +75,18 @@ namespace NetApp.Controllers
                 _logger.LogInformation("done");
                 return "Ok";
             }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IEnumerable<FunctionLocation>> FunctionLocations(int startIndex = 0, int pageSize = 100)
+        {
+            return await _avmtApp.FunctionLocations(startIndex, pageSize);
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IEnumerable<BillBase>> Bills()
+        {
+            return await _avmtApp.Bills();
         }
 
         public class WeatherForecast

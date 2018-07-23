@@ -10,37 +10,16 @@ using NetApp.Repository.Interfaces;
 
 namespace NetApp.Repository
 {
-    public class BaseInfoContext : DbContext
-    {
-        public BaseInfoContext(DbContextOptions<BaseInfoContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<Classify> Classifies { get; set; }
-        public DbSet<BasicInfoConfig> BasicinfoConfigs { get; set; }
-        public DbSet<BasicInfoDictConfig> BasicInfoDictConfigs { get; set; }
-        public DbSet<TechparamConfig> TechparamConfigs { get; set; }
-        public DbSet<TechparamDictConfig> TechparamDictConfigs { get; set; }
-        public DbSet<FunctionLocation> FunctionLocations { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<FunctionLocation>().HasKey(f => new { f.Id, f.WorkspaceId });
-        }
-    }
-
     [Repo(RepoTypeEnum.SQLite)]
     public class SQBaseInfoRepo : IAvmtRepo
     {
-        private BaseInfoContext _baseInfoContext;
+        private AvmtDbContext _baseInfoContext;
 
         public SQBaseInfoRepo(string connectionString = @"Data Source=avmt.db;")
         {
-            var dbConfig = new DbContextOptionsBuilder<BaseInfoContext>();
+            var dbConfig = new DbContextOptionsBuilder<AvmtDbContext>();
             dbConfig.UseSqlite(connectionString);
-            _baseInfoContext = new BaseInfoContext(dbConfig.Options);
+            _baseInfoContext = new AvmtDbContext(dbConfig.Options);
         }
 
         List<Classify> allClassifies = null;
@@ -182,14 +161,29 @@ namespace NetApp.Repository
             throw new NotImplementedException();
         }
 
-        public IEnumerable<FunctionLocation> GetAllFunctionLocations()
+        public IEnumerable<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
         {
-            return _baseInfoContext.FunctionLocations.AsNoTracking().Take(100).ToArray();
+            if (startIndex > 0)
+            {
+                if (pageSize > 0)
+                {
+                    return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).Take(pageSize).ToArray();
+                }
+                return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).ToArray();
+            }
+            else
+            {
+                if (pageSize > 0)
+                {
+                    return _baseInfoContext.FunctionLocations.AsNoTracking().Take(pageSize).ToArray();
+                }
+                return _baseInfoContext.FunctionLocations.AsNoTracking().ToArray();
+            }
         }
 
         public void UpdateFunctionLocation(FunctionLocation functionLocation)
         {
-            Console.WriteLine($"Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
+            Console.WriteLine($"SQLite UpdateFunctionLocation Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
             return;
             try
             {
@@ -221,6 +215,26 @@ namespace NetApp.Repository
             }
             context.SaveChanges();
             return existFunctionLocation;
+        }
+
+        public IEnumerable<MainTransferBill> GetMainTransfersBills()
+        {
+            return _baseInfoContext.MainTransferBills.AsNoTracking().ToArray();
+        }
+
+        public IEnumerable<DisTransferBill> GetDisTransfersBills()
+        {
+            return _baseInfoContext.DisTransferBills.AsNoTracking().ToArray();
+        }
+
+        public IEnumerable<ChangeBill> GetChangeBills()
+        {
+            return _baseInfoContext.ChangeBills.AsNoTracking().ToArray();
+        }
+
+        public Task<IEnumerable<FunctionLocation>> GetFunctionLocationsAsync(int startIndex, int pageSize)
+        {
+            return _baseInfoContext.FunctionLocations.AsNoTracking().ToArrayAsync();
         }
     }
 }

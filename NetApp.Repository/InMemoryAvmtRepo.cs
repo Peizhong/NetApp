@@ -38,9 +38,24 @@ namespace NetApp.Repository
             return f;
         }
 
-        public IEnumerable<FunctionLocation> GetAllFunctionLocations()
+        public IEnumerable<ChangeBill> GetChangeBills()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DisTransferBill> GetDisTransfersBills()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
         {
             return _functionLocations.Values;
+        }
+
+        public IEnumerable<MainTransferBill> GetMainTransfersBills()
+        {
+            throw new NotImplementedException();
         }
 
         public FunctionLocation RemoveFunctionLocation(string id, string workspaceId)

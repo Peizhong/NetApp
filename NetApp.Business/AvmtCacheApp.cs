@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -43,9 +44,9 @@ namespace NetApp.Business
         public bool HasCache => _cacheAvmt != null;
         public bool HasPersist => _persistAvmt != null;
 
-        public Task<IEnumerable<FunctionLocation>> AllFunctionLocations()
+        public Task<IEnumerable<FunctionLocation>> FunctionLocations(int startIndex, int pageSize)
         {
-            var functionLocations = _persistAvmt.GetAllFunctionLocations();
+            var functionLocations = _persistAvmt.GetFunctionLocations(startIndex, pageSize);
             return Task.FromResult(functionLocations);
         }
 
@@ -79,10 +80,19 @@ namespace NetApp.Business
         {
             var toCache = new TransformBlock<FunctionLocation, FunctionLocation>(f => saveToCache(f));
             var toPersist = new TransformBlock<FunctionLocation, FunctionLocation>(f => saveToPersist(f));
-            var end = new ActionBlock<FunctionLocation>(null);
+            var end = new ActionBlock<FunctionLocation>(f => {; });
             toCache.LinkTo(toPersist);
             toPersist.LinkTo(end);
             return toCache;
+        }
+
+        public Task<IEnumerable<BillBase>> Bills()
+        {
+            var main = _persistAvmt.GetMainTransfersBills();
+            var dis = _persistAvmt.GetDisTransfersBills();
+            var change = _persistAvmt.GetChangeBills();
+            var mix = main.Cast<BillBase>().Concat(dis.Cast<BillBase>()).Concat(change.Cast<BillBase>());
+            return Task.FromResult(mix);
         }
     }
 }
