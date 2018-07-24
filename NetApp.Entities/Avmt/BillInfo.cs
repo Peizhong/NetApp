@@ -20,7 +20,8 @@ namespace NetApp.Entities.Avmt
         [Column("update_time")]
         public DateTime UpdateTime { get; set; }
 
-        public virtual ICollection<Workspace> Workspaces { get; set; }
+        [NotMapped]
+        public List<Workspace> Workspaces { get; set; }
     }
 
     [Table("dm_main_transfer")]

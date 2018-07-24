@@ -12,7 +12,7 @@ namespace NetApp.Entities.Avmt
         [Key]
         public string Id { get; set; }
 
-        [Column("WORKSPACE_ID")]
+        [Column("WORKSPACE_NAME")]
         public string WorkspaceName { get; set; }
 
         [Column("BUSINESS_BILL_ID")]

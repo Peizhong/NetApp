@@ -24,10 +24,10 @@ namespace NetApp.Entities.Avmt
         public string ClassifyId { get; set; }
 
         [Column("base_voltage_id")]
-        public int VoltageId { get; set; }
+        public int? VoltageId { get; set; }
 
         [Column("update_time")]
-        public DateTime UpdateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
 
         [Column("remark")]
         public string Remark { get; set; }

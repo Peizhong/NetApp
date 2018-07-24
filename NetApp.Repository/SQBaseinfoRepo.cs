@@ -15,226 +15,71 @@ namespace NetApp.Repository
     {
         private AvmtDbContext _baseInfoContext;
 
-        public SQBaseInfoRepo(string connectionString = @"Data Source=avmt.db;")
+        public SQBaseInfoRepo()
         {
             var dbConfig = new DbContextOptionsBuilder<AvmtDbContext>();
+            string connectionString = @"Data Source=avmt.db";
             dbConfig.UseSqlite(connectionString);
             _baseInfoContext = new AvmtDbContext(dbConfig.Options);
         }
 
-        List<Classify> allClassifies = null;
-
-        public List<Classify> GetAllClassifies()
+        public async Task<List<MainTransferBill>> GetMainTransfersBillsAsync()
         {
-            var context = _baseInfoContext;
-            if (allClassifies == null)
+            List<MainTransferBill> bills = await _baseInfoContext.MainTransferBills.AsNoTracking().ToListAsync();
+            foreach (var m in bills)
             {
-                allClassifies = context.Classifies.AsNoTracking().Where(c => c.IsShow == 1).ToList();
+                m.Workspaces = await _baseInfoContext.Workspaces.AsNoTracking().Where(w => w.BusinessBillId == m.Id).ToListAsync();
             }
-            return allClassifies;
+            return bills;
         }
 
-        public List<BasicInfoConfig> GetAllBasicInfoConfigs()
+        public async Task<List<DisTransferBill>> GetDisTransfersBillsAsync()
         {
-            var context = _baseInfoContext;
-            var start = DateTime.Now;
-            var m3 = from b in context.BasicinfoConfigs.AsNoTracking()
-                     where b.IsDisplay == 1
-                     group b by b.BaseInfoTypeId into bids
-                     orderby bids.Key
-                     select new
-                     {
-                         typeId = bids.Key,
-                         bcs = from bid in bids
-                               join d in context.BasicInfoDictConfigs.AsNoTracking()
-                               on bid.DictionaryId equals d.DictionaryId into temp
-                               orderby bid.SortNo
-                               select new
-                               {
-                                   bc = bid,
-                                   dicts = temp.OrderBy(d => d.SortNo)
-                               }
-                     };
-            start = DateTime.Now;
-            Dictionary<string, List<BasicInfoConfig>> dicts2 = new Dictionary<string, List<BasicInfoConfig>>();
-            foreach (var m in m3)
+            List<DisTransferBill> bills = await _baseInfoContext.DisTransferBills.AsNoTracking().ToListAsync();
+            foreach (var d in bills)
             {
-                List<BasicInfoConfig> configs = new List<BasicInfoConfig>();
-                foreach (var bd in m.bcs)
-                {
-                    if (bd.dicts?.Any() == true)
-                    {
-                        bd.bc.BaseinfoDict = bd.dicts.ToList();
-                    }
-                    configs.Add(bd.bc);
-                }
-                dicts2.Add(m.typeId, configs);
+                d.Workspaces = await _baseInfoContext.Workspaces.AsNoTracking().Where(w => w.BusinessBillId == d.Id).ToListAsync();
             }
-            Console.WriteLine($"took {DateTime.Now - start} to foreach");
-            return dicts2.SelectMany(d => d.Value).ToList();
-
+            return bills;
         }
 
-        public List<BasicInfoConfig> GetBasicInfoConfigs(string classifyId)
+        public async Task<List<ChangeBill>> GetChangeBillsAsync()
         {
-            var context = _baseInfoContext;
-            var match = from c in context.Classifies
-                        join b in context.BasicinfoConfigs.AsNoTracking()
-                        on c.BaseInfoTypeId equals b.BaseInfoTypeId
-                        where c.Id.Equals(classifyId) && c.IsShow.Equals(1) && b.IsDisplay.Equals(1)
-                        orderby b.SortNo
-                        select b;
-            return match.ToList();
-        }
-
-        ILookup<string, BasicInfoConfig> allBasicInfoConfigs = null;
-        public IEnumerable<BasicInfoConfig> GetBasicInfoConfigsWithCache(string classifyId)
-        {
-            if (string.IsNullOrWhiteSpace(classifyId))
-                return new List<BasicInfoConfig>();
-            var baseInfoTypeId = allClassifies.FirstOrDefault(c => c.Id.Equals(classifyId))?.BaseInfoTypeId;
-            if (string.IsNullOrWhiteSpace(baseInfoTypeId))
-                return new List<BasicInfoConfig>();
-            if (allBasicInfoConfigs == null)
+            List<ChangeBill> bills = await _baseInfoContext.ChangeBills.AsNoTracking().ToListAsync();
+            foreach (var c in bills)
             {
-                var context = _baseInfoContext;
-                var match = from c in context.Classifies
-                            join b in context.BasicinfoConfigs.AsNoTracking()
-                            on c.BaseInfoTypeId equals b.BaseInfoTypeId
-                            where c.IsShow.Equals(1) && b.IsDisplay.Equals(1)
-                            orderby b.SortNo
-                            select b;
-                allBasicInfoConfigs = match.ToLookup(b => b.BaseInfoTypeId);
+                c.Workspaces = await _baseInfoContext.Workspaces.AsNoTracking().Where(w => w.BusinessBillId == c.Id).ToListAsync();
             }
-            return allBasicInfoConfigs[baseInfoTypeId];
+            return bills;
         }
 
-        Dictionary<string, List<BasicInfoConfig>> allBasicInfoConfigDict = null;
-        public IEnumerable<BasicInfoConfig> GetBasicInfoConfigsWithCache2(string classifyId)
+        public Task<List<Workspace>> GetWorkspacesAsync(string billId)
         {
-            if (string.IsNullOrWhiteSpace(classifyId))
-                return new List<BasicInfoConfig>();
-            var baseInfoTypeId = allClassifies.FirstOrDefault(c => c.Id.Equals(classifyId))?.BaseInfoTypeId;
-            if (string.IsNullOrWhiteSpace(baseInfoTypeId))
-                return new List<BasicInfoConfig>();
-            if (allBasicInfoConfigDict == null)
-            {
-                allBasicInfoConfigDict = new Dictionary<string, List<BasicInfoConfig>>();
-                var context = _baseInfoContext;
-
-                var match = from c in context.Classifies
-                            join b in context.BasicinfoConfigs.AsNoTracking()
-                            on c.BaseInfoTypeId equals b.BaseInfoTypeId
-                            where c.IsShow.Equals(1) && b.IsDisplay.Equals(1)
-                            orderby b.SortNo
-                            select b;
-                foreach (var m in match.GroupBy(b => b.BaseInfoTypeId))
-                {
-                    allBasicInfoConfigDict.Add(m.Key, m.ToList());
-                }
-            }
-            return allBasicInfoConfigDict[baseInfoTypeId];
+            return _baseInfoContext.Workspaces.Where(w => w.BusinessBillId == billId).ToListAsync();
         }
 
-        public FunctionLocation FindFunctionLocation(string id, string workspaceId)
+        public Task<List<FunctionLocation>> GetFunctionLocationsAsync(string workspaceId, int startIndex, int pageSize)
         {
-            FunctionLocation functionLocation = _baseInfoContext.FunctionLocations.Find(id, workspaceId);
-            return functionLocation;
+            if (startIndex < 0)
+                startIndex = 0;
+            if (pageSize < 1)
+                pageSize = 100;
+            return _baseInfoContext.FunctionLocations.Where(f => f.WorkspaceId == workspaceId).Skip(startIndex).Take(pageSize).ToListAsync();
         }
 
-        public void Add(FunctionLocation functionLocation)
+        public Task<FunctionLocation> FindFunctionLocationAsync(string id, string workspaceId)
         {
-            FunctionLocation existFunctionLocation = _baseInfoContext.FunctionLocations.Find(functionLocation.Id, functionLocation.WorkspaceId);
-            if (existFunctionLocation == null)
-            {
-                _baseInfoContext.Add(functionLocation);
-            }
-            else
-            {
-                _baseInfoContext.Entry(existFunctionLocation).CurrentValues.SetValues(functionLocation);
-            }
-            _baseInfoContext.SaveChanges();
+            return _baseInfoContext.FunctionLocations.FindAsync(id, workspaceId);
         }
 
-        public void AddRange(IEnumerable<FunctionLocation> functionLocations)
+        public Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation)
         {
             throw new NotImplementedException();
         }
 
-        public List<FunctionLocation> GetFunctionLocations(int startIndex, int pageSize)
+        public Task<FunctionLocation> RemoveFunctionLocationAsync(FunctionLocation functionLocation)
         {
-            if (startIndex > 0)
-            {
-                if (pageSize > 0)
-                {
-                    return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).Take(pageSize).ToList();
-                }
-                return _baseInfoContext.FunctionLocations.AsNoTracking().Skip(startIndex).ToList();
-            }
-            else
-            {
-                if (pageSize > 0)
-                {
-                    return _baseInfoContext.FunctionLocations.AsNoTracking().Take(pageSize).ToList();
-                }
-                return _baseInfoContext.FunctionLocations.AsNoTracking().ToList();
-            }
-        }
-
-        public void UpdateFunctionLocation(FunctionLocation functionLocation)
-        {
-            Console.WriteLine($"SQLite UpdateFunctionLocation Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
-            return;
-            try
-            {
-                var context = _baseInfoContext;
-                FunctionLocation existFunctionLocation = context.FunctionLocations.Find(functionLocation.Id, functionLocation.WorkspaceId);
-                if (existFunctionLocation == null)
-                {
-                    context.Add(functionLocation);
-                }
-                else
-                {
-                    context.Entry(existFunctionLocation).CurrentValues.SetValues(functionLocation);
-                }
-                context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                var m = ex.Message;
-            }
-        }
-
-        public FunctionLocation RemoveFunctionLocation(string id, string workspaceId)
-        {
-            var context = _baseInfoContext;
-            FunctionLocation existFunctionLocation = context.FunctionLocations.Find(id, workspaceId);
-            if (existFunctionLocation == null)
-            {
-                context.Remove(existFunctionLocation);
-            }
-            context.SaveChanges();
-            return existFunctionLocation;
-        }
-
-        public Task<List<MainTransferBill>> GetMainTransfersBillsAsync()
-        {
-            return _baseInfoContext.MainTransferBills.AsNoTracking().ToListAsync();
-        }
-
-        public Task<List<DisTransferBill>> GetDisTransfersBillsAsync()
-        {
-            return _baseInfoContext.DisTransferBills.AsNoTracking().ToListAsync();
-        }
-
-        public Task<List<ChangeBill>> GetChangeBillsAsync()
-        {
-            return _baseInfoContext.ChangeBills.AsNoTracking().ToListAsync();
-        }
-
-        public Task<List<FunctionLocation>> GetFunctionLocationsAsync(int startIndex, int pageSize)
-        {
-            return _baseInfoContext.FunctionLocations.AsNoTracking().ToListAsync();
+            throw new NotImplementedException();
         }
     }
 }

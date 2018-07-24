@@ -1,0 +1,52 @@
+﻿@model IEnumerable<NetApp.Entities.Avmt.FunctionLocation>
+@{
+    ViewData["Title"] = "WorkspaceDetailView";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<p>
+    <a asp-action="Index">Back To Bill</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FlName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RunningState)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FlCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ClassifyId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdateTime)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="FunctionLocationDetail" asp-route-id="@item.Id" asp-route-workspaceId="@item.WorkspaceId">@Html.DisplayFor(modelItem => item.FlName)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RunningState)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FlCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClassifyId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdateTime)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

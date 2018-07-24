@@ -32,8 +32,6 @@ namespace NetApp.Repository
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<FunctionLocation>().HasKey(f => new { f.Id, f.WorkspaceId });
-
-            modelBuilder.Entity<MainTransferBill>().HasMany(b => b.Workspaces);
         }
     }
 

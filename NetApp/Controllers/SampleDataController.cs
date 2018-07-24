@@ -96,32 +96,11 @@ namespace NetApp.Controllers
             return "hhaha";
         }
 
-        [HttpGet("[action]")]
-        public async Task<string> Avmt()
-        {
-            using (_logger.BeginScope("sample Avmt pipeling"))
-            {
-                _logger.LogInformation("start");
-                var functionLocations = await _avmtApp.FunctionLocations(0, 100);
-                foreach (var f in functionLocations)
-                {
-                    await _avmtApp.UpdateFunctionLocation(f);
-                }
-                _logger.LogInformation("done");
-                return "Ok";
-            }
-        }
-
-        [HttpGet("[action]")]
-        public async Task<IEnumerable<FunctionLocation>> FunctionLocations(int startIndex = 0, int pageSize = 100)
-        {
-            return await _avmtApp.FunctionLocations(startIndex, pageSize);
-        }
 
         [HttpGet("[action]")]
         public async Task<IEnumerable<BillBase>> Bills()
         {
-            return await _avmtApp.Bills();
+            return await _avmtApp.GetBillsAsync("");
         }
 
         public class WeatherForecast

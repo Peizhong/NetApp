@@ -8,10 +8,12 @@ namespace NetApp.Business.Interfaces
 {
     public interface IAvmtApp
     {
-        Task<List<FunctionLocation>> FunctionLocations(int startIndex, int pageSize);
-        Task<FunctionLocation> FindFunctionLocation(string id);
-        Task UpdateFunctionLocation(FunctionLocation functionLocation);
+        Task<List<FunctionLocation>> GetFunctionLocationsAsync(string workspaceId, int startIndex, int pageSize);
 
-        Task<IEnumerable<BillBase>> Bills();
+        Task<FunctionLocation> FindFunctionLocationAsync(string id, string workspaceId);
+
+        Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation);
+
+        Task<List<BillBase>> GetBillsAsync(string userId);
     }
 }

@@ -1,0 +1,90 @@
+﻿@model NetApp.Entities.Avmt.FunctionLocation
+
+@{
+    ViewData["Title"] = "FunctionlocationDetail";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+
+<div>
+    <h4>FunctionLocation</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FlName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FlName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FlType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FlType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RunningState)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RunningState)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FlCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FlCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SortNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SortNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkspaceId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkspaceId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ProvinceCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProvinceCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BureauCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BureauCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ClassifyId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClassifyId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.VoltageId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.VoltageId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.UpdateTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UpdateTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Remark)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Remark)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="FunctionLocationEdit" asp-route-id="@Model.Id" asp-route-workspaceId="@Model.WorkspaceId">Edit</a> |
+    <a asp-action="WorkspaceDetail" asp-route-id="@Model.WorkspaceId">Back to Workspace</a>
+</div>

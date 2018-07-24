@@ -25,22 +25,60 @@ namespace NetApp.Controllers
         public async Task<ViewResult> Index()
         {
             await _cache.SetStringAsync("lastServerStartTime", DateTime.Now.ToString());
-            var bills = await _avmtApp.Bills();
+            var bills = await _avmtApp.GetBillsAsync("");
             return View(bills);
         }
-        
 
-        public async Task<ActionResult> MainTransferDetail(string id)
+        public async Task<IActionResult> MainTransferDetail(string id)
         {
-            var bills = await _avmtApp.Bills();
+            var bills = await _avmtApp.GetBillsAsync("");
             return View(bills.First(b => b.Id == id));
         }
 
-        private IEnumerable<FunctionLocation> FunctionLocations
-            => Enumerable.Range(1, 10).Select(n =>
-              new FunctionLocation { Id = Guid.NewGuid().ToString("N"), FlName = $"FL{n}" }).ToList();
+        public async Task<IActionResult> Workspaces(string billId)
+        {
+            var bills = await _avmtApp.GetBillsAsync("");
+            var bill = bills.FirstOrDefault(b => b.Id == billId);
+            return PartialView(bill.Workspaces);
+        }
 
-        public IActionResult DetailsAsModel() => View(FunctionLocations);
+        public async Task<IActionResult> WorkspaceDetail(string id, int startIndex, int pageSize)
+        {
+            var functionlocations = await _avmtApp.GetFunctionLocationsAsync(id, startIndex, pageSize);
+            return View(functionlocations);
+        }
+
+        public async Task<IActionResult> FunctionLocationDetail(string id, string workspaceId)
+        {
+            var functionlocation = await _avmtApp.FindFunctionLocationAsync(id, workspaceId);
+            return View(functionlocation);
+        }
+
+        public async Task<IActionResult> FunctionLocationEdit(string id, string workspaceId)
+        {
+            var functionlocation = await _avmtApp.FindFunctionLocationAsync(id, workspaceId);
+            return View(functionlocation);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FunctionLocationEdit(string id, string workspaceId, IFormCollection collection)
+        {
+            var functionlocation = await _avmtApp.FindFunctionLocationAsync(id, workspaceId);
+            return View(functionlocation);
+        }
+
+        public IActionResult DetailsAsModel()
+        {
+            IEnumerable<FunctionLocation> FunctionLocations = Enumerable.Range(1, 10).Select(n =>
+            new FunctionLocation
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                FlName = $"FL{n}"
+            }).ToList();
+
+            return View(FunctionLocations);
+        }
 
         // GET: Avmt/Create
         public ActionResult Create()

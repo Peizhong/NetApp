@@ -1,0 +1,84 @@
+﻿@model NetApp.Entities.Avmt.FunctionLocation
+
+@{
+    ViewData["Title"] = "FunctionLocationEdit";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="FunctionLocationEdit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FlName" class="control-label"></label>
+                <input asp-for="FlName" class="form-control" />
+                <span asp-validation-for="FlName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FlType" class="control-label"></label>
+                <input asp-for="FlType" class="form-control" />
+                <span asp-validation-for="FlType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RunningState" class="control-label"></label>
+                <input asp-for="RunningState" class="form-control" />
+                <span asp-validation-for="RunningState" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FlCode" class="control-label"></label>
+                <input asp-for="FlCode" class="form-control" />
+                <span asp-validation-for="FlCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SortNo" class="control-label"></label>
+                <input asp-for="SortNo" class="form-control" />
+                <span asp-validation-for="SortNo" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="WorkspaceId" class="control-label"></label>
+                <input asp-for="WorkspaceId" class="form-control" />
+                <span asp-validation-for="WorkspaceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProvinceCode" class="control-label"></label>
+                <input asp-for="ProvinceCode" class="form-control" />
+                <span asp-validation-for="ProvinceCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BureauCode" class="control-label"></label>
+                <input asp-for="BureauCode" class="form-control" />
+                <span asp-validation-for="BureauCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClassifyId" class="control-label"></label>
+                <input asp-for="ClassifyId" class="form-control" />
+                <span asp-validation-for="ClassifyId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VoltageId" class="control-label"></label>
+                <input asp-for="VoltageId" class="form-control" />
+                <span asp-validation-for="VoltageId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdateTime" class="control-label"></label>
+                <input asp-for="UpdateTime" class="form-control" />
+                <span asp-validation-for="UpdateTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Remark" class="control-label"></label>
+                <input asp-for="Remark" class="form-control" />
+                <span asp-validation-for="Remark" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

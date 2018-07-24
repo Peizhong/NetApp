@@ -1,0 +1,26 @@
+﻿@model IEnumerable<NetApp.Entities.Avmt.Workspace>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkspaceName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RootId)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <a asp-action="WorkspaceDetail" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.WorkspaceName)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RootId)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

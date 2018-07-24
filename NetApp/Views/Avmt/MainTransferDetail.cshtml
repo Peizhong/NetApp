@@ -5,18 +5,10 @@
     Layout = "~/Views/Shared/_Layout2.cshtml";
 }
 
-<h2>MainTransferDetailView</h2>
-
 <div>
-    <h4>MainTransferBill</h4>
+    <h4>@Model.BusinessBillCode</h4>
     <hr />
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.BusinessBillCode)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.BusinessBillCode)
-        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.BusinessBillName)
         </dt>
@@ -50,6 +42,25 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
     <a asp-action="Index">Back to List</a>
 </div>
+<div>
+    @await Html.PartialAsync("Workspaces", Model.Workspaces)
+</div>
+<button id="getEvents" class="btn btn-default">Get Events</button>
+<div id="partView">
+</div>
+<script>
+    (function () {
+        window.onload = function () {
+            let partView = document.getElementById("partView")
+            partView.innerHTML = "<div>in it</div>"
+            let btnEvents = document.getElementById("getEvents")
+            btnEvents.onclick = function () {
+                fetch("/avmt/Workspaces?billId=d41cb2b81371457ab1934df998224843")
+                    .then(response => response.text())
+                    .then(text => partView.innerHTML = text)
+            }
+        }
+    })();
+</script>

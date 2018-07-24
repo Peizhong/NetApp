@@ -17,6 +17,9 @@ namespace NetApp.Business
         private readonly IAvmtRepo _persistAvmt;
         private readonly IAvmtRepo _cacheAvmt;
 
+        public bool HasCache => _cacheAvmt != null;
+        public bool HasPersist => _persistAvmt != null;
+
         private readonly ITargetBlock<FunctionLocation> _dataInPipeline;
 
         public AvmtCacheApp(IEnumerable<IAvmtRepo> avmtRepo)
@@ -41,24 +44,30 @@ namespace NetApp.Business
             _dataInPipeline = SetupInputPipeline();
         }
 
-        public bool HasCache => _cacheAvmt != null;
-        public bool HasPersist => _persistAvmt != null;
-
-        public Task<List<FunctionLocation>> FunctionLocations(int startIndex, int pageSize)
+        public Task<List<FunctionLocation>> GetFunctionLocationsAsync(string workspaceId, int startIndex, int pageSize)
         {
-            return _persistAvmt.GetFunctionLocationsAsync(startIndex, pageSize);
+            return _persistAvmt.GetFunctionLocationsAsync(workspaceId, startIndex, pageSize);
         }
 
-        public Task<FunctionLocation> FindFunctionLocation(string id)
+        public async Task<FunctionLocation> FindFunctionLocationAsync(string id, string workspaceId)
         {
-            throw new NotImplementedException();
+            FunctionLocation functionLocation = await _cacheAvmt.FindFunctionLocationAsync(id, workspaceId);
+            if (functionLocation == null)
+            {
+                functionLocation = await _persistAvmt.FindFunctionLocationAsync(id, workspaceId);
+                if (functionLocation != null)
+                {
+                    await _cacheAvmt.ReplaceFunctionLocationAsync(functionLocation);
+                }
+            }
+            return functionLocation;
         }
 
-        public Task UpdateFunctionLocation(FunctionLocation functionLocation)
+        public Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation)
         {
             Console.WriteLine($"Post {functionLocation.Id}: Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
             _dataInPipeline.Post(functionLocation);
-            return Task.FromResult(true);
+            return Task.FromResult(functionLocation);
         }
 
         private FunctionLocation saveToCache(FunctionLocation functionLocation)
@@ -85,7 +94,7 @@ namespace NetApp.Business
             return toCache;
         }
 
-        public async Task<IEnumerable<BillBase>> Bills()
+        public async Task<List<BillBase>> GetBillsAsync(string userId)
         {
             var allBills = new List<BillBase>();
             var main = await _persistAvmt.GetMainTransfersBillsAsync();
@@ -96,5 +105,6 @@ namespace NetApp.Business
             allBills.AddRange(change);
             return allBills;
         }
+
     }
 }
