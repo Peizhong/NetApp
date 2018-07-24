@@ -63,6 +63,31 @@ namespace NetApp.Business
             return functionLocation;
         }
 
+        public async Task LoadFunctionLocationDetail(FunctionLocation functionLocation)
+        {
+            Classify classify = (await GetClassifiesAsync(new[] { functionLocation.ClassifyId })).FirstOrDefault();
+            if (classify != null)
+            {
+                functionLocation.Classify = classify;
+                var baseinfConfigs = await _persistAvmt.GetBasicInfoConfigsAsync(classify.BaseInfoTypeId);
+                var baseinfoParams = baseinfConfigs.Select(b => new ParameterInfo
+                {
+                    DisplayName = b.FieldName,
+                    ColumnName = b.FieldColumn,
+                    DataType = b.DataType,
+                    DataSource = 1
+                }).ToList();
+                var techpinfoConfigs = await _persistAvmt.GetTechInfoConfigsAsync(classify.Id);
+                var techinfoParams = techpinfoConfigs.Select(b => new ParameterInfo
+                {
+                    DisplayName = b.TechparamName,
+                    ColumnName = b.ColumnName,
+                    DataType = b.DataType,
+                    DataSource = 2
+                }).ToList();
+            }
+        }
+
         public Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation)
         {
             Console.WriteLine($"Post {functionLocation.Id}: Thread: {Thread.CurrentThread.ManagedThreadId}, Task: {Task.CurrentId}");
@@ -106,5 +131,9 @@ namespace NetApp.Business
             return allBills;
         }
 
+        public Task<List<Classify>> GetClassifiesAsync(IEnumerable<string> classifyIds)
+        {
+            return _persistAvmt.GetClassifiesAsync(classifyIds);
+        }
     }
 }

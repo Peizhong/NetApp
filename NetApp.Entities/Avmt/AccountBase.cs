@@ -23,6 +23,25 @@ namespace NetApp.Entities.Avmt
         [Column("classify_id")]
         public string ClassifyId { get; set; }
 
+        private Classify _classify = null;
+
+        [NotMapped]
+        public Classify Classify
+        {
+            get
+            {
+                return _classify ?? new Classify { Id = ClassifyId };
+            }
+            set
+            {
+                _classify = value;
+                ClassifyId = _classify?.Id;
+            }
+        }
+
+        [NotMapped]
+        public List<ParameterInfo> Parameters { get; set; }
+
         [Column("base_voltage_id")]
         public int? VoltageId { get; set; }
 

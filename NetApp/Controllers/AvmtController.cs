@@ -42,15 +42,20 @@ namespace NetApp.Controllers
             return PartialView(bill.Workspaces);
         }
 
-        public async Task<IActionResult> WorkspaceDetail(string id, int startIndex, int pageSize)
+        public async Task<IActionResult> WorkspaceDetail(string id, int startIndex, int pageSize = 16)
         {
             var functionlocations = await _avmtApp.GetFunctionLocationsAsync(id, startIndex, pageSize);
+            var classifies = await _avmtApp.GetClassifiesAsync(functionlocations.Select(f => f.ClassifyId).Distinct());
+            ViewBag.CurrentIndex = startIndex;
+            ViewBag.PageSize = pageSize;
+            ViewBag.Classifies = classifies;
             return View(functionlocations);
         }
 
         public async Task<IActionResult> FunctionLocationDetail(string id, string workspaceId)
         {
             var functionlocation = await _avmtApp.FindFunctionLocationAsync(id, workspaceId);
+            await _avmtApp.LoadFunctionLocationDetail(functionlocation);
             return View(functionlocation);
         }
 

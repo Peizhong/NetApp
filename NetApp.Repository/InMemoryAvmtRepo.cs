@@ -31,7 +31,17 @@ namespace NetApp.Repository
             return Task.FromResult(functionLocation);
         }
 
+        public Task<List<BasicInfoConfig>> GetBasicInfoConfigsAsync(string baseinfoTypeId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<ChangeBill>> GetChangeBillsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Classify>> GetClassifiesAsync(IEnumerable<string> classifyIds)
         {
             throw new NotImplementedException();
         }
@@ -47,6 +57,11 @@ namespace NetApp.Repository
         }
 
         public Task<List<MainTransferBill>> GetMainTransfersBillsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<TechInfoConfig>> GetTechInfoConfigsAsync(string classifyId)
         {
             throw new NotImplementedException();
         }

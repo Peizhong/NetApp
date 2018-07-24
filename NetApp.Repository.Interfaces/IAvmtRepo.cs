@@ -21,5 +21,11 @@ namespace NetApp.Repository.Interfaces
         Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation);
 
         Task<FunctionLocation> RemoveFunctionLocationAsync(FunctionLocation functionLocation);
+
+        Task<List<Classify>> GetClassifiesAsync(IEnumerable<string> classifyIds);
+
+        Task<List<BasicInfoConfig>> GetBasicInfoConfigsAsync(string baseinfoTypeId);
+
+        Task<List<TechInfoConfig>> GetTechInfoConfigsAsync(string classifyId);
     }
 }

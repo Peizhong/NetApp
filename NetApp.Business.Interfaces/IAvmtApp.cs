@@ -12,8 +12,12 @@ namespace NetApp.Business.Interfaces
 
         Task<FunctionLocation> FindFunctionLocationAsync(string id, string workspaceId);
 
+        Task LoadFunctionLocationDetail(FunctionLocation functionLocation);
+
         Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation);
 
         Task<List<BillBase>> GetBillsAsync(string userId);
+
+        Task<List<Classify>> GetClassifiesAsync(IEnumerable<string> classifyIds);
     }
 }

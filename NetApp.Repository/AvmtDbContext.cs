@@ -14,8 +14,11 @@ namespace NetApp.Repository
         }
 
         public DbSet<Classify> Classifies { get; set; }
+
         public DbSet<BasicInfoConfig> BasicinfoConfigs { get; set; }
         public DbSet<BasicInfoDictConfig> BasicInfoDictConfigs { get; set; }
+        
+        public DbSet<ClassifyTechparamConfig> ClassifyTechparamConfigs { get; set; }
         public DbSet<TechparamConfig> TechparamConfigs { get; set; }
         public DbSet<TechparamDictConfig> TechparamDictConfigs { get; set; }
 

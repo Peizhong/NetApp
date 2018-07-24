@@ -11,6 +11,9 @@ namespace NetApp.Entities.Avmt
         [Column("fl_name")]
         public string FlName { get; set; }
 
+        [Column("full_path")]
+        public string FullPath { get; set; }
+
         [Column("fl_type")]
         public int FlType { get; set; }
 
