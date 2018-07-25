@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using NetApp.Entities.Avmt;
+using NetApp.Entities;
 
 namespace NetApp.Repository
 {
     public class AvmtDbContext : DbContext
     {
+        public AvmtDbContext()
+            : base()
+        {
+
+        }
+
         public AvmtDbContext(DbContextOptions<AvmtDbContext> options)
             : base(options)
         {
@@ -17,7 +24,7 @@ namespace NetApp.Repository
 
         public DbSet<BasicInfoConfig> BasicinfoConfigs { get; set; }
         public DbSet<BasicInfoDictConfig> BasicInfoDictConfigs { get; set; }
-        
+
         public DbSet<ClassifyTechparamConfig> ClassifyTechparamConfigs { get; set; }
         public DbSet<TechparamConfig> TechparamConfigs { get; set; }
         public DbSet<TechparamDictConfig> TechparamDictConfigs { get; set; }
@@ -30,12 +37,30 @@ namespace NetApp.Repository
 
         public DbSet<FunctionLocation> FunctionLocations { get; set; }
 
+        public DbSet<Car> Cars { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<MainTransferBill>()
+                .HasMany(m => m.Workspaces)
+                .WithOne()
+                .HasForeignKey(w => w.BusinessBillId);
+
             modelBuilder.Entity<FunctionLocation>().HasKey(f => new { f.Id, f.WorkspaceId });
+
+            modelBuilder.Entity<BasicInfoConfig>()
+                .HasMany(b => b.BaseinfoDict)
+                .WithOne()
+                .HasForeignKey(d => d.DictionaryId)
+                .HasPrincipalKey(b => b.DictionaryId);
+
+            modelBuilder.Entity<RecordOfSale>()
+                .HasOne(s => s.Car)
+                .WithMany(c => c.SaleHistory)
+                .HasForeignKey(s => s.CarLicensePlate)
+                .HasPrincipalKey(c => c.LicensePlate);
         }
     }
-
 }

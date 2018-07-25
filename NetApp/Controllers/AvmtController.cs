@@ -29,7 +29,19 @@ namespace NetApp.Controllers
             return View(bills);
         }
 
-        public async Task<IActionResult> MainTransferDetail(string id)
+        public async Task<IActionResult> MainTransferBillDetail(string id)
+        {
+            var bills = await _avmtApp.GetBillsAsync("");
+            return View(bills.First(b => b.Id == id));
+        }
+
+        public async Task<IActionResult> DisTransferBillDetail(string id)
+        {
+            var bills = await _avmtApp.GetBillsAsync("");
+            return View(bills.First(b => b.Id == id));
+        }
+
+        public async Task<IActionResult> ChangeBillDetail(string id)
         {
             var bills = await _avmtApp.GetBillsAsync("");
             return View(bills.First(b => b.Id == id));

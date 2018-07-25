@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Business", "NetApp.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Play", "NetApp.Play\NetApp.Play.csproj", "{46BED184-4366-4E09-B03F-0FA0B5A7243B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Service", "NetApp.Service\NetApp.Service.csproj", "{836CCD36-0E2F-4596-9EA0-73F0A1F78E7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46BED184-4366-4E09-B03F-0FA0B5A7243B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{836CCD36-0E2F-4596-9EA0-73F0A1F78E7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{836CCD36-0E2F-4596-9EA0-73F0A1F78E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{836CCD36-0E2F-4596-9EA0-73F0A1F78E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{836CCD36-0E2F-4596-9EA0-73F0A1F78E7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

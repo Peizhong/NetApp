@@ -3,29 +3,38 @@
 @{
     Layout = "/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "单据";
+    var mainBills = Model.OfType<MainTransferBill>();
+    var disBills = Model.OfType<DisTransferBill>();
+    var changeBills = Model.OfType<ChangeBill>();
+
 }
 
+<h5>主网移交</h5>
 <ul>
-    @foreach (var b in Model)
+    @foreach (var b in mainBills)
     {
-        @if (b is MainTransferBill main)
-        {
-            <li>
-                <a asp-action="MainTransferDetail" asp-route-id="@main.Id">主网移交 @main.BusinessBillCode</a>
-            </li>
-        }
-        else if (b is DisTransferBill dis)
-        {
-            <li>
-                <a asp-action="Edit" asp-route-id="@dis.Id">配网网移交 @dis.BusinessCode</a>
-            </li>
-        }
-        else if (b is ChangeBill change)
-        {
-            <li>
-                <a asp-action="Edit" asp-route-id="@change.Id">变更 @change.ChangeCode</a>
-            </li>
-        }
+        <li>
+            <a asp-action="MainTransferBillDetail" asp-route-id="@b.Id">主网移交 @b.BusinessBillCode</a>
+        </li>
     }
 </ul>
-
+<br />
+<h5>配网移交</h5>
+<ul>
+    @foreach (var b in disBills)
+    {
+        <li>
+            <a asp-action="DisTransferBillDetail" asp-route-id="@b.Id">配网网移交 @b.BusinessCode</a>
+        </li>
+    }
+</ul>
+<br />
+<h5>变更</h5>
+<ul>
+    @foreach (var b in changeBills)
+    {
+        <li>
+            <a asp-action="ChangeBillDetail" asp-route-id="@b.Id">配网网移交 @b.ChangeCode</a>
+        </li>
+    }
+</ul>

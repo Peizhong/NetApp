@@ -27,11 +27,14 @@ namespace NetApp.Entities.Avmt
     [Table("dm_main_transfer")]
     public class MainTransferBill : BillBase
     {
-        [Column("business_bill_code")]
+        [Column("BUSINESS_BILL_CODE")]
         public string BusinessBillCode { get; set; }
 
-        [Column("business_bill_name")]
+        [Column("BUSINESS_BILL_NAME")]
         public string BusinessBillName { get; set; }
+
+        [Column("TRANSFER_STATE")]
+        public int TransferState { get; set; }
     }
 
     [Table("dm_dis_transfer")]
@@ -50,10 +53,13 @@ namespace NetApp.Entities.Avmt
     [Table("dm_change_bill")]
     public class ChangeBill : BillBase
     {
-        [Column("change_code")]
+        [Column("CHANGE_CODE")]
         public string ChangeCode { get; set; }
 
-        [Column("business_content")]
+        [Column("BUSINESS_CONTENT")]
         public string BusinessContent { get; set; }
+
+        [Column("POWER_GRID_FLAG")]
+        public int PowerGridFlag { get; set; }
     }
 }

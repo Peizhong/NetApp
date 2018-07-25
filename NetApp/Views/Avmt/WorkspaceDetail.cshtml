@@ -3,13 +3,26 @@
 @{
     ViewData["Title"] = "WorkspaceDetailView";
     Layout = "~/Views/Shared/_Layout2.cshtml";
+    int index = ViewBag.CurrentIndex;
     int pageSize = ViewBag.PageSize;
-    int nextIndex = ViewBag.CurrentIndex + pageSize;
-    int previousIndex = ViewBag.CurrentIndex - pageSize;
+    int nextIndex = index + pageSize;
+    int previousIndex = index - pageSize;
     @if (previousIndex < 0)
     {
         previousIndex = 0;
     }
+    Func<int, string> runningState = (n) =>
+    {
+        switch (n)
+        {
+            case 1:
+                return "运行";
+            case 2:
+                return "在建";
+            default:
+                return "未知";
+        }
+    };
 }
 <p>
     <a asp-action="Index">Back To Bill</a>
@@ -17,6 +30,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                序号
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.FlName)
             </th>
@@ -39,11 +55,14 @@
         @foreach (var item in Model)
         {
         <tr>
+            <td>
+                @(++index)
+            </td>
             <td title="@item.FullPath">
                 <a asp-action="FunctionLocationDetail" asp-route-id="@item.Id" asp-route-workspaceId="@item.WorkspaceId">@Html.DisplayFor(modelItem => item.FlName)</a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RunningState)
+                @runningState(item.RunningState)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.FlCode)

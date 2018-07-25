@@ -3,32 +3,53 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NetApp.Entities.Avmt;
 using NetApp.Entities.Attributes;
 using NetApp.Repository.Interfaces;
 using System.Threading.Tasks;
 using StackExchange.Redis;
+using Newtonsoft.Json;
 
 namespace NetApp.Repository
 {
     [Repo(RepoTypeEnum.InMemory)]
     public class InMemoryAvmtRepo : IAvmtRepo
     {
+        private readonly ILogger<InMemoryAvmtRepo> _logger;
         private readonly ConcurrentDictionary<string, FunctionLocation> _functionLocations;
         private readonly ConcurrentDictionary<string, BillBase> _bills;
+        private readonly ConnectionMultiplexer _redis;
 
-        public InMemoryAvmtRepo()
+        public InMemoryAvmtRepo(ILogger<InMemoryAvmtRepo> logger)
         {
+            _logger = logger;
+
             int numProcs = Environment.ProcessorCount;
             _functionLocations = new ConcurrentDictionary<string, FunctionLocation>(numProcs * 2, 1024);
             _bills = new ConcurrentDictionary<string, BillBase>(numProcs * 2, 1024);
+            _redis = ConnectionMultiplexer.Connect("193.112.41.28:6379");
         }
 
-        public Task<FunctionLocation> FindFunctionLocationAsync(string id, string workspaceId)
+        public async Task<FunctionLocation> FindFunctionLocationAsync(string id, string workspaceId)
         {
-            string key = $"fl_{id}_{workspaceId}";
-            _functionLocations.TryGetValue(key, out FunctionLocation functionLocation);
-            return Task.FromResult(functionLocation);
+            FunctionLocation functionLocation = null;
+            try
+            {
+                string key = $"fl_{id}_{workspaceId}";
+                IDatabase db = _redis.GetDatabase();
+                string json = await db.StringGetAsync(key);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    functionLocation = JsonConvert.DeserializeObject<FunctionLocation>(json);
+                    //_functionLocations.TryGetValue(key, out FunctionLocation functionLocation);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+            }
+            return functionLocation;
         }
 
         public Task<List<BasicInfoConfig>> GetBasicInfoConfigsAsync(string baseinfoTypeId)
@@ -76,12 +97,21 @@ namespace NetApp.Repository
             throw new NotImplementedException();
         }
 
-        public Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation)
+        public async Task<FunctionLocation> ReplaceFunctionLocationAsync(FunctionLocation functionLocation)
         {
-            //TODO: 最大值?
-            string key = $"fl_{functionLocation.Id}_{functionLocation.WorkspaceId}";
-            _functionLocations[key] = functionLocation;
-            return Task.FromResult(functionLocation);
+            try
+            {
+                //TODO: 最大值?
+                string key = $"fl_{functionLocation.Id}_{functionLocation.WorkspaceId}";
+                IDatabase db = _redis.GetDatabase();
+                await db.StringSetAsync(key, JsonConvert.SerializeObject(functionLocation));
+                //_functionLocations[key] = functionLocation;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+            }
+            return functionLocation;
         }
     }
 }

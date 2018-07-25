@@ -94,6 +94,8 @@ namespace NetApp.Repository
 
         public async Task<List<BasicInfoConfig>> GetBasicInfoConfigsAsync(string baseinfoTypeId)
         {
+            var basinfos = await _avmtContext.BasicinfoConfigs.Where(b => b.BaseInfoTypeId == baseinfoTypeId).ToListAsync();
+
             var match = await (from bc in _avmtContext.BasicinfoConfigs.AsNoTracking().Where(b => b.BaseInfoTypeId == baseinfoTypeId && b.IsDisplay == 1)
                                join dt in _avmtContext.BasicInfoDictConfigs.AsNoTracking()
                                on bc.DictionaryId equals dt.DictionaryId into leftjoin

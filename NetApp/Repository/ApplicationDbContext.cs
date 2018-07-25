@@ -26,5 +26,9 @@ namespace NetApp.Repository
         public DbSet<NetApp.Entities.Avmt.Workspace> Workspace { get; set; }
 
         public DbSet<NetApp.Entities.Avmt.FunctionLocation> FunctionLocation { get; set; }
+
+        public DbSet<NetApp.Entities.Avmt.ChangeBill> ChangeBill { get; set; }
+
+        public DbSet<NetApp.Entities.Avmt.DisTransferBill> DisTransferBill { get; set; }
     }
 }

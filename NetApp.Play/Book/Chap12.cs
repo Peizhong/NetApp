@@ -15,12 +15,6 @@ namespace NetApp.Play.Book
     /// </summary>
     public class Chap12
     {
-        public void DoQuery()
-        {
-            var repo = new SQBaseInfoRepo();
-
-            Console.WriteLine($"took {DateTime.Now - start} to query all cache baseinfoconfg");
-        }
 
         public void DoGroup()
         {

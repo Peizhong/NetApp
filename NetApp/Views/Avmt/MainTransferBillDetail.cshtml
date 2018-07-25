@@ -42,11 +42,12 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Index">Back to List</a>
-</div>
-<div>
     @await Html.PartialAsync("Workspaces", Model.Workspaces)
 </div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
 <button id="getEvents" class="btn btn-default">Get Events</button>
 <div id="partView">
 </div>
