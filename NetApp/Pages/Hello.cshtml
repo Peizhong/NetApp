@@ -11,24 +11,24 @@
 
 @functions
 {
-    public class InlinePageModel : PageModel
+public class InlinePageModel : PageModel
+{
+    private readonly ApplicationDbContext _dbContext;
+    public InlinePageModel(ApplicationDbContext dbContext)
     {
-        private readonly ApplicationDbContext _dbContext;
-        public InlinePageModel(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
-        public IEnumerable<Entry> Entries { get; set; }
-
-        /// <summary>
-        /// OnGet method is invoked on every GET request of the page
-        /// </summary>
-        public void OnGet()
-        {
-            Entries = _dbContext.Entries.Take(100).ToArray();
-        }
+        _dbContext = dbContext;
     }
+
+    public IEnumerable<Entry> Entries { get; set; }
+
+    /// <summary>
+    /// OnGet method is invoked on every GET request of the page
+    /// </summary>
+    public void OnGet()
+    {
+        Entries = _dbContext.Entries.Take(100).ToArray();
+    }
+}
 }
 
 <h2>This is in line demo page</h2>

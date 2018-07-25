@@ -1,4 +1,6 @@
 ﻿@using NetApp.Entities.Avmt
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Extensions
 @model IEnumerable<FunctionLocation>
 @{
     ViewData["Title"] = "WorkspaceDetailView";
@@ -11,6 +13,8 @@
     {
         previousIndex = 0;
     }
+    Context.Session.SetString("1231", "mim");
+    var billId = TempData["billId"]?.ToString();
     Func<int, string> runningState = (n) =>
     {
         switch (n)
@@ -54,29 +58,29 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @(++index)
-            </td>
-            <td title="@item.FullPath">
-                <a asp-action="FunctionLocationDetail" asp-route-id="@item.Id" asp-route-workspaceId="@item.WorkspaceId">@Html.DisplayFor(modelItem => item.FlName)</a>
-            </td>
-            <td>
-                @runningState(item.RunningState)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FlCode)
-            </td>
-            @{
-                Classify classify = ((IEnumerable<Classify>)ViewBag.Classifies).FirstOrDefault(c => c.Id == item.ClassifyId);
-                <td title="@classify.FullName">
-                    @classify.ClassifyName
+            <tr>
+                <td>
+                    @(++index)
                 </td>
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdateTime)
-            </td>
-        </tr>
+                <td title="@item.FullPath">
+                    <a asp-action="FunctionLocationDetail" asp-route-id="@item.Id" asp-route-workspaceId="@item.WorkspaceId">@Html.DisplayFor(modelItem => item.FlName)</a>
+                </td>
+                <td>
+                    @runningState(item.RunningState)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FlCode)
+                </td>
+                @{
+                    Classify classify = ((IEnumerable<Classify>)ViewBag.Classifies).FirstOrDefault(c => c.Id == item.ClassifyId);
+                    <td title="@classify.FullName">
+                        @classify.ClassifyName
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdateTime)
+                </td>
+            </tr>
         }
     </tbody>
 </table>

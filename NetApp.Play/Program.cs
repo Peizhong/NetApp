@@ -8,12 +8,54 @@ namespace NetApp.Play
 {
     class Program
     {
+        class A
+        {
+            protected int vv = 0;
+
+            public A()
+            {
+                Console.WriteLine("hello a");
+                Stuff();
+            }
+
+            public A(int b)
+            {
+                vv = b;
+            }
+
+            public virtual void Stuff()
+            {
+                Console.WriteLine("hello a, doing something");
+            }
+        }
+
+        class B : A
+        {
+            string mimi = null;
+            public B()
+                :base(1)
+            {
+                
+                mimi = "abc";
+                Console.WriteLine("hello b");
+            }
+            
+            public override void Stuff()
+            {
+                int x = vv;
+                mimi.ToString();
+                Console.WriteLine("hello b, doing something");
+            }
+        }
+
         static void Main(string[] args)
         {
+            B b = new B();
+
             EncodingProvider provider = CodePagesEncodingProvider.Instance;
             Encoding.RegisterProvider(provider);
 
-            EFTest();
+            //EFTest();
 
             var chap = new Book.Chap23();
             //var task = chap.TcpHttpClient();
