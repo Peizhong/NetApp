@@ -3,6 +3,8 @@ using System.Linq;
 using System.Buffers;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace NetApp.Play
 {
@@ -50,6 +52,20 @@ namespace NetApp.Play
 
         static void Main(string[] args)
         {
+            Task.Run(async () =>
+            {
+                HttpClient c = new HttpClient(new HttpClientHandler {
+                    Proxy = null,
+                    UseProxy = false
+                });
+                while (true)
+                {
+                    var m = await c.GetAsync("http://localhost:8000/api/mallservice/");
+                    var s = m.Content.ReadAsStringAsync();
+                }
+
+            }).Wait();
+
             B b = new B();
 
             EncodingProvider provider = CodePagesEncodingProvider.Instance;
@@ -67,6 +83,7 @@ namespace NetApp.Play
 
         static async void EFTest()
         {
+
             var dbConfig = new DbContextOptionsBuilder<Repository.AvmtDbContext>();
             string connectionString = @"Data Source=avmt.db";
             dbConfig.UseSqlite(connectionString);

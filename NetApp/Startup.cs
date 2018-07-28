@@ -142,7 +142,7 @@ namespace NetApp
 
             app.UseSession();
 
-            app.UseStartTimeHeader();
+            //app.UseStartTimeHeader();
 
             app.UseMvc(routes =>
             {

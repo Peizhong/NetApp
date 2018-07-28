@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
-using NetApp.Entities.Avmt;
+using Newtonsoft.Json;
 using NetApp.Business.Interfaces;
 
 namespace NetApp.Controllers
@@ -14,13 +14,12 @@ namespace NetApp.Controllers
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly HttpClient _httpClient;
         private readonly IAvmtApp _avmtApp;
         private readonly ILogger<SampleDataController> _logger;
         public SampleDataController(IHttpClientFactory clientFactory, IAvmtApp avmtApp, ILogger<SampleDataController> logger)
         {
-            _clientFactory = clientFactory;
-            var client = _clientFactory.CreateClient();
+            _httpClient = clientFactory.CreateClient();
             _avmtApp = avmtApp;
             _logger = logger;
         }
@@ -48,7 +47,6 @@ namespace NetApp.Controllers
         {
             try
             {
-                var client = _clientFactory.CreateClient();
                 var res = await Portal.MachineLearning.Instance.GetComputerVisionResult(imgPath);
                 if (string.IsNullOrEmpty(res))
                 {
@@ -86,21 +84,19 @@ namespace NetApp.Controllers
             return Ok("haha");
         }
 
-        [HttpGet("[action]")]
-        public async Task<string> DoSync()
-        {
-            Console.WriteLine($"before await thread {Thread.CurrentThread?.ManagedThreadId}, task {Task.CurrentId}");
-            Thread.Sleep(1000);
-
-            Console.WriteLine($"after await thread{Thread.CurrentThread?.ManagedThreadId}, task{Task.CurrentId}");
-            return "hhaha";
-        }
 
 
         [HttpGet("[action]")]
-        public async Task<IEnumerable<BillBase>> Bills()
+        public async Task<IActionResult> Users()
         {
-            return await _avmtApp.GetBillsAsync("");
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla /5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0");
+            //var request = new HttpRequestMessage(HttpMethod.Get, @"http://localhost:8000/api/mallservice/users/");
+            var response = await _httpClient.GetAsync(@"http://localhost:8000/api/mallservice/users");
+            var data = await response.Content.ReadAsStringAsync();
+            //var json = JsonConvert.DeserializeObject(data);
+            return Ok(data);
         }
 
         public class WeatherForecast
