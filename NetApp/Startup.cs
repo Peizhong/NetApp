@@ -108,7 +108,7 @@ namespace NetApp
             {
                 // Set a short timeout for easy testing.
                 // after then Http.Session won't find the session
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.IdleTimeout = TimeSpan.FromDays(1);
                 options.Cookie.HttpOnly = true;
             });
         }
@@ -123,13 +123,11 @@ namespace NetApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                /*
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
                     ReactHotModuleReplacement = true
                 });
-                */
             }
             else
             {

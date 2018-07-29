@@ -22,13 +22,5 @@ namespace NetApp.Repository
         public DbSet<Entry> Entries { get; set; }
 
         public DbSet<Topic> Topics { get; set; }
-
-        public DbSet<NetApp.Entities.Avmt.Workspace> Workspace { get; set; }
-
-        public DbSet<NetApp.Entities.Avmt.FunctionLocation> FunctionLocation { get; set; }
-
-        public DbSet<NetApp.Entities.Avmt.ChangeBill> ChangeBill { get; set; }
-
-        public DbSet<NetApp.Entities.Avmt.DisTransferBill> DisTransferBill { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿@using NetApp.Entities.Avmt
 @model IEnumerable<BillBase>
 @{
-    Layout = "/Views/Shared/_Layout2.cshtml";
+    Layout = "/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "单据";
     var mainBills = Model.OfType<MainTransferBill>();
     var disBills = Model.OfType<DisTransferBill>();

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NetApp.Entities.Mall
 {
@@ -14,22 +16,25 @@ namespace NetApp.Entities.Mall
 
     public class Order
     {
-        public string Id { get; set; }
-
-        public string UserId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string OrderId { get; set; }
         
+        public User User { get; set; }
+
         public string TransactionId { get; set; }
 
-        public DateTime CreateTime { get; set; }
-
-        public DateTime UpdateTime { get; set; }
+        public DateTime? CreateTime { get; set; }
+        
+        public DateTime? UpdateTime { get; set; }
 
         public OrderStatus Status { get; set; }
 
+        [DataType(DataType.Currency)]
         public decimal TotalPrice { get; set; }
 
+        [DataType(DataType.Currency)]
         public decimal ActualPrice { get; set; }
 
-        public List<OrderDetail> Details { get; set; }
+        public List<OrderDetail> OrderDetails { get; set; }
     }
 }
