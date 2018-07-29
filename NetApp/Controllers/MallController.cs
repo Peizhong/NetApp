@@ -30,11 +30,16 @@ namespace NetApp.Controllers
                 Price = 14.3m,
                 Description = $"Tell me something about {n}"
             });
+#if DEBUG
+            Console.WriteLine("this is debug, make remote call");
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla /5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0");
             var response = await _httpClient.GetAsync(@"http://localhost/api/mallservice/users");
             var data = await response.Content.ReadAsStringAsync();
+#else
+            Console.WriteLine("this is no debug, so no remote call");
+#endif
             if (Request.Headers["accept"] == "application/json")
             {
                 return Ok(products);
