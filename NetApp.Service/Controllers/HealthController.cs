@@ -12,6 +12,6 @@ namespace NetApp.Service.Controllers
     [ApiController]
     public class HealthController : ControllerBase
     {
-        public ActionResult Get() => Ok("OK");
+        public JsonResult Get() => new JsonResult("OK");
     }
 }

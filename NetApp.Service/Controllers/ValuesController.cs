@@ -33,7 +33,8 @@ namespace NetApp.Service.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            var host = HttpContext.Request.Host.Value;
+            return new string[] { "value1", "value2", "from", host };
         }
 
         // GET api/values/5
