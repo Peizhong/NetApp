@@ -18,7 +18,11 @@ namespace NetApp
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+#if DEBUG
                 .UseUrls("http://*:5000")
+#else
+                .UseUrls("http://*:80")
+#endif
                 .Build();
     }
 }

@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Service", "NetApp.Se
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DjgSite", "DjgSite\DjgSite.pyproj", "{C2AD07CE-927E-474A-81F2-73A0BD8064F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Gateway", "NetApp.Gateway\NetApp.Gateway.csproj", "{75FD1233-94DB-476F-8C29-6DF92CAF232C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Gateway", "NetApp.Gateway\NetApp.Gateway.csproj", "{75FD1233-94DB-476F-8C29-6DF92CAF232C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

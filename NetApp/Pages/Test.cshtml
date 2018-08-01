@@ -1,0 +1,48 @@
+﻿@page
+@model TestModel
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@{
+    Layout = "/Views/Shared/_LayoutMall.cshtml";
+}
+@functions{
+    public class TestModel : PageModel
+    {
+    }
+}
+<script type="text/javascript">
+    //文档就绪
+    $(document).ready(function () {
+    //$(selector).action()
+        $("#p1").click(function () {
+            $(this).hide();
+        });
+        $("#p0").click(() => {
+            $("[href]").hide();
+        })
+        $("#p0").click(() => {
+            $("[href]").hide();
+        })
+        $("#helloBtn").click(() => {
+            $("p").toggle(100);
+            //异步请求
+            $.get("avmt", (data, status) => {
+                //alert(data+status)
+            });
+            $.ajax({
+                url: "hello", context: document.body, success: function () {
+                    $("#helloBtn").toggleClass("btn-primary");
+                }
+            });
+        })
+        //blur: 失去焦点
+        $("#helloBtn").blur(() => {
+            $("p").toggle(100);
+        })
+    });
+</script>
+<body>
+    <p id="p0">If you click on me, I will disappear.</p>
+    <p id="p1">this is p1</p>
+    <a href="www.baidu.com">aaa</a>
+    <button id="helloBtn" class="btn btn-primary">Click me</button>
+</body>
