@@ -27,6 +27,10 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DjgSite", "DjgSite\DjgSite.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Gateway", "NetApp.Gateway\NetApp.Gateway.csproj", "{75FD1233-94DB-476F-8C29-6DF92CAF232C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.OldMVC", "NetApp.OldMVC\NetApp.OldMVC.csproj", "{E6083BDB-0B06-442B-ADBA-9701FBB7443C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.OldMVC.Tests", "NetApp.OldMVC.Tests\NetApp.OldMVC.Tests.csproj", "{92006E5E-753B-4088-A01F-06EE51552665}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{75FD1233-94DB-476F-8C29-6DF92CAF232C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75FD1233-94DB-476F-8C29-6DF92CAF232C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75FD1233-94DB-476F-8C29-6DF92CAF232C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92006E5E-753B-4088-A01F-06EE51552665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92006E5E-753B-4088-A01F-06EE51552665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92006E5E-753B-4088-A01F-06EE51552665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92006E5E-753B-4088-A01F-06EE51552665}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
