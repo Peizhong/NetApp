@@ -8,7 +8,7 @@ namespace NetApp.Repository.Interfaces
 {
     public interface IMallRepo
     {
-        Task<List<Product>> ProductsAsync(string key, int startIndex, int pageSize);
+        Task<List<Product>> ProductsAsync(int startIndex, int pageSize);
 
         Task<Product> ProductAsync(int id);
 
@@ -20,7 +20,7 @@ namespace NetApp.Repository.Interfaces
 
         Task RemoveProductAsync(Product product);
 
-        Task<List<Order>> OrdersAsync(string key, int startIndex, int pageSize);
+        Task<List<Order>> OrdersAsync(string userId, int startIndex, int pageSize);
 
         Task AddOrdersAsync(IEnumerable<Order> orders);
     }

@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.OldMVC", "NetApp.Old
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.OldMVC.Tests", "NetApp.OldMVC.Tests\NetApp.OldMVC.Tests.csproj", "{92006E5E-753B-4088-A01F-06EE51552665}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.CLR", "NetApp.CLR\NetApp.CLR.csproj", "{1A8523F8-A7DC-4DF9-A02F-6D065709F3A1}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{775F99B6-F921-4EF3-B91F-630574650328}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +97,14 @@ Global
 		{92006E5E-753B-4088-A01F-06EE51552665}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92006E5E-753B-4088-A01F-06EE51552665}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92006E5E-753B-4088-A01F-06EE51552665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A8523F8-A7DC-4DF9-A02F-6D065709F3A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A8523F8-A7DC-4DF9-A02F-6D065709F3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A8523F8-A7DC-4DF9-A02F-6D065709F3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A8523F8-A7DC-4DF9-A02F-6D065709F3A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{775F99B6-F921-4EF3-B91F-630574650328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{775F99B6-F921-4EF3-B91F-630574650328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{775F99B6-F921-4EF3-B91F-630574650328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{775F99B6-F921-4EF3-B91F-630574650328}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

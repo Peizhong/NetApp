@@ -18,7 +18,7 @@ namespace NetApp.Repository
         public SQBaseInfoRepo()
         {
             var dbConfig = new DbContextOptionsBuilder<AvmtDbContext>();
-            string connectionString = @"Data Source=avmt.db";
+            string connectionString = @"Data Source=DB/avmt.db";
             dbConfig.UseSqlite(connectionString);
             _avmtContext = new AvmtDbContext(dbConfig.Options);
         }

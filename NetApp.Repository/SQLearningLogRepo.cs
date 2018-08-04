@@ -13,7 +13,7 @@ namespace NetApp.Repository
     {
         static string connStr;
 
-        public SQLearningLogRepo(string connectionString = "Data Source=mydev.db;")
+        public SQLearningLogRepo(string connectionString = "Data Source=DB/mydev.db;")
         {
             connStr = connectionString;
         }

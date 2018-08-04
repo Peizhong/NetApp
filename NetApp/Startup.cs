@@ -42,7 +42,7 @@ namespace NetApp
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=mydev.db;"));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(@"Data Source=DB/mydev.db;"));
             services.AddLogging(builder =>
             {
                 builder.AddConfiguration(Configuration.GetSection("Logging"));
