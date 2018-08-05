@@ -1,4 +1,4 @@
-﻿FROM microsoft/dotnet:2.1.1-aspnetcore-runtime AS base
+﻿FROM wpz/mservice/net:v0 AS base
 
 # 作者信息 
 MAINTAINER wangpeizhong
@@ -21,4 +21,5 @@ RUN dotnet publish NetApp.Service.csproj -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+
 ENTRYPOINT ["dotnet", "NetApp.Service.dll"]

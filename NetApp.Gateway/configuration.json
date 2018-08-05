@@ -7,7 +7,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "193.112.41.28",
-          "Port": "32780"
+          "Port": "32786"
         },
         {
           "Host": "193.112.41.28",
@@ -20,7 +20,9 @@
       ],
       "UpstreamPathTemplate": "/ClientService/{url}",
       "UpstreamHttpMethod": [ "Get", "Post" ],
-      "LoadBalancer": "RoundRobin"
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      }
     }
   ],
   "GlobalConfiguration": {

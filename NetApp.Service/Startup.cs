@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using NetApp.Service.Models;
+using NetApp.Service.Extensions;
 
 namespace NetApp.Service
 {
@@ -36,7 +37,7 @@ namespace NetApp.Service
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
@@ -70,6 +71,16 @@ namespace NetApp.Service
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseMvc();
+
+            ServiceEntity serviceEntity = new ServiceEntity
+            {
+                IP = NetworkHelper.LocalIPAddress,
+                Port = Convert.ToInt32(Configuration["Service:Port"]),
+                ServiceName = Configuration["Service:Name"],
+                ConsulIP = "172.17.0.8",
+                ConsulPort = Convert.ToInt32(Configuration["Consul:Port"])
+            };
+            app.RegisterConsul(lifetime, serviceEntity);
         }
     }
 }
