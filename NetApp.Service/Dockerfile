@@ -11,9 +11,6 @@ EXPOSE 80
 
 FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
-COPY NetApp.Service/NetApp.Service.csproj NetApp.Service/
-COPY NetApp.Entities/NetApp.Entities.csproj NetApp.Entities/
-RUN dotnet restore NetApp.Service/NetApp.Service.csproj
 COPY . .
 WORKDIR /src/NetApp.Service
 RUN dotnet build NetApp.Service.csproj -c Release -o /app

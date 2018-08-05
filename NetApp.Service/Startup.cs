@@ -68,6 +68,7 @@ namespace NetApp.Service
             }
             */
             //app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseMvc();
         }
     }

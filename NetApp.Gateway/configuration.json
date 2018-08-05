@@ -6,12 +6,21 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": "5002"
+          "Host": "193.112.41.28",
+          "Port": "32780"
+        },
+        {
+          "Host": "193.112.41.28",
+          "Port": "32787"
+        },
+        {
+          "Host": "193.112.41.28",
+          "Port": "32785"
         }
       ],
       "UpstreamPathTemplate": "/ClientService/{url}",
-      "UpstreamHttpMethod": [ "Get", "Post" ]
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "LoadBalancer": "RoundRobin"
     }
   ],
   "GlobalConfiguration": {
