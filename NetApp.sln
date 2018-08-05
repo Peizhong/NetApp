@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp", "NetApp\NetApp.csproj", "{BE9DA210-AED1-408F-A6F9-4E680DA9EF5E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Tests", "NetApp.Tests\NetApp.Tests.csproj", "{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Portal", "NetApp.Portal\NetApp.Portal.csproj", "{301B17E7-9DD9-4D03-B9B1-DE67FAEEDEA6}"
@@ -27,9 +25,9 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DjgSite", "DjgSite\DjgSite.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Gateway", "NetApp.Gateway\NetApp.Gateway.csproj", "{75FD1233-94DB-476F-8C29-6DF92CAF232C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.OldMVC", "NetApp.OldMVC\NetApp.OldMVC.csproj", "{E6083BDB-0B06-442B-ADBA-9701FBB7443C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.React", "NetApp.React\NetApp.React.csproj", "{835FAA38-EDA9-4095-BA5E-8CEE46116069}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{775F99B6-F921-4EF3-B91F-630574650328}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp", "NetApp\NetApp.csproj", "{C4C36DFD-818F-4263-8E4D-E382FD53B5A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +35,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BE9DA210-AED1-408F-A6F9-4E680DA9EF5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE9DA210-AED1-408F-A6F9-4E680DA9EF5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE9DA210-AED1-408F-A6F9-4E680DA9EF5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE9DA210-AED1-408F-A6F9-4E680DA9EF5E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC1F3BC1-0BE5-482E-9E17-4D57FC5872A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -85,14 +79,14 @@ Global
 		{75FD1233-94DB-476F-8C29-6DF92CAF232C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75FD1233-94DB-476F-8C29-6DF92CAF232C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75FD1233-94DB-476F-8C29-6DF92CAF232C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6083BDB-0B06-442B-ADBA-9701FBB7443C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{775F99B6-F921-4EF3-B91F-630574650328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{775F99B6-F921-4EF3-B91F-630574650328}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{775F99B6-F921-4EF3-B91F-630574650328}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{775F99B6-F921-4EF3-B91F-630574650328}.Release|Any CPU.Build.0 = Release|Any CPU
+		{835FAA38-EDA9-4095-BA5E-8CEE46116069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{835FAA38-EDA9-4095-BA5E-8CEE46116069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{835FAA38-EDA9-4095-BA5E-8CEE46116069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{835FAA38-EDA9-4095-BA5E-8CEE46116069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4C36DFD-818F-4263-8E4D-E382FD53B5A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4C36DFD-818F-4263-8E4D-E382FD53B5A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4C36DFD-818F-4263-8E4D-E382FD53B5A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4C36DFD-818F-4263-8E4D-E382FD53B5A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
