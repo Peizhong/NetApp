@@ -39,7 +39,8 @@ class MyLibaray extends React.Component<MyLibarayProps, {}> {
               style={{ width: "100%" }}
             />
           </div>
-        )}
+            )}
+        请退出默认账号，使用账号test@test.com test1234登陆
         {this.renderTopics()}
         <button className="btn btn-primary pull-left">Look Good</button>
       </div>
