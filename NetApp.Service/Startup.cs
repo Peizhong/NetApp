@@ -71,14 +71,11 @@ namespace NetApp.Service
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseMvc();
-
             ServiceEntity serviceEntity = new ServiceEntity
             {
-                IP = NetworkHelper.LocalIPAddress,
-                Port = Convert.ToInt32(Configuration["Service:Port"]),
-                ServiceName = Configuration["Service:Name"],
-                ConsulIP = "172.17.0.8",
-                ConsulPort = Convert.ToInt32(Configuration["Consul:Port"])
+                ServiceName = "NetApp_Service",
+                ConsulIP = "127.0.0.1",
+                ConsulPort = 8500
             };
             app.RegisterConsul(lifetime, serviceEntity);
         }
