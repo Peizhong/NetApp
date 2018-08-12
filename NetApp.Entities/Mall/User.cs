@@ -8,6 +8,7 @@ namespace NetApp.Entities.Mall
 {
     public class User
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string UserId { get; set; }
 
         public string UserName { get; set; }
@@ -18,6 +19,6 @@ namespace NetApp.Entities.Mall
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        public List<Order> Orders { get; set; }
+        public ICollection<Order> Orders { get; set; }
     }
 }

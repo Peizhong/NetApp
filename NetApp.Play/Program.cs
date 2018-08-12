@@ -52,9 +52,21 @@ namespace NetApp.Play
 
         static void Main(string[] args)
         {
+            var v = (6503154).ToString();
+            var sp = v.Split('.');
+            var i = string.Concat(sp[0].Take(3));
+            var d = "0";
+            if (sp.Length > 1)
+            {
+                d = string.Concat(sp[1].Take(2));
+            }
+            var cv = decimal.Parse($"{i}.{d}");
+
+
             Task.Run(async () =>
             {
-                HttpClient c = new HttpClient(new HttpClientHandler {
+                HttpClient c = new HttpClient(new HttpClientHandler
+                {
                     Proxy = null,
                     UseProxy = false
                 });
@@ -79,27 +91,6 @@ namespace NetApp.Play
             //task.Wait();
             Console.WriteLine("done");
             Console.ReadKey();
-        }
-
-        static async void EFTest()
-        {
-
-            var dbConfig = new DbContextOptionsBuilder<Repository.AvmtDbContext>();
-            string connectionString = @"Data Source=avmt.db";
-            dbConfig.UseSqlite(connectionString);
-            using (var context = new Repository.AvmtDbContext(dbConfig.Options))
-            {
-                try
-                {
-                    var cc = await context.Cars.AsNoTracking().ToListAsync();
-                    var baseinfo = await context.BasicinfoConfigs.AsNoTracking().Where(b => b.Id == "70").ToListAsync();
-                    var good = baseinfo.Any(b => b.BaseinfoDict?.Any() == true);
-                }
-                catch (Exception ex)
-                {
-                    var m = ex.Message;
-                }
-            }
         }
     }
 }

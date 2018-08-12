@@ -17,7 +17,7 @@ namespace NetApp.Service.Extensions
         public int ConsulPort { get; set; }
     }
 
-    public static class ConsulExtensions
+    public static class ConsulExtension
     {
         public static IApplicationBuilder RegisterConsul(this IApplicationBuilder app, IApplicationLifetime lifetime, ServiceEntity serviceEntity)
         {
@@ -41,10 +41,11 @@ namespace NetApp.Service.Extensions
                 Tags = new[] { $"urlprefix-/{serviceEntity.ServiceName}" }//添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
             };
 
-            consulClient.Agent.ServiceRegister(registration).Wait();//服务启动时注册，内部实现其实就是使用 Consul API 进行注册（HttpClient发起）
+            //consulClient.Agent.ServiceRegister(registration).Wait();//服务启动时注册，内部实现其实就是使用 Consul API 进行注册（HttpClient发起）
             lifetime.ApplicationStopping.Register(() =>
             {
-                consulClient.Agent.ServiceDeregister(registration.ID).Wait();//服务停止时取消注册
+                Console.WriteLine("life time: application closed");
+                //consulClient.Agent.ServiceDeregister(registration.ID).Wait();//服务停止时取消注册
             });
 
             return app;

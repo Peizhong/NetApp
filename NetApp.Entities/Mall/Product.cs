@@ -8,30 +8,26 @@ namespace NetApp.Entities.Mall
 {
     public class Product
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string ProductId { get; set; }
+
         public string ProductName { get; set; }
+
         public string Description { get; set; }
+
         public string ManufacturerId { get; set; }
+
         public string VendorId { get; set; }
+
+        public string CategoryId { get; set; }
+
+        public Category Category { get; set; }
+
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
-    }
-
-    public class Blog
-    {
-        public int BlogId { get; set; }
-        public string Url { get; set; }
-
-        public ICollection<Post> Posts { get; set; }
-    }
-
-    public class Post
-    {
-        public int PostId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
         
-        public Blog Blog { get; set; }
+        public DateTime? UpdateTime { get; set; }
+
+        public string Remark { get; set; }
     }
 }

@@ -35,5 +35,11 @@ namespace NetApp.Entities.Avmt
 
         [Column("SORT_NO")]
         public int SortNo { get; set; }
+
+        [Column("UPDATE_TIME")]
+        public DateTime UpdateTime { get; set; }
+
+        [Column("REMARK")]
+        public string Remark { get; set; }
     }
 }

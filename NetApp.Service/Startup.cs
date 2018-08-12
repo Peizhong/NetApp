@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using NetApp.Service.Models;
 using NetApp.Service.Extensions;
+using NetApp.Service.Models;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace NetApp.Service
 {
@@ -28,12 +23,20 @@ namespace NetApp.Service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging();
-            
             var connectionString = Configuration.GetConnectionString("MallDB");
-            services.AddDbContext<MallContext>(opt => opt.UseSqlServer(connectionString));
+            services.AddDbContext<MallContext>(opt => opt.UseMySql(connectionString));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Formatting = Formatting.Indented;
+                }); ;
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v0", new Info { Title = "Mall API", Version = "v0", Contact = new Contact { Name = "Wang Peizhong" } });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,32 +48,23 @@ namespace NetApp.Service
             }
             else
             {
-                app.UseHsts();
+                //app.UseHsts();
             }
-            /*
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                try
-                {
-                    var context = serviceScope.ServiceProvider.GetRequiredService<MallContext>();
 
-                    //context.Database.EnsureDeleted();
-                    //var user = context.Users.FirstOrDefault();
-                    //var detail = context.OrderDetails.Include(d => d.Product).Include(d => d.Order).ThenInclude(o => o.User).Where(o => o.Order.User == user).ToArray();
-                    //context.Database.EnsureCreated();
-                    //SeedData.Initialize(context);
-                    context.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Startup>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                }
-            }
-            */
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseMvc();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v0/swagger.json", "Mall API V0");
+            });
+
+#if DEBUG
+            app.MockClassify();
+#endif
+
             ServiceEntity serviceEntity = new ServiceEntity
             {
                 ServiceName = "NetApp_Service",

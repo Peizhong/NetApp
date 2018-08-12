@@ -9,12 +9,6 @@ namespace NetApp.Repository
 {
     public class AvmtDbContext : DbContext
     {
-        public AvmtDbContext()
-            : base()
-        {
-
-        }
-
         public AvmtDbContext(DbContextOptions<AvmtDbContext> options)
             : base(options)
         {
@@ -36,9 +30,7 @@ namespace NetApp.Repository
         public DbSet<Workspace> Workspaces { get; set; }
 
         public DbSet<FunctionLocation> FunctionLocations { get; set; }
-
-        public DbSet<Car> Cars { get; set; }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -55,12 +47,6 @@ namespace NetApp.Repository
                 .WithOne()
                 .HasForeignKey(d => d.DictionaryId)
                 .HasPrincipalKey(b => b.DictionaryId);
-
-            modelBuilder.Entity<RecordOfSale>()
-                .HasOne(s => s.Car)
-                .WithMany(c => c.SaleHistory)
-                .HasForeignKey(s => s.CarLicensePlate)
-                .HasPrincipalKey(c => c.LicensePlate);
         }
     }
 }

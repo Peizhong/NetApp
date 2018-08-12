@@ -24,7 +24,7 @@ namespace NetApp.Entities.Avmt
         public string FlCode { get; set; }
 
         [Column("sort_no")]
-        public int SortNo { get; set; }
+        public double SortNo { get; set; }
     }
 
     public class LineFunctionLocation : FunctionLocation

@@ -35,6 +35,6 @@ namespace NetApp.Entities.Mall
         [DataType(DataType.Currency)]
         public decimal ActualPrice { get; set; }
 
-        public List<OrderDetail> OrderDetails { get; set; }
+        public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

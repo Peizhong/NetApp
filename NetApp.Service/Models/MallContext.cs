@@ -17,18 +17,16 @@ namespace NetApp.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Blog>()
-                .HasMany(c => c.Posts)
-                .WithOne(e => e.Blog)
-                .IsRequired();
         }
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Product> Products { get; set; }
+
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderDetail> OrderDetails { get; set; }
     }
 }

@@ -1,65 +1,74 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using NetApp.Entities.Mall;
+using NetApp.Service.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using NetApp.Service.Models;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace NetApp.Service.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly ILogger _logger;
         private readonly MallContext _context;
 
-        public ValuesController(MallContext context)
+        public ValuesController(ILogger<ValuesController> logger, MallContext context)
         {
+            _logger = logger;
             _context = context;
         }
 
-        [HttpGet("[action]/{id}")]
-        public async Task<ActionResult<string>> MallUser(string id)
-        {
-            var user = await _context.Users.OrderBy(u => u.UserName).Skip(100).FirstOrDefaultAsync();
-            var bills = await _context.Orders.Where(o => o.User == user).ToArrayAsync();
-            //var detail = await _context.OrderDetails.Include(d => d.Product).Include(d => d.Order).ThenInclude(o => o.User).Where(o => o.Order.User == user).ToArrayAsync();
-            return JsonConvert.SerializeObject(user, settings: new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-        }
-
-        // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        [ApiExplorerSettings(GroupName = "v0")]
+        public async Task<IEnumerable<Category>> Categories([FromQuery]Pageable pageable)
         {
-            var host = HttpContext.Request.Host.Value;
-            return new string[] { "value1", "value2", "from", host };
+            var categories = await _context.Categories.Where(c => c.IsShow == 1).OrderBy(c => c.SortNo).Skip(pageable.StartIndex).Take(pageable.PageSize).ToListAsync();
+            return categories;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        [HttpGet("{categoryId}")]
+        [ApiExplorerSettings(GroupName = "v0")]
+        public async Task<Category> Categories(string categoryId)
         {
-            return "value";
+            var category = await _context.Categories.FindAsync(categoryId);
+            return category;
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpGet("{parentCategoryId}")]
+        [ApiExplorerSettings(GroupName = "v0")]
+        public async Task<IEnumerable<Category>> ChildCategories(string parentCategoryId)
         {
+            var categories = await _context.Categories.Where(c => c.ParentCategoryId == parentCategoryId && c.IsShow == 1).OrderBy(c => c.SortNo).ToListAsync();
+            return categories;
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpGet]
+        [ApiExplorerSettings(GroupName = "v0")]
+        public async Task<IEnumerable<Product>> Products([FromQuery]ProductViewModel viewModel)
         {
+            IEnumerable<Product> products = null;
+            var categoryId = viewModel.CategoryId;
+            if (!string.IsNullOrEmpty(categoryId))
+            {
+                products = await _context.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Price).Skip(viewModel.StartIndex).Take(viewModel.PageSize).ToListAsync();
+            }
+            else
+            {
+                products = await _context.Products.OrderBy(p => p.Price).Skip(viewModel.StartIndex).Take(viewModel.PageSize).ToListAsync();
+            }
+            return products;
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpGet("{productId}")]
+        [ApiExplorerSettings(GroupName = "v0")]
+        public async Task<Product> Products(string productId)
         {
+            var product = await _context.Products.FindAsync(productId);
+            return product;
         }
     }
 }

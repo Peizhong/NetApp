@@ -60,6 +60,8 @@ namespace NetApp.Repository
 
         public Task<List<FunctionLocation>> GetFunctionLocationsAsync(string workspaceId, int startIndex, int pageSize)
         {
+            if (string.IsNullOrEmpty(workspaceId))
+                return _avmtContext.FunctionLocations.AsNoTracking().ToListAsync();
             if (startIndex < 0)
                 startIndex = 0;
             if (pageSize < 1)
@@ -86,8 +88,7 @@ namespace NetApp.Repository
         {
             if (classifyIds?.Any() != true)
             {
-                List<Classify> classifies = null;
-                return Task.FromResult(classifies);
+                return _avmtContext.Classifies.AsNoTracking().ToListAsync();
             }
             return _avmtContext.Classifies.AsNoTracking().Where(c => classifyIds.Contains(c.Id)).ToListAsync();
         }

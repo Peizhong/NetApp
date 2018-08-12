@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using NetApp.Service.Extensions;
+using NLog.Web;
+using System;
 
 namespace NetApp.Service
 {
@@ -16,27 +10,41 @@ namespace NetApp.Service
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            // NLog: setup the logger first to catch all errors
+            var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            try
+            {
+                var ps = string.Join(";", args);
+                logger.Info($"start up with args: {ps}");
+
+                CreateWebHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                //NLog: catch setup errors
+                logger.Error(ex, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                NLog.LogManager.Shutdown();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            if (args?.Any() == true)
-            {
-                Regex regexHost = new Regex(@"\d{2,4}");
-                foreach (var a in args)
-                {
-                    var p = regexHost.Match(a);
-                    if (p != null)
-                    {
-                        Console.WriteLine($"found the port is : [{p.Value}]");
-                        ServiceEntity.Port = int.Parse(p.Value);
-                    }
-               }
-            }
-            var builder = WebHost.CreateDefaultBuilder(args)
+            var builder = WebHost.CreateDefaultBuilder(args)//calls UseKestrel behind the scenes
+                .UseNLog()
                 .UseStartup<Startup>();
-            //.UseUrls("http://*:5001");
+
+            var m = builder.GetSetting("ASPNETCORE_URLS");
+            builder = builder.UseUrls(m);
+
+            Uri u = new Uri(m);
+            ServiceEntity.IP = u.Host;
+            ServiceEntity.Port = u.Port;
+            
             return builder;
         }
     }
