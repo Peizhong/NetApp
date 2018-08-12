@@ -4,6 +4,7 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
+using NetApp.Entities.Interfaces;
 
 namespace NetApp.Entities.Mall
 {
@@ -36,5 +37,30 @@ namespace NetApp.Entities.Mall
 
         [JsonIgnore]
         public ICollection<Product> Products { get; set; }
+    }
+
+    public class Category2 : ITreeNode
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string ParentId { get; set; }
+        public string FullPath { get; set; }
+
+        [JsonIgnore]
+        public ITreeNode Parent { get; set; }
+
+        [JsonIgnore]
+        public IEnumerable<ITreeNode> Children { get; set; }
+
+        public string IamCategory { get; set; }
+    }
+
+    public class Product2 : IQuery
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+
+        public double Pricet { get; set; }
     }
 }
