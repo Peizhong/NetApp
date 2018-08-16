@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Portal\NetApp.Portal.csproj" />
     <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
   </ItemGroup>
 
