@@ -6,8 +6,8 @@ namespace NetApp.Entities.Interfaces
 {
     public interface IQuery
     {
-        string Id { get; set; }
+        string Id { get; }
 
-        string Name { get; set; }
+        string Name { get; }
     }
 }

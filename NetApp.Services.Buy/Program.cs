@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace NetApp.Services.Order
+namespace NetApp.Services.Buy
 {
     public class Program
     {

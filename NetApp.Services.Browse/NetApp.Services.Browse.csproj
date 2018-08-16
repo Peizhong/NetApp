@@ -9,9 +9,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Consul" Version="0.7.2.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetApp.Entities\NetApp.Entities.csproj" />
+    <ProjectReference Include="..\NetApp.Services.Lib\NetApp.Services.Lib.csproj" />
   </ItemGroup>
 
 </Project>

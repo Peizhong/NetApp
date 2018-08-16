@@ -54,13 +54,4 @@ namespace NetApp.Entities.Mall
 
         public string IamCategory { get; set; }
     }
-
-    public class Product2 : IQuery
-    {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
-        public double Pricet { get; set; }
-    }
 }

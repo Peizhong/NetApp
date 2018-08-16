@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NetApp.Entities.Interfaces;
 
 namespace NetApp.Entities.Mall
 {
-    public class Product
+    public class Product : IQuery
     {
+        [NotMapped]
+        public string Id { get; set; }
+
+        [NotMapped]
+        public string Name { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string ProductId { get; set; }
 
@@ -29,5 +36,14 @@ namespace NetApp.Entities.Mall
         public DateTime? UpdateTime { get; set; }
 
         public string Remark { get; set; }
+    }
+
+    public class Product2 : IQuery
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+
+        public double Price { get; set; }
     }
 }

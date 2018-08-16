@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace NetApp.Services.Account.Controllers
+namespace NetApp.Services.Buy.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
