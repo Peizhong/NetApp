@@ -9,6 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NetApp.Entities.Mall;
+using NetApp.Repository;
+using NetApp.Repository.Interfaces;
 
 namespace NetApp.Services.Browse
 {
@@ -25,6 +28,8 @@ namespace NetApp.Services.Browse
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSingleton<IListRepo<Product>, MQMallRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -30,7 +30,7 @@ namespace NetApp.Services.Lib.Controllers
         }
 
         // GET: api/Products/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}")]
         public Task<T> GetAsync(string id)
         {
             return _repo.FindAsync(id);
