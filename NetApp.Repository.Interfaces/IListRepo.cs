@@ -11,9 +11,9 @@ namespace NetApp.Repository.Interfaces
     {
         Task<T> FindAsync(string id);
 
-        Task<T> GetAsync(Expression expression);
+        Task<T> GetAsync(Expression<Func<T, bool>> expression);
 
-        Task<IList<T>> GetListAsync(Expression expression);
+        Task<IList<T>> GetListAsync(Expression<Func<T, bool>> expression);
 
         Task UpdateAsync(T value);
 

@@ -6,7 +6,7 @@ using NetApp.Entities.Interfaces;
 
 namespace NetApp.Repository.Interfaces
 {
-    public interface ITreeRepo<T> : IListRepo<T> where T : ITreeNode
+    public interface ITreeRepo<T> : IListRepo<T> where T : ITreeNode<T>
     {
         Task<IList<T>> GetRoot();
 

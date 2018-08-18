@@ -4,14 +4,14 @@ using System.Text;
 
 namespace NetApp.Entities.Interfaces
 {
-    public interface ITreeNode : IQuery
+    public interface ITreeNode<T> : IQuery where T : IQuery
     {
         string ParentId { get; set; }
 
-        ITreeNode Parent { get; set; }
+        T Parent { get; set; }
 
         string FullPath { get; set; }
 
-        IEnumerable<ITreeNode> Children { get; }
+        ICollection<T> Children { get; }
     }
 }

@@ -9,16 +9,26 @@ namespace NetApp.Entities.Mall
 {
     public class Product : IQuery
     {
-        [NotMapped]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; set; }
 
-        [NotMapped]
         public string Name { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string ProductId { get; set; }
+        public int DataStatus { get; set; }
 
-        public string ProductName { get; set; }
+        [NotMapped]
+        public string ProductId
+        {
+            get { return Id; }
+            set { Id = value; }
+        }
+
+        [NotMapped]
+        public string ProductName
+        {
+            get { return Name; }
+            set { Name = value; }
+        }
 
         public string Description { get; set; }
 
@@ -28,22 +38,13 @@ namespace NetApp.Entities.Mall
 
         public string CategoryId { get; set; }
 
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
-        
+
         public DateTime? UpdateTime { get; set; }
 
         public string Remark { get; set; }
-    }
-
-    public class Product2 : IQuery
-    {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
-        public double Price { get; set; }
     }
 }

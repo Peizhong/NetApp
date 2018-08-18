@@ -13,7 +13,7 @@ namespace NetApp.Services.Browse.Controllers
 {
     public class ProductsController : ListController<Product>
     {
-        public ProductsController(ILogger<ProductsController> logger, IListRepo<Product> repo)
+        public ProductsController(ILogger<ProductsController> logger, IListRepo<Product> repo, ITreeRepo<Category> treeRepo)
             : base(logger, repo)
         {
         }

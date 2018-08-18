@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NetApp.Entities.Interfaces;
 using NetApp.Repository.Interfaces;
+using System.Linq.Expressions;
 
 namespace NetApp.Services.Lib.Controllers
 {
@@ -26,7 +27,8 @@ namespace NetApp.Services.Lib.Controllers
         [HttpGet]
         public Task<IList<T>> GetAsync()
         {
-            return _repo.GetListAsync(null);
+            Expression<Func<T, bool>> show = (t) => t.DataStatus != 0;
+            return _repo.GetListAsync(show);
         }
 
         // GET: api/Products/5

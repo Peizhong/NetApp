@@ -8,7 +8,7 @@ using NetApp.Repository.Interfaces;
 
 namespace NetApp.Services.Lib.Controllers
 {
-    public abstract class TreeController<T> : ListController<T> where T : ITreeNode
+    public abstract class TreeController<T> : ListController<T> where T : ITreeNode<T>
     {
         public TreeController(ILogger<TreeController<T>> logger, ITreeRepo<T> repo) :
             base(logger, repo)
