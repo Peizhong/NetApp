@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using NetApp.Entities.Avmt;
 
 namespace NetApp.Play.Book
 {
@@ -14,31 +13,7 @@ namespace NetApp.Play.Book
     {
         public void DoSomething()
         {
-            Nullable<int> x;
-            x = 4;
-            int b = (int)x;
 
-
-            var array = new System.Collections.ArrayList();
-            var r = new Entities.Avmt.BasicInfoConfig();
-            var basicData = new[] {
-            new {
-                type= typeof(Entities.Avmt.BasicInfoConfig), table="DM_BASIC_CONFIG",
-            },
-            new {
-                type= typeof(Entities.Avmt.BasicInfoDictConfig), table="DM_BASIC_DICT",
-            },
-            };
-            foreach (var tb in basicData)
-            {
-                var n = tb.type.Name;
-                var list = download(Activator.CreateInstance(tb.type), tb.table);
-            }
-            var es = download(new BasicInfoConfig(), "ads");
-
-            var cf = new Classify();
-            var classifyNodes = new LinkNode<Classify>(cf);
-            var f = classifyNodes.Where(c => !string.IsNullOrEmpty(c.FullName)).ToList();
         }
 
         public List<T> download<T>(T a, string tableName)
