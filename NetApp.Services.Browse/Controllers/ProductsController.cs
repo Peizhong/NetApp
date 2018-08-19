@@ -8,13 +8,14 @@ using Microsoft.Extensions.Logging;
 using NetApp.Entities.Mall;
 using NetApp.Repository.Interfaces;
 using NetApp.Services.Lib.Controllers;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace NetApp.Services.Browse.Controllers
 {
     public class ProductsController : ListController<Product>
     {
-        public ProductsController(ILogger<ProductsController> logger, IListRepo<Product> repo, ITreeRepo<Category> treeRepo)
-            : base(logger, repo)
+        public ProductsController(ILogger<ProductsController> logger, IDistributedCache cache, IListRepo<Product> repo)
+            : base(logger, cache, repo)
         {
         }
     }

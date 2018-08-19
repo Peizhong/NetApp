@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Distributed;
 using NetApp.Entities.Interfaces;
 using NetApp.Repository.Interfaces;
 
@@ -10,8 +11,8 @@ namespace NetApp.Services.Lib.Controllers
 {
     public abstract class TreeController<T> : ListController<T> where T : ITreeNode<T>
     {
-        public TreeController(ILogger<TreeController<T>> logger, ITreeRepo<T> repo) :
-            base(logger, repo)
+        public TreeController(ILogger<TreeController<T>> logger, IDistributedCache cache, ITreeRepo<T> repo) :
+            base(logger, cache, repo)
         {
 
         }

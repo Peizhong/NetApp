@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using NetApp.Entities.Mall;
 using NetApp.Repository.Interfaces;
 using NetApp.Services.Lib.Controllers;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace NetApp.Services.Browse.Controllers
 {
@@ -15,8 +16,8 @@ namespace NetApp.Services.Browse.Controllers
     [ApiController]
     public class CategoriesController : TreeController<Category>
     {
-        public CategoriesController(ILogger<CategoriesController> logger, ITreeRepo<Category> repo)
-            : base(logger, repo)
+        public CategoriesController(ILogger<CategoriesController> logger, IDistributedCache cache, ITreeRepo<Category> repo)
+            : base(logger, cache, repo)
         {
         }
     }

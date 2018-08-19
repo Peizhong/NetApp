@@ -13,7 +13,7 @@ namespace NetApp.Repository
     public class MQMallRepo : IListRepo<Product>, ITreeRepo<Category>
     {
         private readonly MallDbContext _context;
-        
+
         public MQMallRepo(string connectionString)
         {
             _context = new MallDbContext(connectionString);
@@ -22,9 +22,16 @@ namespace NetApp.Repository
             //_context.Database.Migrate();
         }
 
-        public Task<Product> FindAsync(string id)
+        async Task<Product> IListRepo<Product>.FindAsync(string id)
         {
-            throw new NotImplementedException();
+            var result = await _context.Products.FindAsync(id);
+            return result;
+        }
+
+        async Task<Category> IListRepo<Category>.FindAsync(string id)
+        {
+            var result = await _context.Categories.FindAsync(id);
+            return result;
         }
 
         public Task<IList<Category>> GetAllChildren(string id)
@@ -83,11 +90,6 @@ namespace NetApp.Repository
         }
 
         public Task UpdateListAsync(IEnumerable<Category> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Category> IListRepo<Category>.FindAsync(string id)
         {
             throw new NotImplementedException();
         }

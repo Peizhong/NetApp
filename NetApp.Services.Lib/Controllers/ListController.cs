@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Distributed;
 using NetApp.Entities.Interfaces;
 using NetApp.Repository.Interfaces;
 using System.Linq.Expressions;
@@ -12,30 +13,39 @@ namespace NetApp.Services.Lib.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public abstract class ListController<T> : ControllerBase where T : IQuery
+    public abstract class ListController<T> : CacheController where T : IQuery
     {
-        protected readonly ILogger<ListController<T>> _logger;
         protected readonly IListRepo<T> _repo;
 
-        public ListController(ILogger<ListController<T>> logger, IListRepo<T> repo)
+        public ListController(ILogger<ListController<T>> logger, IDistributedCache cache, IListRepo<T> repo)
+            : base(logger, cache)
         {
-            _logger = logger;
             _repo = repo;
         }
 
         // GET: api/Products
         [HttpGet]
-        public Task<IList<T>> GetAsync()
+        public async Task<IList<T>> GetAsync()
         {
-            Expression<Func<T, bool>> show = (t) => t.DataStatus != 0;
-            return _repo.GetListAsync(show);
+            Func<Task<IList<T>>> query = async () =>
+            {
+                Expression<Func<T, bool>> show = (t) => t.DataStatus != 0;
+                return await _repo.GetListAsync(show);
+            };
+            var result = await CacheIt(query);
+            return result;
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public Task<T> GetAsync(string id)
+        public async Task<T> GetAsync(string id)
         {
-            return _repo.FindAsync(id);
+            Func<Task<T>> query = async () =>
+            {
+                return await _repo.FindAsync(id);
+            };
+            var result = await CacheIt(query);
+            return result;
         }
 
         // POST: api/Products
