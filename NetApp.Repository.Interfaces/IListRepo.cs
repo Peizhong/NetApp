@@ -13,7 +13,7 @@ namespace NetApp.Repository.Interfaces
 
         Task<T> GetAsync(Expression<Func<T, bool>> expression);
 
-        Task<IList<T>> GetListAsync(Expression<Func<T, bool>> expression, IPageable pageable);
+        Task<IList<T>> GetListAsync(Expression<Func<T, bool>> expression, IPageable<T> pageable);
 
         Task UpdateAsync(T value);
 

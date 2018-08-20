@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace NetApp.Entities.Interfaces
 {
-    public interface IPageable
+    public interface IPageable<T>
     {
-        uint StartIndex { get; }
-        uint PageSize { get; }
-        bool Reverse { get; }
-    }
+        int StartIndex { get; set; }
+        int PageSize { get; set; }
+        bool Reverse { get; set; }
 
-    public class Pageable
-    {
-        public uint StartIndex { get; set; }
-
-        public uint PageSize { get; set; }
-
-        public bool Reverse { get; set; }
+        //Expression<Func<T, object>> Sort { get; }
     }
 }

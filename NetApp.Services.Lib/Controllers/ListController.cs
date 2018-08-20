@@ -11,10 +11,19 @@ using NetApp.Repository.Interfaces;
 
 namespace NetApp.Services.Lib.Controllers
 {
+
     [Route("api/[controller]")]
+    [Produces("application/json")]
     [ApiController]
     public abstract class ListController<T> : CacheController where T : IQuery
     {
+        class Pageable : IPageable<T>
+        {
+            public int StartIndex { get; set; }
+            public int PageSize { get; set; }
+            public bool Reverse { get; set; }
+        }
+
         protected readonly IListRepo<T> _repo;
 
         public ListController(ILogger<ListController<T>> logger, IDistributedCache cache, IListRepo<T> repo)
@@ -23,14 +32,20 @@ namespace NetApp.Services.Lib.Controllers
             _repo = repo;
         }
 
-        // GET: api/Products
+        /// <summary>
+        /// 查询集合，url不带参数，写在header中
+        /// 响应中包含self,next,prev的链接和total
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<IList<T>> GetAsync(IPageable pageable)
+        public async Task<IList<T>> GetAsync()
         {
+            //
+            var page = new Pageable();
             Func<Task<IList<T>>> query = async () =>
             {
                 Expression<Func<T, bool>> show = (t) => t.DataStatus != 0;
-                return await _repo.GetListAsync(show, pageable);
+                return await _repo.GetListAsync(show, page);
             };
             var result = await CacheIt(query);
             return result;
@@ -68,4 +83,5 @@ namespace NetApp.Services.Lib.Controllers
         {
         }
     }
+
 }

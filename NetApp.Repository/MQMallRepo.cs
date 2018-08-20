@@ -55,15 +55,24 @@ namespace NetApp.Repository
             throw new NotImplementedException();
         }
 
-        public async Task<IList<Product>> GetListAsync(Expression<Func<Product, bool>> expression, IPageable pageable)
+        public async Task<IList<Product>> GetListAsync(Expression<Func<Product, bool>> expression, IPageable<Product> pageable)
         {
-            var products = await _context.Products.Where(expression).ToListAsync();
+            IQueryable<Product> query = _context.Products;
+            if (expression != null)
+                query = query.Where(expression);
+
+            if (pageable.StartIndex > 0)
+                query = query.Skip(pageable.StartIndex);
+            if (pageable.PageSize > 0)
+                query = query.Take(pageable.PageSize);
+
+            var products = await query.ToListAsync();
             var categoryIds = products.Select(p => p.CategoryId).ToList();
             var categories = await _context.Categories.Where(c => categoryIds.Contains(c.Id)).ToListAsync();
             return products;
         }
 
-        public async Task<IList<Category>> GetListAsync(Expression<Func<Category, bool>> expression, IPageable pageable)
+        public async Task<IList<Category>> GetListAsync(Expression<Func<Category, bool>> expression, IPageable<Category> pageable)
         {
             var result = await _context.Categories.ToListAsync();
             return result;

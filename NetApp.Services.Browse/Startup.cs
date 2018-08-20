@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using NetApp.Entities.Mall;
 using NetApp.Repository;
 using NetApp.Repository.Interfaces;
@@ -58,6 +59,7 @@ namespace NetApp.Services.Browse
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v0", new Info { Title = "Mall API", Version = "v0", Contact = new Contact { Name = "Wang Peizhong" } });
+                c.OperationFilter<MyHeaderFilter>();
             });
         }
 
@@ -76,7 +78,26 @@ namespace NetApp.Services.Browse
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v0/swagger.json", "Mall API V0");
+                //serve the Swagger UI at the app's root
+                c.RoutePrefix = string.Empty;
             });
+        }
+
+        class MyHeaderFilter : IOperationFilter
+        {
+            public void Apply(Operation operation, OperationFilterContext context)
+            {
+                if (operation.Parameters == null)
+                    operation.Parameters = new List<IParameter>();
+
+                operation.Parameters.Add(new NonBodyParameter
+                {
+                    Name = "PageInfo",
+                    In = "header",
+                    Type = "string",
+                    Required = false // set to false if this is optional
+                });
+            }
         }
     }
 }
