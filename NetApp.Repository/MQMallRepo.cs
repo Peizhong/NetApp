@@ -6,7 +6,7 @@ using NetApp.Entities.Mall;
 using NetApp.Repository.Interfaces;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using NetApp.Entities.Interfaces;
 
 namespace NetApp.Repository
 {
@@ -55,7 +55,7 @@ namespace NetApp.Repository
             throw new NotImplementedException();
         }
 
-        public async Task<IList<Product>> GetListAsync(Expression<Func<Product, bool>> expression)
+        public async Task<IList<Product>> GetListAsync(Expression<Func<Product, bool>> expression, IPageable pageable)
         {
             var products = await _context.Products.Where(expression).ToListAsync();
             var categoryIds = products.Select(p => p.CategoryId).ToList();
@@ -63,7 +63,7 @@ namespace NetApp.Repository
             return products;
         }
 
-        public async Task<IList<Category>> GetListAsync(Expression<Func<Category, bool>> expression)
+        public async Task<IList<Category>> GetListAsync(Expression<Func<Category, bool>> expression, IPageable pageable)
         {
             var result = await _context.Categories.ToListAsync();
             return result;

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
 using NetApp.Entities.Interfaces;
 using NetApp.Repository.Interfaces;
-using System.Linq.Expressions;
 
 namespace NetApp.Services.Lib.Controllers
 {
@@ -25,12 +25,12 @@ namespace NetApp.Services.Lib.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<IList<T>> GetAsync()
+        public async Task<IList<T>> GetAsync(IPageable pageable)
         {
             Func<Task<IList<T>>> query = async () =>
             {
                 Expression<Func<T, bool>> show = (t) => t.DataStatus != 0;
-                return await _repo.GetListAsync(show);
+                return await _repo.GetListAsync(show, pageable);
             };
             var result = await CacheIt(query);
             return result;
