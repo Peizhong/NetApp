@@ -12,6 +12,7 @@ namespace NetApp.Entities.Mall
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
         public int DataStatus { get; set; }
@@ -24,11 +25,7 @@ namespace NetApp.Entities.Mall
         }
 
         [NotMapped]
-        public string ProductName
-        {
-            get { return Name; }
-            set { Name = value; }
-        }
+        public string ProductName => Name;
 
         public string Description { get; set; }
 
@@ -41,6 +38,7 @@ namespace NetApp.Entities.Mall
         public virtual Category Category { get; set; }
 
         [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal Price { get; set; }
 
         public DateTime? UpdateTime { get; set; }

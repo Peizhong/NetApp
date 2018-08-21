@@ -18,8 +18,8 @@ namespace NetApp.Repository
         {
             _context = new MallDbContext(connectionString);
 
-            //_context.Database.EnsureCreated();
-            //_context.Database.Migrate();
+            _context.Database.EnsureCreated();
+            _context.Database.Migrate();
         }
 
         async Task<Product> IListRepo<Product>.FindAsync(string id)
