@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using NetApp.Entities.Mall;
+using NetApp.Models.Mall;
 using NetApp.Repository;
 using NetApp.Repository.Interfaces;
 

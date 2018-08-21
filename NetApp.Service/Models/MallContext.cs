@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NetApp.Entities.Mall;
 using Microsoft.EntityFrameworkCore;
 
 namespace NetApp.Service.Models
@@ -18,15 +17,5 @@ namespace NetApp.Service.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         }
-
-        public DbSet<Category> Categories { get; set; }
-
-        public DbSet<Product> Products { get; set; }
-
-        public DbSet<User> Users { get; set; }
-
-        public DbSet<Order> Orders { get; set; }
-
-        public DbSet<OrderDetail> OrderDetails { get; set; }
     }
 }

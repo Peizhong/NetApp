@@ -5,12 +5,13 @@ using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
-using NetApp.Entities.Interfaces;
+using NetApp.Models.Interfaces;
 
-namespace NetApp.Entities.Mall
+namespace NetApp.Models.Mall
 {
     public class Category : ITreeNode<Category>
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; set; }
 
         [NotMapped]

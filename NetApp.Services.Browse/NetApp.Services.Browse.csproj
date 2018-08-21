@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Entities\NetApp.Entities.csproj" />
+    <ProjectReference Include="..\NetApp.Models\NetApp.Models.csproj" />
     <ProjectReference Include="..\NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj" />
     <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
     <ProjectReference Include="..\NetApp.Services.Lib\NetApp.Services.Lib.csproj" />

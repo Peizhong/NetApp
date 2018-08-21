@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NetApp.Entities.Mall;
 using NetApp.Repository.Interfaces;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using NetApp.Entities.Interfaces;
+using NetApp.Models.Mall;
+using NetApp.Models.Interfaces;
 
 namespace NetApp.Repository
 {

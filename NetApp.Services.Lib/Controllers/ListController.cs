@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
-using NetApp.Entities.Interfaces;
+using NetApp.Models.Interfaces;
 using NetApp.Repository.Interfaces;
 
 namespace NetApp.Services.Lib.Controllers

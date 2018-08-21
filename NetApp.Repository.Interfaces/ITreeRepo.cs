@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using NetApp.Entities.Interfaces;
+using NetApp.Models.Interfaces;
 
 namespace NetApp.Repository.Interfaces
 {

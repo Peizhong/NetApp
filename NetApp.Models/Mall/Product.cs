@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NetApp.Entities.Interfaces;
+using NetApp.Models.Interfaces;
 
-namespace NetApp.Entities.Mall
+namespace NetApp.Models.Mall
 {
     public class Product : IQuery
     {

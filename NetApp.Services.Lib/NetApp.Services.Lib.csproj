@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Entities\NetApp.Entities.csproj" />
+    <ProjectReference Include="..\NetApp.Models\NetApp.Models.csproj" />
     <ProjectReference Include="..\NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj" />
   </ItemGroup>
 

@@ -61,9 +61,6 @@ namespace NetApp.Service
                 c.SwaggerEndpoint("/swagger/v0/swagger.json", "Mall API V0");
             });
 
-#if DEBUG
-            app.MockClassify();
-#endif
 
             ServiceEntity serviceEntity = new ServiceEntity
             {

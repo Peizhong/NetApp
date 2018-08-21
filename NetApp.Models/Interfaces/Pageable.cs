@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace NetApp.Entities.Interfaces
+namespace NetApp.Models.Interfaces
 {
     public interface IPageable<T>
     {

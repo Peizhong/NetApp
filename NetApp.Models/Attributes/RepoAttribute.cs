@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetApp.Entities.Attributes
+namespace NetApp.Models.Attributes
 {
     public enum RepoTypeEnum
     {

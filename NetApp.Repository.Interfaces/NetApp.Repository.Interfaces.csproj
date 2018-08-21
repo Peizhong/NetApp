@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Entities\NetApp.Entities.csproj" />
+    <ProjectReference Include="..\NetApp.Models\NetApp.Models.csproj" />
   </ItemGroup>
 
 </Project>
