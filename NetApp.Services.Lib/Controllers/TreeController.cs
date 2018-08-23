@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
@@ -11,16 +13,23 @@ namespace NetApp.Services.Lib.Controllers
 {
     public abstract class TreeController<T> : ListController<T> where T : ITreeNode<T>
     {
+        private readonly ITreeRepo<T> _repo;
+
         public TreeController(ILogger<TreeController<T>> logger, IDistributedCache cache, ITreeRepo<T> repo) :
             base(logger, cache, repo)
         {
-
+            _repo = repo;
         }
 
         [HttpGet("{id}/children")]
-        public IEnumerable<T> Children(string id)
+        public async Task<IList<T>> Children(string id)
         {
-            return null;
+            Func<Task<IList<T>>> query = async () =>
+            {
+                return await _repo.GetListAsync(t => t.ParentId == id, null);
+            };
+            var result = await CacheIt(query);
+            return result;
         }
     }
 }

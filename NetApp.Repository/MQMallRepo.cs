@@ -18,8 +18,9 @@ namespace NetApp.Repository
         {
             _context = new MallDbContext(connectionString);
 
-            _context.Database.EnsureCreated();
-            _context.Database.Migrate();
+            //_context.Database.EnsureDeleted();
+            //_context.Database.EnsureCreated();
+            //_context.Database.Migrate();
         }
 
         async Task<Product> IListRepo<Product>.FindAsync(string id)
@@ -49,32 +50,45 @@ namespace NetApp.Repository
         {
             throw new NotImplementedException();
         }
-
-        public Task<IList<Category>> GetChildren(string id)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public async Task<IList<Product>> GetListAsync(Expression<Func<Product, bool>> expression, IPageable<Product> pageable)
         {
             IQueryable<Product> query = _context.Products;
             if (expression != null)
                 query = query.Where(expression);
 
-            if (pageable.StartIndex > 0)
-                query = query.Skip(pageable.StartIndex);
-            if (pageable.PageSize > 0)
-                query = query.Take(pageable.PageSize);
+            if (pageable != null)
+            {
+                if (pageable.StartIndex > 0)
+                    query = query.Skip(pageable.StartIndex);
+                if (pageable.PageSize > 0)
+                    query = query.Take(pageable.PageSize);
+            }
 
             var products = await query.ToListAsync();
             var categoryIds = products.Select(p => p.CategoryId).ToList();
+            //add category info to product
             var categories = await _context.Categories.Where(c => categoryIds.Contains(c.Id)).ToListAsync();
             return products;
         }
 
         public async Task<IList<Category>> GetListAsync(Expression<Func<Category, bool>> expression, IPageable<Category> pageable)
         {
-            var result = await _context.Categories.ToListAsync();
+            IQueryable<Category> query = _context.Categories;
+            if (expression != null)
+                query = query.Where(expression);
+
+            if (pageable != null)
+            {
+                if (pageable.StartIndex > 0)
+                    query = query.Skip(pageable.StartIndex);
+                if (pageable.PageSize > 0)
+                    query = query.Take(pageable.PageSize);
+            }
+
+            query = query.OrderBy(c => c.SortNo);
+
+            var result = await query.ToListAsync();
             return result;
         }
 

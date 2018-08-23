@@ -24,7 +24,7 @@ namespace NetApp.Services.Lib.Controllers
             public bool Reverse { get; set; }
         }
 
-        protected readonly IListRepo<T> _repo;
+        private readonly IListRepo<T> _repo;
 
         public ListController(ILogger<ListController<T>> logger, IDistributedCache cache, IListRepo<T> repo)
             : base(logger, cache)
