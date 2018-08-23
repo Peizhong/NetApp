@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "antd": "^3.8.2",
+    "connected-react-router": "^4.4.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",
@@ -19,5 +20,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "redux-devtools": "^3.4.1"
   }
 }
