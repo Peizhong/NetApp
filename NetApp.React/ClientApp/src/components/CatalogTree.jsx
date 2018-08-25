@@ -1,77 +1,47 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Tree } from 'antd';
+import { actionCreators } from '../store/categoryTree';
 
 const TreeNode = Tree.TreeNode;
 
-const mapStateToProps = state => ({
-  todos: state.trees,
-  isLoading: state.isLoading
-});
-
-const toggleTodo = x => x + 1;
-
-const mapDispatchToProps = dispatch => ({
-  onTodoClick: id => {
-    dispatch(toggleTodo(id));
-  }
-});
-
-const treeData = [
-  {
-    title: 'Node1',
-    value: '0-0',
-    key: '0-0',
-    children: [
-      {
-        title: 'Child Node1',
-        value: '0-0-1',
-        key: '0-0-1'
-      },
-      {
-        title: 'Child Node2',
-        value: '0-0-2',
-        key: '0-0-2'
-      }
-    ]
-  },
-  {
-    title: 'Node2',
-    value: '0-1',
-    key: '0-1'
-  }
-];
-
-class CatalogTree extends React.Component {
+class CatalogTree extends Component {
   renderTreeNodes = data => {
     return data.map(item => {
       if (item.children) {
         return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
+          <TreeNode title={item.name} key={item.id} dataRef={item}>
             {this.renderTreeNodes(item.children)}
           </TreeNode>
         );
       }
-      return <TreeNode {...item} dataRef={item} />;
+      return <TreeNode title={item.name} key={item.id} dataRef={item} />;
     });
   };
 
+  onLoadData = treeNode => {
+    return new Promise(resolve => {
+      if (treeNode) {
+        this.props.requestChildTree(treeNode.props.eventKey);
+      }
+      resolve();
+      return;
+    });
+  };
+
+  componentWillMount() {
+    // This method runs when the component is first added to the page
+    this.props.requestChildTree(-1);
+  }
+
   render() {
-    return (
-      <Tree
-        defaultExpandedKeys={['0-0-0', '0-0-1']}
-        defaultSelectedKeys={['0-0-0', '0-0-1']}
-        defaultCheckedKeys={['0-0-0', '0-0-1']}
-        onSelect={this.onSelect}
-        onCheck={this.onCheck}
-      >
-        {this.renderTreeNodes(treeData)}
-      </Tree>
-    );
+    const trees = this.props.trees || [];
+    return <Tree loadData={this.onLoadData}>{this.renderTreeNodes(trees)}</Tree>;
   }
 }
 
 export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+  state => state.categoryTree,
+  dispatch => bindActionCreators(actionCreators, dispatch),
 )(CatalogTree);
