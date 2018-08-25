@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.2" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
@@ -13,6 +14,13 @@
   <ItemGroup>
     <ProjectReference Include="..\NetApp.Models\NetApp.Models.csproj" />
     <ProjectReference Include="..\NetApp.Repository.Interfaces\NetApp.Repository.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Model\IPageable.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
   </ItemGroup>
 
 </Project>

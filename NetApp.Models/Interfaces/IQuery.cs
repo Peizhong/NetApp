@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq.Expressions;
 
 namespace NetApp.Models.Interfaces
 {
-    public interface IQuery
+    public interface IQuery<T> where T : IBase
     {
-        string Id { get; }
-
-        string Name { get; }
-        
-        int DataStatus { get; }
+        Expression<Func<T, bool>> Filter { get; set; }
     }
 }
