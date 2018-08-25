@@ -7,7 +7,7 @@ using NetApp.Models.Interfaces;
 
 namespace NetApp.Models.Mall
 {
-    public class Product : IQuery
+    public class Product : IBase
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; set; }

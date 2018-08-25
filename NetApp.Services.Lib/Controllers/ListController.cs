@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
@@ -11,19 +10,11 @@ using NetApp.Repository.Interfaces;
 
 namespace NetApp.Services.Lib.Controllers
 {
-
     [Route("api/[controller]")]
     [Produces("application/json")]
     [ApiController]
-    public abstract class ListController<T> : CacheController where T : IQuery
+    public abstract class ListController<T> : CacheController where T : IBase
     {
-        class Pageable : IPageable<T>
-        {
-            public int StartIndex { get; set; }
-            public int PageSize { get; set; }
-            public bool Reverse { get; set; }
-        }
-
         private readonly IListRepo<T> _repo;
 
         public ListController(ILogger<ListController<T>> logger, IDistributedCache cache, IListRepo<T> repo)
@@ -38,14 +29,13 @@ namespace NetApp.Services.Lib.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IList<T>> GetAsync()
+        public async Task<PageableQueryResult<T>> GetAsync()
         {
-            //
-            var page = new Pageable();
-            Func<Task<IList<T>>> query = async () =>
+            var page = new PageableQuery<T>();
+            Func<Task<PageableQueryResult<T>>> query = async () =>
             {
-                Expression<Func<T, bool>> show = (t) => t.DataStatus != 0;
-                return await _repo.GetListAsync(show, page);
+                page.Filter = (t) => t.DataStatus != 2;
+                return await _repo.GetListAsync(page);
             };
             var result = await CacheIt(query);
             return result;

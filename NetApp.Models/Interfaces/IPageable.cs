@@ -5,12 +5,13 @@ using System.Text;
 
 namespace NetApp.Models.Interfaces
 {
-    public interface IPageable<T>
+    /// <summary>
+    /// from the url
+    /// </summary>
+    public interface IPageable
     {
         int StartIndex { get; set; }
-        int PageSize { get; set; }
-        bool Reverse { get; set; }
 
-        //Expression<Func<T, object>> Sort { get; }
+        int PageSize { get; set; }
     }
 }
