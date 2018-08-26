@@ -21,11 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Buy", "NetA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Delivery", "NetApp.Services.Delivery\NetApp.Services.Delivery.csproj", "{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Service", "NetApp.Service\NetApp.Service.csproj", "{DC8935BC-FA39-4D19-B84D-CCAAC2146EA9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.React", "NetApp.React\NetApp.React.csproj", "{739C8C87-36B7-431A-B79D-61CAEA54D697}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Models", "NetApp.Models\NetApp.Models.csproj", "{3919A7E3-4A75-494E-AF03-00835B1D2874}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Models", "NetApp.Models\NetApp.Models.csproj", "{3919A7E3-4A75-494E-AF03-00835B1D2874}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,10 +67,6 @@ Global
 		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC8935BC-FA39-4D19-B84D-CCAAC2146EA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC8935BC-FA39-4D19-B84D-CCAAC2146EA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC8935BC-FA39-4D19-B84D-CCAAC2146EA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC8935BC-FA39-4D19-B84D-CCAAC2146EA9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{739C8C87-36B7-431A-B79D-61CAEA54D697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{739C8C87-36B7-431A-B79D-61CAEA54D697}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{739C8C87-36B7-431A-B79D-61CAEA54D697}.Release|Any CPU.ActiveCfg = Release|Any CPU

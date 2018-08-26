@@ -16,6 +16,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using NetApp.Models.Mall;
 using NetApp.Repository;
 using NetApp.Repository.Interfaces;
+using NetApp.Services.Lib.Extensions;
 
 namespace NetApp.Services.Browse
 {
@@ -24,6 +25,12 @@ namespace NetApp.Services.Browse
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            var host = Configuration["host"];
+            if (string.IsNullOrEmpty(host))
+                throw new ArgumentNullException();
+            Uri u = new Uri(host);
+            ServiceEntity.IP = u.Host;
+            ServiceEntity.Port = u.Port;
         }
 
         public IConfiguration Configuration { get; }
@@ -59,12 +66,12 @@ namespace NetApp.Services.Browse
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v0", new Info { Title = "Mall API", Version = "v0", Contact = new Contact { Name = "Wang Peizhong" } });
-                c.OperationFilter<MyHeaderFilter>();
+                //c.OperationFilter<MyHeaderFilter>();
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
@@ -80,6 +87,13 @@ namespace NetApp.Services.Browse
                 c.SwaggerEndpoint("/swagger/v0/swagger.json", "Mall API V0");
                 //serve the Swagger UI at the app's root
                 c.RoutePrefix = string.Empty;
+            });
+
+            app.RegisterConsul(lifetime, new ServiceEntity
+            {
+                ServiceName="NetApp.Services.Browse",
+                ConsulIP = "192.168.1.102",
+                ConsulPort = 8500,
             });
         }
 

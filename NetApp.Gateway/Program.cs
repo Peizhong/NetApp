@@ -20,7 +20,6 @@ namespace NetApp.Gateway
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls("http://*:5001")
                 .ConfigureAppConfiguration((hostingContext, builder) =>
                 {
                     builder.AddJsonFile("configuration.json", false, true);

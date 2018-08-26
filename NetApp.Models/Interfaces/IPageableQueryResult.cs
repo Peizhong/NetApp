@@ -16,6 +16,8 @@ namespace NetApp.Models.Interfaces
 
         public int CurrentCount { get; set; }
 
+        public string Host { get; set; }
+
         public string Message { get; set; }
     }
 }

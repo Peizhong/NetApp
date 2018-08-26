@@ -17,6 +17,6 @@ namespace NetApp.Models.Interfaces
     {
         T Parent { get; set; }
 
-        ICollection<T> Children { get; }
+        ICollection<T> Children { get; set; }
     }
 }

@@ -1,31 +1,25 @@
 ﻿{
   "ReRoutes": [
-    // API:CAS.ClientService
+    // API: Browse Service
     {
       "DownstreamPathTemplate": "/api/{url}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "193.112.41.28",
-          "Port": "32786"
-        },
-        {
-          "Host": "193.112.41.28",
-          "Port": "32787"
-        },
-        {
-          "Host": "193.112.41.28",
-          "Port": "32785"
-        }
-      ],
       "UpstreamPathTemplate": "/ClientService/{url}",
       "UpstreamHttpMethod": [ "Get", "Post" ],
+      "ServiceName": "NetApp.Services.Browse",
+      "ReRoutesCaseSensitive": false, // non case sensitive
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
-      }
+      },
+      "UseServiceDiscovery": true, // use Consul service discovery
     }
   ],
   "GlobalConfiguration": {
-    "AdministrationPath": "/administration"
+    //"AdministrationPath": "/administration",
+    "ServiceDiscoveryProvider": {
+      "Host": "192.168.1.102", // Consul Service IP
+      "Port": 8500, // Consul Service Port
+      "Type": "Consul"
+    }
   }
 }

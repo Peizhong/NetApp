@@ -3,11 +3,12 @@
   "profiles": {
     "NetApp.Services.Browse": {
       "commandName": "Project",
+      "commandLineArgs": "--host http://192.168.1.102:5001",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "http://*:5000",
+        "ASPNETCORE_URLS": "http://*:5001",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": ""
     },
     "Docker": {
       "commandName": "Docker",

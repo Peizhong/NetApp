@@ -25,24 +25,21 @@ namespace NetApp.Services.Lib.Controllers
             public virtual List<LiteTreeNode> Children { get; set; }
         }
 
-        static object locker = new object();
-
         static IMapper _mapper = null;
 
         static TreeController()
         {
-            lock (locker)
+            if (_mapper == null)
             {
-                if (_mapper == null)
+                var config = new MapperConfiguration(cfg =>
                 {
-                    var config = new MapperConfiguration(cfg =>
-                    {
-                        cfg.CreateMap<T, LiteTreeNode>();
-                    });
-                    _mapper = config.CreateMapper();
+                    cfg.CreateMap<T, LiteTreeNode>();
 
-                    config.AssertConfigurationIsValid();
-                }
+                    cfg.CreateMap<PageableQueryResult<T>, PageableQueryResult<LiteTreeNode>>();
+                });
+                _mapper = config.CreateMapper();
+
+                config.AssertConfigurationIsValid();
             }
         }
 
@@ -72,6 +69,7 @@ namespace NetApp.Services.Lib.Controllers
                 return gen1;
             };
             var result = await CacheIt(query);
+            result.Host = $"{Request.Host}";
             return result;
         }
 
@@ -79,17 +77,7 @@ namespace NetApp.Services.Lib.Controllers
         public async Task<PageableQueryResult<LiteTreeNode>> ChildrenLite(string id)
         {
             var fullResult = await Children(id);
-            var liteResult = new PageableQueryResult<LiteTreeNode>
-            {
-                TotalCount = fullResult.TotalCount,
-                StartIndex = fullResult.StartIndex,
-                PageSize = fullResult.PageSize,
-                Message = fullResult.Message
-            };
-            if (fullResult.Items != null)
-            {
-                liteResult.Items = _mapper.Map<IList<LiteTreeNode>>(fullResult.Items);
-            }
+            var liteResult = _mapper.Map<PageableQueryResult<LiteTreeNode>>(fullResult);
             return liteResult;
         }
     }
