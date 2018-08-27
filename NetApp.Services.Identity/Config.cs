@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -16,7 +17,6 @@ namespace NetApp.Services.Identity
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
-                new IdentityResources.Email(),
             };
         }
 
@@ -62,7 +62,7 @@ namespace NetApp.Services.Identity
                     AllowedScopes = new List<string>
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
+                        IdentityServerConstants.StandardScopes.Profile,
                     }
                 }
             };
@@ -76,13 +76,25 @@ namespace NetApp.Services.Identity
                 {
                     SubjectId = "1",
                     Username = "alice",
-                    Password = "password"
+                    Password = "password",
+                    Claims = new []
+                    {
+                        new Claim("name", "Alice"),
+                        new Claim("website", "https://alice.com")
+                    }
                 },
                 new TestUser
                 {
                     SubjectId = "2",
                     Username = "bob",
-                    Password = "password"
+                    Password = "password",
+                    Claims = new []
+                    {
+                        new Claim("name", "Bob"),
+                        new Claim("nickname", "big bob"),
+                        new Claim("email", "bob@google.com"),
+                        new Claim("website", "https://bob.com")
+                    }
                 },
                 new TestUser
                 {

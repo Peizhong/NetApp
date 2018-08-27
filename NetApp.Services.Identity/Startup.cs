@@ -13,6 +13,9 @@ using Microsoft.Extensions.Options;
 
 namespace NetApp.Services.Identity
 {
+    /// <summary>
+    /// http://docs.identityserver.io/en/release/index.html
+    /// </summary>
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -25,6 +28,10 @@ namespace NetApp.Services.Identity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            //Adding support for OpenID Connect Identity Scopes
+            //In contrast to OAuth, scopes in OIDC don’t represent APIs, but identity data like user id, name or email address
             services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
@@ -37,8 +44,6 @@ namespace NetApp.Services.Identity
             .AddInMemoryClients(Config.GetClients())//A client must be first registered with IdentityServer before it can request tokens
             .AddTestUsers(Config.GetUsers())
             .AddInMemoryCaching();
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

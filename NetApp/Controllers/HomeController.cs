@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using IdentityModel.Client;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace NetApp.Controllers
 {
@@ -15,7 +16,7 @@ namespace NetApp.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            var u = User.Claims;
+            //OpenID Connect middleware asks for the profile scope by default.
             return View();
         }
 
@@ -50,6 +51,14 @@ namespace NetApp.Controllers
                 Console.WriteLine(content);
             }
             return Ok("aa");
+        }
+
+        public async Task OpenIDLogout()
+        {
+            //make a roundtrip to IdentityServer to clear the central single sign-on session
+            //exact protocol steps are implemented inside the OpenID Connect middleware
+            await HttpContext.SignOutAsync("Cookies");
+            await HttpContext.SignOutAsync("oidc");
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
