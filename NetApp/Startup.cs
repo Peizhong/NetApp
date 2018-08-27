@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace NetApp
 {
@@ -17,6 +18,26 @@ namespace NetApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "Cookies";//using a cookie as the primary means to authenticate a use
+                options.DefaultChallengeScheme = "oidc";//OpenID Connect scheme
+            })
+            .AddCookie("Cookies")
+            .AddOpenIdConnect("oidc", options => 
+            {
+                //configure the handler that perform the OpenID Connect protocol
+                options.SignInScheme = "Cookies";
+
+                options.Authority = "http://localhost:5050";
+                options.RequireHttpsMetadata = false;
+
+                options.ClientId = "mvc";
+                options.SaveTokens = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -26,6 +47,8 @@ namespace NetApp
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseAuthentication();
 
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();

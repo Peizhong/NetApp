@@ -55,12 +55,21 @@ namespace NetApp.Services.Browse
                 opt.IdleTimeout = TimeSpan.FromHours(1);
                 opt.Cookie.HttpOnly = true;
             });
-
+            
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.Formatting = Formatting.Indented;
+                });
+
+            services
+                .AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "http://localhost:5050";
+                    options.RequireHttpsMetadata = false;
+                    options.ApiName = "api1";
                 });
 
             services.AddSwaggerGen(c =>
@@ -77,10 +86,12 @@ namespace NetApp.Services.Browse
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            app.UseAuthentication();
 
             app.UseSession();
             app.UseMvc();
-
+            
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -92,7 +103,7 @@ namespace NetApp.Services.Browse
             app.RegisterConsul(lifetime, new ServiceEntity
             {
                 ServiceName="NetApp.Services.Browse",
-                ConsulIP = "192.168.1.102",
+                ConsulIP = "localhost",
                 ConsulPort = 8500,
             });
         }

@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.React", "NetApp.Reac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Models", "NetApp.Models\NetApp.Models.csproj", "{3919A7E3-4A75-494E-AF03-00835B1D2874}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Services.Identity", "NetApp.Services.Identity\NetApp.Services.Identity.csproj", "{FCBFF2B8-3591-40B1-834F-7D5E83A4FB05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{3919A7E3-4A75-494E-AF03-00835B1D2874}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3919A7E3-4A75-494E-AF03-00835B1D2874}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3919A7E3-4A75-494E-AF03-00835B1D2874}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCBFF2B8-3591-40B1-834F-7D5E83A4FB05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCBFF2B8-3591-40B1-834F-7D5E83A4FB05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCBFF2B8-3591-40B1-834F-7D5E83A4FB05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCBFF2B8-3591-40B1-834F-7D5E83A4FB05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
