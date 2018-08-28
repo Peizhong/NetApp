@@ -26,7 +26,7 @@ namespace NetApp.Services.Lib.Extensions
             {
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(3),//服务启动多久后注册
                 Interval = TimeSpan.FromSeconds(10),//健康检查时间间隔，或者称为心跳间隔
-                HTTP = $"http://{ServiceEntity.IP}:{ServiceEntity.Port}/api/home",//健康检查地址
+                HTTP = $"http://{ServiceEntity.IP}:{ServiceEntity.Port}/api/home/health",//健康检查地址
                 Timeout = TimeSpan.FromSeconds(5)
             };
 

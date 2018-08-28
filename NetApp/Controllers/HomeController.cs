@@ -35,22 +35,20 @@ namespace NetApp.Controllers
             if (tokenResponse.IsError)
             {
                 Console.WriteLine(tokenResponse.Error);
-                return null;
+                return NotFound("tokenResponse.IsError");
             }
             // call api
             var client = new HttpClient();
             client.SetBearerToken(tokenResponse.AccessToken);
-            var response = await client.GetAsync("http://localhost:5100/api/home/Authorized");
+            var response = await client.GetAsync("http://192.168.1.102:5010/ClientService/home/SecretService");
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine(response.StatusCode);
+                return NotFound("!response.IsSuccessStatusCode");
             }
-            else
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
-            }
-            return Ok("aa");
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(content);
+            return Ok(content);
         }
 
         public async Task OpenIDLogout()

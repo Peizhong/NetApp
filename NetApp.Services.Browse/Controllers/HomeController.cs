@@ -20,9 +20,9 @@ namespace NetApp.Services.Browse.Controllers
 
         [Authorize]
         [HttpGet]
-        public string Authorized()
+        public string SecretService()
         {
-            return Request.Path;
+            return $"oh you found it on {Request.Path} of {Request.Host.Value} at {DateTime.Now}";
         }
     }
 }
