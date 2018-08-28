@@ -53,6 +53,8 @@ namespace NetApp.Services.Identity
                     ClientName = "MVC Client",
                     AllowedGrantTypes = GrantTypes.Implicit,
 
+                    RequireConsent =false,
+
                     // where to redirect to after login
                     RedirectUris = { "http://localhost:5000/signin-oidc" },
 
