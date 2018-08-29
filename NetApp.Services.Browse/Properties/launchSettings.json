@@ -3,7 +3,7 @@
   "profiles": {
     "NetApp.Services.Browse": {
       "commandName": "Project",
-      "commandLineArgs": "--host http://192.168.1.102:5100",
+      "commandLineArgs": "--host http://99.1.232.240:5100",
       "environmentVariables": {
         "ASPNETCORE_URLS": "http://*:5100",
         "ASPNETCORE_ENVIRONMENT": "Development"
