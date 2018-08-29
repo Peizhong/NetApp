@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NetApp.Models.Interfaces;
+using NetApp.Common.Interfaces;
 
-namespace NetApp.Models.Mall
+namespace NetApp.Common.Models
 {
     public class Product : IBase
     {

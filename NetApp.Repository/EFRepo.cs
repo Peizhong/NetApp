@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NetApp.Models.Interfaces;
+using NetApp.Common.Interfaces;
 
 namespace NetApp.Repository
 {

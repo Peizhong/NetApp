@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
 
-namespace NetApp.Models.Interfaces
+namespace NetApp.Common.Interfaces
 {
     public interface IQuery<T> where T : IBase
     {

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
-using NetApp.Models.Interfaces;
 
-namespace NetApp.Repository.Interfaces
+namespace NetApp.Common.Interfaces
 {
     public interface IListRepo<T> where T : IBase
     {

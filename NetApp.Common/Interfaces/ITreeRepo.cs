@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using NetApp.Models.Interfaces;
 
-namespace NetApp.Repository.Interfaces
+namespace NetApp.Common.Interfaces
 {
     public interface ITreeRepo<T> : IListRepo<T> where T : ITreeNode<T>
     {

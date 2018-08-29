@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using NetApp.Models.Mall;
+using NetApp.Common.Models;
 using Pomelo.EntityFrameworkCore.MySql;
 
 namespace NetApp.Repository

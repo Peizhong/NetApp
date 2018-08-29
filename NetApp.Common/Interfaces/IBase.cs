@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetApp.Models.Interfaces
+namespace NetApp.Common.Interfaces
 {
     public interface IBase
     {

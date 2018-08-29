@@ -13,9 +13,9 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using NetApp.Models.Mall;
 using NetApp.Repository;
-using NetApp.Repository.Interfaces;
+using NetApp.Common.Models;
+using NetApp.Common.Interfaces;
 using NetApp.Services.Lib.Extensions;
 
 namespace NetApp.Services.Browse

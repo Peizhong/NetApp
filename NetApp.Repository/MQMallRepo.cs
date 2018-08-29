@@ -1,6 +1,5 @@
-﻿using NetApp.Models.Interfaces;
-using NetApp.Models.Mall;
-using NetApp.Repository.Interfaces;
+﻿using NetApp.Common.Interfaces;
+using NetApp.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

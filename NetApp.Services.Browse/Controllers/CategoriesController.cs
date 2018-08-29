@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NetApp.Models.Mall;
-using NetApp.Repository.Interfaces;
+using NetApp.Common.Models;
+using NetApp.Common.Interfaces;
 using NetApp.Services.Lib.Controllers;
 using Microsoft.Extensions.Caching.Distributed;
 
