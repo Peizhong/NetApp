@@ -31,7 +31,7 @@ namespace NetApp.Controllers
             }
             // request token
             var tokenClient = new TokenClient(disco.TokenEndpoint, "client", "secret");
-            var tokenResponse = await tokenClient.RequestResourceOwnerPasswordAsync("bob", "password", "api1");
+            var tokenResponse = await tokenClient.RequestResourceOwnerPasswordAsync("alice", "password", "api1");
             if (tokenResponse.IsError)
             {
                 Console.WriteLine(tokenResponse.Error);
@@ -40,7 +40,7 @@ namespace NetApp.Controllers
             // call api
             var client = new HttpClient();
             client.SetBearerToken(tokenResponse.AccessToken);
-            var response = await client.GetAsync("http://localhost:5010/ClientService/home/SecretService");
+            var response = await client.GetAsync("http://192.168.1.102:5010/ClientService/home/SecretService");
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine(response.StatusCode);
