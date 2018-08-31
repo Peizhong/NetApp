@@ -73,7 +73,7 @@ namespace NetApp.Play.Utils
             {
                 var classifyToCategory = new MapperConfiguration(cfg =>
                  {
-                     cfg.CreateMap<Classify, Models.Mall.Category>()
+                     cfg.CreateMap<Classify, Common.Models.Category>()
                      .ForMember(c => c.CategoryId, opt => opt.MapFrom(src => src.Id))
                      .ForMember(c => c.CategoryName, opt => opt.MapFrom(src => src.Name))
                      .ForMember(c => c.CategoryType, opt => opt.MapFrom(src => src.ClassifyType))
@@ -88,7 +88,7 @@ namespace NetApp.Play.Utils
 
                 using (var context = new Repository.MallDbContext("Server=193.112.41.28;Database=malldb;User=root;Password=mypass;"))
                 {
-                    var categories = mapper.Map<IList<Models.Mall.Category>>(classifies);
+                    var categories = mapper.Map<IList<Common.Models.Category>>(classifies);
                     context.Categories.AddRange(categories);
                     context.SaveChanges();
                 }

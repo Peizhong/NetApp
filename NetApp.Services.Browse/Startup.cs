@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,12 +38,12 @@ namespace NetApp.Services.Browse
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var mysqlConnectionString = Configuration.GetConnectionString("MallDB");
             services.AddScoped(s => new MQMallRepo(mysqlConnectionString));
             services.AddScoped<IListRepo<Product>>(s => s.GetService<MQMallRepo>());
-            services.AddScoped<ITreeRepo<Category>>(s => s.GetService<MQMallRepo>());
+            services.AddScoped<ITreeRepo<Category>>(s =>s.GetService<MQMallRepo>());
 
             var redisConnectionString = Configuration.GetConnectionString("Redis");
             services.AddDistributedRedisCache(opt =>
@@ -55,7 +57,7 @@ namespace NetApp.Services.Browse
                 opt.IdleTimeout = TimeSpan.FromHours(1);
                 opt.Cookie.HttpOnly = true;
             });
-            
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(options =>
@@ -77,6 +79,13 @@ namespace NetApp.Services.Browse
                 c.SwaggerDoc("v0", new Info { Title = "Mall API", Version = "v0", Contact = new Contact { Name = "Wang Peizhong" } });
                 //c.OperationFilter<MyHeaderFilter>();
             });
+            
+            services.AddOptions();
+
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
+            return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,12 +95,12 @@ namespace NetApp.Services.Browse
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseAuthentication();
 
             app.UseSession();
             app.UseMvc();
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -102,7 +111,7 @@ namespace NetApp.Services.Browse
 
             app.RegisterConsul(lifetime, new ServiceEntity
             {
-                ServiceName="NetApp.Services.Browse",
+                ServiceName = "NetApp.Services.Browse",
                 ConsulIP = "localhost",
                 ConsulPort = 8500,
             });
