@@ -1,4 +1,5 @@
-﻿using NetApp.Common.Abstractions;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using NetApp.Common.Abstractions;
 using NetApp.Common.Models;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,13 @@ namespace NetApp.Repository
             //_context.Database.EnsureDeleted();
             //_context.Database.EnsureCreated();
             //_context.Database.Migrate();
+        }
+
+        public DatabaseFacade Database => _absContext.Database;
+
+        public Task SaveChangesAsync()
+        {
+            return _absContext.SaveChangesAsync();
         }
 
         async Task<Product> IListRepo<Product>.FindAsync(string id)

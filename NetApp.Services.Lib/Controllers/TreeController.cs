@@ -42,7 +42,7 @@ namespace NetApp.Services.Lib.Controllers
             }
         }
 
-        private readonly ITreeRepo<T> _repo;
+        private readonly new ITreeRepo<T> _repo;
 
         public TreeController(ILogger<TreeController<T>> logger, IDistributedCache cache, ITreeRepo<T> repo) :
             base(logger, cache, repo)

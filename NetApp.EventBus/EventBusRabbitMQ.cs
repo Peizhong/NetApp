@@ -42,124 +42,6 @@ namespace NetApp.EventBus
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;
         }
 
-        private void SubsManager_OnEventRemoved(object sender, string eventName)
-        {
-            if (!_persistentConnection.IsConnected)
-            {
-                _persistentConnection.TryConnect();
-            }
-
-            using (var channel = _persistentConnection.CreateModel())
-            {
-                channel.QueueUnbind(queue: _queueName,
-                    exchange: BROKER_NAME,
-                    routingKey: eventName);
-
-                if (_subsManager.IsEmpty)
-                {
-                    _queueName = string.Empty;
-                    _consumerChannel.Close();
-                }
-            }
-        }
-
-        public void Publish(IntegrationEvent @event)
-        {
-            if (!_persistentConnection.IsConnected)
-            {
-                _persistentConnection.TryConnect();
-            }
-
-            var policy = Policy.Handle<BrokerUnreachableException>()
-                .Or<SocketException>()
-                .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
-                {
-                    _logger.LogWarning(ex.ToString());
-                });
-
-            using (var channel = _persistentConnection.CreateModel())
-            {
-                var eventName = @event.GetType()
-                    .Name;
-
-                channel.ExchangeDeclare(exchange: BROKER_NAME,
-                                    type: "direct");
-
-                var message = JsonConvert.SerializeObject(@event);
-                var body = Encoding.UTF8.GetBytes(message);
-
-                policy.Execute(() =>
-                {
-                    var properties = channel.CreateBasicProperties();
-                    properties.DeliveryMode = 2; // persistent
-
-                    channel.BasicPublish(exchange: BROKER_NAME,
-                                     routingKey: eventName,
-                                     mandatory: true,
-                                     basicProperties: properties,
-                                     body: body);
-                });
-            }
-        }
-
-        public void SubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-            DoInternalSubscription(eventName);
-            _subsManager.AddDynamicSubscription<TH>(eventName);
-        }
-
-        public void Subscribe<T, TH>()
-            where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>
-        {
-            var eventName = _subsManager.GetEventKey<T>();
-            DoInternalSubscription(eventName);
-            _subsManager.AddSubscription<T, TH>();
-        }
-
-        private void DoInternalSubscription(string eventName)
-        {
-            var containsKey = _subsManager.HasSubscriptionsForEvent(eventName);
-            if (!containsKey)
-            {
-                if (!_persistentConnection.IsConnected)
-                {
-                    _persistentConnection.TryConnect();
-                }
-
-                using (var channel = _persistentConnection.CreateModel())
-                {
-                    channel.QueueBind(queue: _queueName,
-                                      exchange: BROKER_NAME,
-                                      routingKey: eventName);
-                }
-            }
-        }
-
-        public void Unsubscribe<T, TH>()
-            where TH : IIntegrationEventHandler<T>
-            where T : IntegrationEvent
-        {
-            _subsManager.RemoveSubscription<T, TH>();
-        }
-
-        public void UnsubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-            _subsManager.RemoveDynamicSubscription<TH>(eventName);
-        }
-
-        public void Dispose()
-        {
-            if (_consumerChannel != null)
-            {
-                _consumerChannel.Dispose();
-            }
-
-            _subsManager.Clear();
-        }
-
         private IModel CreateConsumerChannel()
         {
             if (!_persistentConnection.IsConnected)
@@ -177,8 +59,7 @@ namespace NetApp.EventBus
                                  exclusive: false,
                                  autoDelete: false,
                                  arguments: null);
-
-
+            
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += async (model, ea) =>
             {
@@ -229,6 +110,124 @@ namespace NetApp.EventBus
                     }
                 }
             }
+        }
+
+        public void Publish(IntegrationEvent @event)
+        {
+            if (!_persistentConnection.IsConnected)
+            {
+                _persistentConnection.TryConnect();
+            }
+
+            var policy = Policy.Handle<BrokerUnreachableException>()
+                .Or<SocketException>()
+                .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+                {
+                    _logger.LogWarning(ex.ToString());
+                });
+
+            using (var channel = _persistentConnection.CreateModel())
+            {
+                var eventName = @event.GetType()
+                    .Name;
+
+                channel.ExchangeDeclare(exchange: BROKER_NAME,
+                                    type: "direct");
+
+                var message = JsonConvert.SerializeObject(@event);
+                var body = Encoding.UTF8.GetBytes(message);
+
+                policy.Execute(() =>
+                {
+                    var properties = channel.CreateBasicProperties();
+                    properties.DeliveryMode = 2; // persistent
+
+                    channel.BasicPublish(exchange: BROKER_NAME,
+                                     routingKey: eventName,
+                                     mandatory: true,
+                                     basicProperties: properties,
+                                     body: body);
+                });
+            }
+        }
+
+        private void DoInternalSubscription(string eventName)
+        {
+            var containsKey = _subsManager.HasSubscriptionsForEvent(eventName);
+            if (!containsKey)
+            {
+                if (!_persistentConnection.IsConnected)
+                {
+                    _persistentConnection.TryConnect();
+                }
+
+                using (var channel = _persistentConnection.CreateModel())
+                {
+                    channel.QueueBind(queue: _queueName,
+                                      exchange: BROKER_NAME,
+                                      routingKey: eventName);
+                }
+            }
+        }
+
+        public void SubscribeDynamic<TH>(string eventName)
+            where TH : IDynamicIntegrationEventHandler
+        {
+            DoInternalSubscription(eventName);
+            _subsManager.AddDynamicSubscription<TH>(eventName);
+        }
+
+        public void Subscribe<T, TH>()
+            where T : IntegrationEvent
+            where TH : IIntegrationEventHandler<T>
+        {
+            var eventName = _subsManager.GetEventKey<T>();
+            DoInternalSubscription(eventName);
+            _subsManager.AddSubscription<T, TH>();
+        }
+
+        public void Unsubscribe<T, TH>()
+            where TH : IIntegrationEventHandler<T>
+            where T : IntegrationEvent
+        {
+            _subsManager.RemoveSubscription<T, TH>();
+        }
+
+        public void UnsubscribeDynamic<TH>(string eventName)
+            where TH : IDynamicIntegrationEventHandler
+        {
+            _subsManager.RemoveDynamicSubscription<TH>(eventName);
+        }
+
+        private void SubsManager_OnEventRemoved(object sender, string eventName)
+        {
+            if (!_persistentConnection.IsConnected)
+            {
+                _persistentConnection.TryConnect();
+            }
+
+            using (var channel = _persistentConnection.CreateModel())
+            {
+                channel.QueueUnbind(queue: _queueName,
+                    exchange: BROKER_NAME,
+                    routingKey: eventName);
+
+                if (_subsManager.IsEmpty)
+                {
+                    _queueName = string.Empty;
+                    _consumerChannel.Close();
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_consumerChannel != null)
+            {
+                _consumerChannel.Dispose();
+            }
+
+            _subsManager.Clear();
         }
     }
 }
