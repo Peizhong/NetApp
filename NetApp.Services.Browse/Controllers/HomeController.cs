@@ -15,7 +15,7 @@ namespace NetApp.Services.Browse.Controllers
         [HttpGet]
         public string Health()
         {
-            return Request.Host.Value;
+            return $"{Request.Host.Value} at {DateTime.Now}";
         }
 
         [Authorize]

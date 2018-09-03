@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace NetApp.Common.Interfaces
+namespace NetApp.Common.Abstractions
 {
     /// <summary>
     /// from the url

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
-using NetApp.Common.Interfaces;
+using NetApp.Common.Abstractions;
 
 namespace NetApp.Services.Lib.Controllers
 {
@@ -14,7 +14,7 @@ namespace NetApp.Services.Lib.Controllers
     [ApiController]
     public abstract class ListController<T> : CacheController where T : IBase
     {
-        private readonly IListRepo<T> _repo;
+        protected readonly IListRepo<T> _repo;
 
         public ListController(ILogger<ListController<T>> logger, IDistributedCache cache, IListRepo<T> repo)
             : base(logger, cache)
@@ -37,12 +37,13 @@ namespace NetApp.Services.Lib.Controllers
                 return await _repo.GetListAsync(page);
             };
             var result = await CacheIt(query);
+            result.Host = $"{Request.Host}";
             return result;
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<T> GetAsync(string id)
+        public async Task<T> GetByIdAsync(string id)
         {
             Func<Task<T>> query = async () =>
             {
@@ -50,26 +51,6 @@ namespace NetApp.Services.Lib.Controllers
             };
             var result = await CacheIt(query);
             return result;
-        }
-
-        // POST: api/Products
-        [HttpPost]
-        public Task PostAsync([FromBody] T value)
-        {
-            return _repo.UpdateAsync(value);
-        }
-
-        // PUT: api/Products/5
-        [HttpPut("{id}")]
-        public Task PutAsync(int id, [FromBody] T value)
-        {
-            return _repo.UpdateAsync(value);
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

@@ -1,24 +1,20 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using NetApp.Common.Abstractions;
+using NetApp.Common.Models;
+using NetApp.Repository;
+using NetApp.Services.Browse.Events;
+using NetApp.Services.Lib.Extensions;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using NetApp.Repository;
-using NetApp.Common.Models;
-using NetApp.Common.Interfaces;
-using NetApp.Services.Lib.Extensions;
+using System;
+using System.Collections.Generic;
 
 namespace NetApp.Services.Browse
 {
@@ -44,6 +40,10 @@ namespace NetApp.Services.Browse
             services.AddScoped(s => new MQMallRepo(mysqlConnectionString));
             services.AddScoped<IListRepo<Product>>(s => s.GetService<MQMallRepo>());
             services.AddScoped<ITreeRepo<Category>>(s =>s.GetService<MQMallRepo>());
+
+            services.AddIntegrationServices(Configuration);
+            services.AddEventBus(Configuration);
+            services.AddTransient<IBrowseIntegrationEventService, BrowseIntegrationEventService>();
 
             var redisConnectionString = Configuration.GetConnectionString("Redis");
             services.AddDistributedRedisCache(opt =>

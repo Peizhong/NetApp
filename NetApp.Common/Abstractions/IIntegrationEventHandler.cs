@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NetApp.Common.Interfaces
+namespace NetApp.Common.Abstractions
 {
     /// <summary>
     /// Contravariant interface

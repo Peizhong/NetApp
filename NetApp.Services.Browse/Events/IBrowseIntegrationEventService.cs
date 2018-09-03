@@ -9,5 +9,7 @@ namespace NetApp.Services.Browse.Events
     public interface IBrowseIntegrationEventService
     {
         Task PublishThroughEventBusAsync(IntegrationEvent evt);
+
+        Task SaveEventAndCatalogContextChangesAsync(IntegrationEvent evt);
     }
 }

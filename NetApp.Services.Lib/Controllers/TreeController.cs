@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
-using NetApp.Common.Interfaces;
+using NetApp.Common.Abstractions;
 using AutoMapper;
 
 namespace NetApp.Services.Lib.Controllers

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NetApp.Common.Events;
 
-namespace NetApp.Common.Interfaces
+namespace NetApp.Common.Abstractions
 {
     public interface IEventBus
     {

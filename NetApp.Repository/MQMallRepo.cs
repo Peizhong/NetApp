@@ -1,4 +1,4 @@
-﻿using NetApp.Common.Interfaces;
+﻿using NetApp.Common.Abstractions;
 using NetApp.Common.Models;
 using System;
 using System.Collections.Generic;

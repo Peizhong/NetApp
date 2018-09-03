@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
 
-namespace NetApp.Common.Interfaces
+namespace NetApp.Common.Abstractions
 {
     /// <summary>
     /// to repo

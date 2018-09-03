@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 
-namespace NetApp.Common.Interfaces
+namespace NetApp.Common.Abstractions
 {
     public interface IListRepo<T> where T : IBase
     {

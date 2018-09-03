@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetApp.Common.Interfaces
+namespace NetApp.Common.Abstractions
 {
     public class PageableQueryResult<T> : IPageable
     {
