@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using NetApp.Common.Abstractions;
-using NetApp.Common.Events;
+using NetApp.EventBus.Abstractions;
+using NetApp.EventBus.Model;
 using System;
 using System.Data.Common;
 using System.Linq;

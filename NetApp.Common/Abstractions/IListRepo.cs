@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
 
 namespace NetApp.Common.Abstractions
 {
@@ -14,8 +13,8 @@ namespace NetApp.Common.Abstractions
 
         Task<PageableQueryResult<T>> GetListAsync(PageableQuery<T> query);
 
-        Task UpdateAsync(T value);
+        Task UpdateAsync(T value, RepoOption option = null);
 
-        Task UpdateListAsync(IEnumerable<T> values);
+        Task UpdateListAsync(IEnumerable<T> values, RepoOption option = null);
     }
 }

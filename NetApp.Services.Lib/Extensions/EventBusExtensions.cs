@@ -2,8 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NetApp.Common.Abstractions;
+using NetApp.EventBus.Abstractions;
 using NetApp.Common.Events;
 using NetApp.EventBus;
 using RabbitMQ.Client;
@@ -15,7 +14,7 @@ namespace NetApp.Services.Lib.Extensions
 {
     public static class EventBusExtensions
     {
-        public static IServiceCollection AddEventBus(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMyEventBus(this IServiceCollection services, IConfiguration configuration)
         {
             var subscriptionClientName = configuration["SubscriptionClientName"];
 
@@ -40,7 +39,7 @@ namespace NetApp.Services.Lib.Extensions
             return services;
         }
 
-        public static IServiceCollection AddIntegrationServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMyIntegrationServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
             {

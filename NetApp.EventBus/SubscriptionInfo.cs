@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetApp.Common.Events
+namespace NetApp.EventBus
 {
     public class SubscriptionInfo
     {

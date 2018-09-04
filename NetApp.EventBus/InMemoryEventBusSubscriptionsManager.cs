@@ -1,10 +1,8 @@
-﻿using System;
+﻿using NetApp.EventBus.Abstractions;
+using NetApp.EventBus.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using NetApp.Common.Abstractions;
-using NetApp.Common.Events;
 
 namespace NetApp.EventBus
 {

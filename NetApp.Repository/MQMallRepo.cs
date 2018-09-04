@@ -68,22 +68,26 @@ namespace NetApp.Repository
             return categories;
         }
 
-        public Task UpdateAsync(Product value)
+        public async Task UpdateAsync(Product value, RepoOption option = null)
+        {
+            var entity = await _absContext.Set<Product>().FindAsync(value.Id);
+            _absContext.Entry(entity).CurrentValues.SetValues(value);
+            if (option?.SaveLater == true)
+                return;
+            await _absContext.SaveChangesAsync();
+        }
+
+        public Task UpdateAsync(Category value, RepoOption option = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(Category value)
+        public Task UpdateListAsync(IEnumerable<Product> values, RepoOption option)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateListAsync(IEnumerable<Product> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateListAsync(IEnumerable<Category> values)
+        public Task UpdateListAsync(IEnumerable<Category> values, RepoOption option)
         {
             throw new NotImplementedException();
         }

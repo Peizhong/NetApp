@@ -6,11 +6,11 @@ using RabbitMQ.Client.Exceptions;
 using System;
 using System.IO;
 using System.Net.Sockets;
+using NetApp.EventBus.Abstractions;
 
 namespace NetApp.Common.Events
 {
-    public class DefaultRabbitMQPersistentConnection
-       : IRabbitMQPersistentConnection
+    public class DefaultRabbitMQPersistentConnection : IRabbitMQPersistentConnection
     {
         private readonly IConnectionFactory _connectionFactory;
         private readonly ILogger<DefaultRabbitMQPersistentConnection> _logger;

@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NetApp.Common.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using NetApp.EventBus.Model;
 
 namespace NetApp.EventBus
 {
@@ -13,5 +10,13 @@ namespace NetApp.EventBus
         }
 
         public DbSet<IntegrationEventLogEntry> IntegrationEventLogs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<IntegrationEventLogEntry>()
+                .HasKey(c => c.EventId);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

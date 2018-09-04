@@ -13,19 +13,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Gateway", "NetApp.Ga
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Lib", "NetApp.Services.Lib\NetApp.Services.Lib.csproj", "{6CC20F89-A488-42D4-BECD-9434EEB51BA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Browse", "NetApp.Services.Browse\NetApp.Services.Browse.csproj", "{EB49D513-521E-42D4-B016-566CB4D8B4CA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Buy", "NetApp.Services.Buy\NetApp.Services.Buy.csproj", "{E8FA0E28-72CE-4408-9183-18C695D2375C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Delivery", "NetApp.Services.Delivery\NetApp.Services.Delivery.csproj", "{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.React", "NetApp.React\NetApp.React.csproj", "{739C8C87-36B7-431A-B79D-61CAEA54D697}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Identity", "NetApp.Services.Identity\NetApp.Services.Identity.csproj", "{68018069-7C90-4D10-9779-6B5B584657F3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Common", "NetApp.Common\NetApp.Common.csproj", "{A8674A42-E725-4A60-B023-B91E88659063}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.EventBus", "NetApp.EventBus\NetApp.EventBus.csproj", "{33CDA84D-48A8-407D-8938-46B8972871E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.EventBus", "NetApp.EventBus\NetApp.EventBus.csproj", "{33CDA84D-48A8-407D-8938-46B8972871E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{01DABFAB-4796-43CC-B550-6D5D29E6BA1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Catalog", "NetApp.Services.Catalog\NetApp.Services.Catalog.csproj", "{9FD975C7-ED4F-4F12-926D-585084170312}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Tests", "NetApp.Tests\NetApp.Tests.csproj", "{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,18 +53,6 @@ Global
 		{6CC20F89-A488-42D4-BECD-9434EEB51BA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CC20F89-A488-42D4-BECD-9434EEB51BA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CC20F89-A488-42D4-BECD-9434EEB51BA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB49D513-521E-42D4-B016-566CB4D8B4CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB49D513-521E-42D4-B016-566CB4D8B4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB49D513-521E-42D4-B016-566CB4D8B4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB49D513-521E-42D4-B016-566CB4D8B4CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E8FA0E28-72CE-4408-9183-18C695D2375C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8FA0E28-72CE-4408-9183-18C695D2375C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8FA0E28-72CE-4408-9183-18C695D2375C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8FA0E28-72CE-4408-9183-18C695D2375C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB0F284C-FEDB-4B72-BE99-4E0CBBAC9F2B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{739C8C87-36B7-431A-B79D-61CAEA54D697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{739C8C87-36B7-431A-B79D-61CAEA54D697}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{739C8C87-36B7-431A-B79D-61CAEA54D697}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,9 +69,22 @@ Global
 		{33CDA84D-48A8-407D-8938-46B8972871E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33CDA84D-48A8-407D-8938-46B8972871E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33CDA84D-48A8-407D-8938-46B8972871E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FD975C7-ED4F-4F12-926D-585084170312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FD975C7-ED4F-4F12-926D-585084170312}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FD975C7-ED4F-4F12-926D-585084170312}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FD975C7-ED4F-4F12-926D-585084170312}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6CC20F89-A488-42D4-BECD-9434EEB51BA9} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
+		{68018069-7C90-4D10-9779-6B5B584657F3} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
+		{9FD975C7-ED4F-4F12-926D-585084170312} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9D0EFEEC-3D68-433F-B13D-29A8AE5E6227}

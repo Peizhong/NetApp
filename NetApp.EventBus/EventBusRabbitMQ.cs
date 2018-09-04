@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
-using NetApp.Common.Abstractions;
-using NetApp.Common.Events;
+using NetApp.EventBus.Abstractions;
+using NetApp.EventBus.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
