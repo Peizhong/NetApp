@@ -23,12 +23,12 @@ namespace NetApp.Services.Lib.Controllers
         public async Task<TValue> CacheIt<TValue>(Func<Task<TValue>> queryTask, DateTime? timeout = null)
         {
             TValue result = default(TValue);
-            string path = Request.Path;
-            var value = await _cache.GetStringAsync(path);
+            string key = $"{Request.Path}{Request.QueryString}";
+            var value = await _cache.GetStringAsync(key);
             if (string.IsNullOrEmpty(value))
             {
                 result = await queryTask.Invoke();
-                await _cache.SetStringAsync(path, JsonConvert.SerializeObject(result), new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddSeconds(60) });
+                await _cache.SetStringAsync(key, JsonConvert.SerializeObject(result), new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddSeconds(10) });
             }
             else
             {

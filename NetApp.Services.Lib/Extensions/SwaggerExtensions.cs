@@ -13,6 +13,7 @@ namespace NetApp.Services.Lib.Extensions
         {
             services.AddSwaggerGen(c =>
             {
+                c.DescribeAllEnumsAsStrings();
                 c.SwaggerDoc("v0", new Info { Title = name, Version = version, Contact = new Contact { Name = "Wang Peizhong" } });
                 //c.OperationFilter<MyHeaderFilter>();
             });

@@ -3,24 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using NetApp.Common.Models;
-using Pomelo.EntityFrameworkCore.MySql;
 
 namespace NetApp.Repository
 {
     public class MallDbContext : DbContext
     {
-        private readonly string _connectionString;
-
-        public MallDbContext(string connectionString)
+        public MallDbContext(DbContextOptions<MallDbContext> options)
+            : base(options)
         {
-            _connectionString = connectionString;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseMySql(_connectionString);
-            base.OnConfiguring(optionsBuilder);
-        }
+        }        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

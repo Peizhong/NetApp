@@ -68,7 +68,7 @@ namespace NetApp.Services.Lib.Controllers
                 return gen1;
             };
             var result = await CacheIt(query);
-            result.Host = $"{Request.Host}";
+            result.Source = $"{Request.Host}";
             return result;
         }
 

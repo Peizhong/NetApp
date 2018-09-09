@@ -62,7 +62,7 @@ namespace NetApp.Play
 
             var ost = istr.whoareyou();
             var m = new Utils.MirgrateAvmt();
-            var cs = m.GetClassifies();
+            var cs = m.GetDevices();
         }
     }
 }

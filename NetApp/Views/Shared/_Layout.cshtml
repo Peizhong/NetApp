@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NetApp</title>
+    <link rel="stylesheet" href="~/css/bootstrap.css" />
+
+</head>
+<body>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2018 - NetApp</p>
+        </footer>
+    </div>
+    <script src="~/js/jquery.js"></script>
+    <script src="~/js/bootstrap.bundle.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

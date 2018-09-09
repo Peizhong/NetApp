@@ -4,6 +4,7 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetApp.Common.Abstractions;
+using Newtonsoft.Json;
 
 namespace NetApp.Common.Models
 {
@@ -18,11 +19,7 @@ namespace NetApp.Common.Models
         public int DataStatus { get; set; }
 
         [NotMapped]
-        public string ProductId
-        {
-            get { return Id; }
-            set { Id = value; }
-        }
+        public string ProductId => Name;
 
         [NotMapped]
         public string ProductName => Name;
@@ -44,5 +41,16 @@ namespace NetApp.Common.Models
         public DateTime? UpdateTime { get; set; }
 
         public string Remark { get; set; }
+
+        public static Product FromJson(string json)
+        {
+            try
+            {
+                var result = JsonConvert.DeserializeObject<Product>(json);
+                return result;
+            }
+            catch {; }
+            return null;
+        }
     }
 }

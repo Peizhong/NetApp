@@ -10,13 +10,9 @@ namespace NetApp.Repository
 {
     public class MQMallRepo : EFRepo, IListRepo<Product>, ITreeRepo<Category>
     {
-        public MQMallRepo(string connectionString)
+        public MQMallRepo(MallDbContext _mallDbContext)
         {
-            _absContext = new MallDbContext(connectionString);
-
-            //_context.Database.EnsureDeleted();
-            //_context.Database.EnsureCreated();
-            //_context.Database.Migrate();
+            _absContext = _mallDbContext;
         }
 
         public DatabaseFacade Database => _absContext.Database;

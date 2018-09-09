@@ -13,10 +13,10 @@ namespace NetApp.Services.Catalog.Events
     {
         private readonly IEventBus _eventBus;
         private readonly IIntegrationEventLogService _eventLogService;
-        private MQMallRepo _repo;
+        private MallDbContext _repo;
 
         public CatalogIntegrationEventService(IEventBus eventBus,
-            MQMallRepo repo,
+            MallDbContext repo,
           Func<DbConnection, IIntegrationEventLogService> integrationEventLogServiceFactory)
         {
             _repo = repo;
@@ -38,11 +38,14 @@ namespace NetApp.Services.Catalog.Events
             //If a transient failure occurs, the execution strategy will invoke the delegate again.
             await _repo.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
+                var dbTransactionId = _repo.Database.CurrentTransaction?.TransactionId;
                 using (var transaction = _repo.Database.BeginTransaction())
                 {
+                    var dbTransactionId2 = _repo.Database.CurrentTransaction.TransactionId;
+                    var dbTransaction = _repo.Database.CurrentTransaction.GetDbTransaction();
                     //TODO: really?
                     await _repo.SaveChangesAsync();
-                    await _eventLogService.SaveEventAsync(evt, _repo.Database.CurrentTransaction.GetDbTransaction());
+                    await _eventLogService.SaveEventAsync(evt, dbTransaction);
 
                     transaction.Commit();
                 }

@@ -28,16 +28,19 @@ namespace NetApp.Services.Lib.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<PageableQueryResult<T>> GetAsync()
+        public async Task<PageableQueryResult<T>> GetAsync([FromQuery]Pageable q)
         {
-            var page = new PageableQuery<T>();
+            var page = new PageableQuery<T>
+            {
+                PageSize = q.PageSize > 0 ? q.PageSize : 100
+            };
             Func<Task<PageableQueryResult<T>>> query = async () =>
             {
                 page.Filter = (t) => t.DataStatus != 2;
                 return await _repo.GetListAsync(page);
             };
             var result = await CacheIt(query);
-            result.Host = $"{Request.Host}";
+            result.Source = $"{Request.Host}";
             return result;
         }
 

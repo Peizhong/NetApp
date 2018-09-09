@@ -25,7 +25,7 @@ namespace NetApp.Services.Lib.Extensions
             var httpCheck = new AgentServiceCheck()
             {
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(3),//服务启动多久后注册
-                Interval = TimeSpan.FromSeconds(60),//健康检查时间间隔，或者称为心跳间隔
+                Interval = TimeSpan.FromSeconds(30),
                 HTTP = $"http://{ServiceEntity.IP}:{ServiceEntity.Port}/api/home/health",//健康检查地址
                 Timeout = TimeSpan.FromSeconds(5)
             };

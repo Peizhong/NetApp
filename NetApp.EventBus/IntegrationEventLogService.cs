@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Storage;
 using NetApp.EventBus.Abstractions;
 using NetApp.EventBus.Model;
 using System;
@@ -32,22 +33,27 @@ namespace NetApp.EventBus
             }
 
             var eventLogEntry = new IntegrationEventLogEntry(@event);
-
+            
             _integrationEventLogContext.Database.UseTransaction(transaction);
             _integrationEventLogContext.IntegrationEventLogs.Add(eventLogEntry);
 
             return _integrationEventLogContext.SaveChangesAsync();
         }
 
-        public Task MarkEventAsPublishedAsync(IntegrationEvent @event)
+        public async Task MarkEventAsPublishedAsync(IntegrationEvent @event)
         {
-            var eventLogEntry = _integrationEventLogContext.IntegrationEventLogs.Single(ie => ie.EventId == @event.Id);
-            eventLogEntry.TimesSent++;
-            eventLogEntry.State = EventStateEnum.Published;
+            using (_integrationEventLogContext.Database.BeginTransaction())
+            {
+                var trans = _integrationEventLogContext.Database.CurrentTransaction?.GetDbTransaction();
+                var eventLogEntry = _integrationEventLogContext.IntegrationEventLogs.Single(ie => ie.EventId == @event.Id);
+                eventLogEntry.TimesSent++;
+                eventLogEntry.State = EventStateEnum.Published;
 
-            _integrationEventLogContext.IntegrationEventLogs.Update(eventLogEntry);
+                _integrationEventLogContext.IntegrationEventLogs.Update(eventLogEntry);
 
-            return _integrationEventLogContext.SaveChangesAsync();
+                await _integrationEventLogContext.SaveChangesAsync();
+                trans.Commit();
+            }
         }
     }
 }

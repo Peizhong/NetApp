@@ -8,10 +8,10 @@ namespace NetApp.Common.Abstractions
     /// <summary>
     /// from the url
     /// </summary>
-    public interface IPageable
+    public class Pageable
     {
-        int StartIndex { get; set; }
+        public int StartIndex { get; set; }
 
-        int PageSize { get; set; }
+        public int PageSize { get; set; }
     }
 }

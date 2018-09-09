@@ -12,10 +12,11 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NetApp.Common\NetApp.Common.csproj" />
     <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
     <ProjectReference Include="..\NetApp.Services.Lib\NetApp.Services.Lib.csproj" />
   </ItemGroup>

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NetApp.Common.Models;
-using NetApp.Common.Events;
 using NetApp.Common.Abstractions;
 using NetApp.Services.Lib.Controllers;
 using Microsoft.Extensions.Caching.Distributed;
@@ -28,16 +27,9 @@ namespace NetApp.Services.Catalog.Controllers
             _catalogIntegrationEventService = catalogIntegrationEventService;
         }
 
-        // POST: api/Products
-        [HttpPost]
-        public Task PostAsync([FromBody] Product value)
-        {
-            return _repo.UpdateAsync(value);
-        }
-
         // PUT: api/Products/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(int id, [FromBody] Product value)
+        [HttpPost("{id}")]
+        public async Task<IActionResult> PostAsync(string id, [FromBody] Product value)
         {
             var item = await _repo.FindAsync(value.Id);
             if (item == null)

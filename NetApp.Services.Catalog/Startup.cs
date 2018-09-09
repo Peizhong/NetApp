@@ -14,6 +14,8 @@ using NetApp.Services.Catalog.Events;
 using NetApp.Services.Lib.Extensions;
 using Newtonsoft.Json;
 using System;
+using NetApp.EventBus.Abstractions;
+using System.Data.Common;
 
 namespace NetApp.Services.Catalog
 {
@@ -36,8 +38,15 @@ namespace NetApp.Services.Catalog
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var mysqlConnectionString = Configuration.GetConnectionString("MallDB");
-
-            services.AddScoped(s => new MQMallRepo(mysqlConnectionString));
+            services.AddDbContext<MallDbContext>(opt =>
+            {
+                opt.UseMySql(Configuration.GetConnectionString("MallDB"));
+            });
+            services.AddDbContext<IntegrationEventLogContext>(opt =>
+            {
+                opt.UseMySql(Configuration.GetConnectionString("MallDB"));
+            });
+            services.AddScoped<MQMallRepo>();
             services.AddScoped<IListRepo<Product>>(s => s.GetRequiredService<MQMallRepo>());
             services.AddScoped<ITreeRepo<Category>>(s => s.GetRequiredService<MQMallRepo>());
 
@@ -65,13 +74,13 @@ namespace NetApp.Services.Catalog
 
             services.AddMyIdentityServerAuthentication("http://localhost:5050", "api1");
 
-            services.AddDbContext<IntegrationEventLogContext>(opt =>
-            {
-                opt.UseMySql(Configuration.GetConnectionString("EventLogDB"));
-            });
+            services.AddTransient<Func<DbConnection, IIntegrationEventLogService>>(
+               sp => (DbConnection c) => new IntegrationEventLogService(c));
+
+            services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
+
             services.AddMyIntegrationServices(Configuration);
             services.AddMyEventBus(Configuration);
-            services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
 
             services.AddMySwagger("Catalog API", "v0");
 
@@ -84,9 +93,6 @@ namespace NetApp.Services.Catalog
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime lifetime)
         {
-            //var content = app.ApplicationServices.GetRequiredService<IntegrationEventLogContext>();
-            //content.Database.EnsureCreated();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
