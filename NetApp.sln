@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Services.Catalog", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Tests", "NetApp.Tests\NetApp.Tests.csproj", "{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Services.Basket", "NetApp.Services.Basket\NetApp.Services.Basket.csproj", "{5B33DFAB-DC44-40F8-A6FB-119C0EA6C351}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EAFA6BB-82A6-4364-AA34-D67407CFBF37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B33DFAB-DC44-40F8-A6FB-119C0EA6C351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B33DFAB-DC44-40F8-A6FB-119C0EA6C351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B33DFAB-DC44-40F8-A6FB-119C0EA6C351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B33DFAB-DC44-40F8-A6FB-119C0EA6C351}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +91,7 @@ Global
 		{6CC20F89-A488-42D4-BECD-9434EEB51BA9} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
 		{68018069-7C90-4D10-9779-6B5B584657F3} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
 		{9FD975C7-ED4F-4F12-926D-585084170312} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
+		{5B33DFAB-DC44-40F8-A6FB-119C0EA6C351} = {01DABFAB-4796-43CC-B550-6D5D29E6BA1E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9D0EFEEC-3D68-433F-B13D-29A8AE5E6227}

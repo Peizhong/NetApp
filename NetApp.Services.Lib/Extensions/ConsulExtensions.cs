@@ -5,28 +5,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Consul;
+using Microsoft.Extensions.Configuration;
 
 namespace NetApp.Services.Lib.Extensions
 {
-    public class ServiceEntity
-    {
-        public static string IP { get; set; } = "127.0.0.1";
-        public static int Port { get; set; }
-        public string ServiceName { get; set; }
-        public string ConsulIP { get; set; }
-        public int ConsulPort { get; set; }
-    }
-
     public static class ConsulExtensions
     {
-        public static IApplicationBuilder RegisterConsul(this IApplicationBuilder app, IApplicationLifetime lifetime, ServiceEntity serviceEntity)
+        public static IApplicationBuilder RegisterConsul(this IApplicationBuilder app, IConfiguration config, IApplicationLifetime lifetime)
         {
-            var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{serviceEntity.ConsulIP}:{serviceEntity.ConsulPort}"));//请求注册的 Consul 地址
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+            app.Map("/health", lapp => lapp.Run(async ctx => ctx.Response.StatusCode = 200));
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+            
+            var serviceName = config["ServiceName"];
+            var consulServer = config["ConsulServer"];
+            var servicHost = config["host"];
+            if (string.IsNullOrEmpty(servicHost)||string.IsNullOrEmpty(consulServer) || string.IsNullOrEmpty(serviceName))
+                throw new ArgumentNullException("Consul appsetting is empty");
+            if (string.IsNullOrEmpty(servicHost))
+                servicHost = "http://localhost:5100";
+            if (!servicHost.StartsWith("http"))
+                servicHost = $"http://{servicHost}";
+            Uri hostUrl = new Uri(servicHost);
+            
+            var consulClient = new ConsulClient(x => x.Address = new Uri(consulServer));//请求注册的 Consul 地址
             var httpCheck = new AgentServiceCheck()
             {
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(3),//服务启动多久后注册
                 Interval = TimeSpan.FromSeconds(30),
-                HTTP = $"http://{ServiceEntity.IP}:{ServiceEntity.Port}/api/home/health",//健康检查地址
+                HTTP = $"{hostUrl.AbsoluteUri}health",//健康检查地址
                 Timeout = TimeSpan.FromSeconds(5)
             };
 
@@ -35,10 +42,10 @@ namespace NetApp.Services.Lib.Extensions
             {
                 Checks = new[] { httpCheck },
                 ID = Guid.NewGuid().ToString(),
-                Name = serviceEntity.ServiceName,
-                Address = ServiceEntity.IP,
-                Port = ServiceEntity.Port,
-                Tags = new[] { $"urlprefix-/{serviceEntity.ServiceName}" }//添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
+                Name = serviceName,
+                Address = hostUrl.Host,
+                Port = hostUrl.Port,
+                Tags = new[] { $"urlprefix-/{serviceName}" }//添加 urlprefix-/servicename 格式的 tag 标签，以便 Fabio 识别
             };
 
             consulClient.Agent.ServiceRegister(registration).Wait();//服务启动时注册，内部实现其实就是使用 Consul API 进行注册（HttpClient发起）

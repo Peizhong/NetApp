@@ -3,4 +3,5 @@
 1. 5000 mvc
 2. 5010 gateway
 2. 5050 idendity
-3. 5100 browse: 客户端要访问某API, 向idendity申请凭据, 然后用凭据访问api
+3. 5100 catalog: 客户端要访问某API, 向idendity申请凭据, 然后用凭据访问api
+4. 5110 basket

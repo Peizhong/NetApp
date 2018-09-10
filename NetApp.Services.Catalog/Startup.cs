@@ -25,12 +25,6 @@ namespace NetApp.Services.Catalog
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            var host = Configuration["host"];
-            if (string.IsNullOrEmpty(host))
-                throw new ArgumentNullException();
-            Uri u = new Uri(host);
-            ServiceEntity.IP = u.Host;
-            ServiceEntity.Port = u.Port;
         }
 
         public IConfiguration Configuration { get; }
@@ -123,12 +117,7 @@ namespace NetApp.Services.Catalog
 
             app.EnableMySwaggerWithUI("Catalog API", "v0");
 
-            app.RegisterConsul(lifetime, new ServiceEntity
-            {
-                ServiceName = "NetApp.Services.Catalog",
-                ConsulIP = "localhost",
-                ConsulPort = 8500,
-            });
+            app.RegisterConsul(Configuration,lifetime);
 
             ConfigureEventBus(app);
         }
