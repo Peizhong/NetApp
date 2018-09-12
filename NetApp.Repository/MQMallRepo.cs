@@ -10,7 +10,7 @@ namespace NetApp.Repository
 {
     public class MQMallRepo : EFRepo, IListRepo<Product>, ITreeRepo<Category>
     {
-        public MQMallRepo(MallDbContext _mallDbContext)
+        public MQMallRepo(MallDBContext _mallDbContext)
         {
             _absContext = _mallDbContext;
         }

@@ -33,7 +33,7 @@ namespace NetApp.Services.Catalog
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var mysqlConnectionString = Configuration.GetConnectionString("MallDB");
-            services.AddDbContext<MallDbContext>(opt =>
+            services.AddDbContext<MallDBContext>(opt =>
             {
                 opt.UseMySql(Configuration.GetConnectionString("MallDB"));
             });

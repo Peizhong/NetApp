@@ -6,9 +6,9 @@ using NetApp.Common.Models;
 
 namespace NetApp.Repository
 {
-    public class MallDbContext : DbContext
+    public class MallDBContext : DbContext
     {
-        public MallDbContext(DbContextOptions<MallDbContext> options)
+        public MallDBContext(DbContextOptions<MallDBContext> options)
             : base(options)
         {
         }        

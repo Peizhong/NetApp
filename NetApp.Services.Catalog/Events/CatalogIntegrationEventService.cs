@@ -13,10 +13,10 @@ namespace NetApp.Services.Catalog.Events
     {
         private readonly IEventBus _eventBus;
         private readonly IIntegrationEventLogService _eventLogService;
-        private MallDbContext _repo;
+        private MallDBContext _repo;
 
         public CatalogIntegrationEventService(IEventBus eventBus,
-            MallDbContext repo,
+            MallDBContext repo,
           Func<DbConnection, IIntegrationEventLogService> integrationEventLogServiceFactory)
         {
             _repo = repo;

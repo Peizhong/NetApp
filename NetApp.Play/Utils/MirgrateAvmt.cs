@@ -110,9 +110,9 @@ namespace NetApp.Play.Utils
                 classifyToCategory.AssertConfigurationIsValid();
                 var mapper = classifyToCategory.CreateMapper();
 
-                var mysqlBuilder = new DbContextOptionsBuilder<MallDbContext>();
+                var mysqlBuilder = new DbContextOptionsBuilder<MallDBContext>();
                 mysqlBuilder.UseMySql("Server=;Database=malldb;User=root;Password=;");
-                using (var context = new MallDbContext(mysqlBuilder.Options))
+                using (var context = new MallDBContext(mysqlBuilder.Options))
                 {
                     var categories = mapper.Map<IList<Common.Models.Category>>(classifies);
                     context.Categories.AddRange(categories);
@@ -161,9 +161,9 @@ namespace NetApp.Play.Utils
                 classifyToCategory.AssertConfigurationIsValid();
                 var mapper = classifyToCategory.CreateMapper();
 
-                var mysqlBuilder = new DbContextOptionsBuilder<MallDbContext>();
+                var mysqlBuilder = new DbContextOptionsBuilder<MallDBContext>();
                 mysqlBuilder.UseMySql("Server=;Database=malldb;User=root;Password=;");
-                using (var context = new MallDbContext(mysqlBuilder.Options))
+                using (var context = new MallDBContext(mysqlBuilder.Options))
                 {
                     var products = mapper.Map<IList<Common.Models.Product>>(devices);
                     var oneIdProducts = products.GroupBy(p => p.Id).Select(g => g.First());
