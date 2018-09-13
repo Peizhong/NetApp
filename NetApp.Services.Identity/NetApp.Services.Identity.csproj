@@ -9,7 +9,6 @@
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
-    <PackageReference Include="Sendgrid" Version="9.9.0" />
   </ItemGroup>
 
 </Project>

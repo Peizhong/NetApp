@@ -16,7 +16,6 @@ using NetApp.Services.Catalog.Events;
 using NetApp.Services.Lib.Extensions;
 using Newtonsoft.Json;
 using System;
-using System.Data.Common;
 
 namespace NetApp.Services.Catalog
 {
@@ -35,16 +34,16 @@ namespace NetApp.Services.Catalog
             var mysqlConnectionString = Configuration.GetConnectionString("MallDB");
             services.AddDbContext<MallDBContext>(opt =>
             {
-                opt.UseMySql(Configuration.GetConnectionString("MallDB"));
+                opt.UseMySql(mysqlConnectionString);
             });
             services.AddDbContext<IntegrationEventLogContext>(opt =>
             {
-                opt.UseMySql(Configuration.GetConnectionString("MallDB"));
+                opt.UseMySql(mysqlConnectionString);
             });
             services.AddScoped<MQMallRepo>();
             services.AddScoped<IListRepo<Product>>(s => s.GetRequiredService<MQMallRepo>());
             services.AddScoped<ITreeRepo<Category>>(s => s.GetRequiredService<MQMallRepo>());
-
+            
             var redisConnectionString = Configuration.GetConnectionString("Redis");
             services.AddDistributedRedisCache(opt =>
             {
@@ -86,13 +85,8 @@ namespace NetApp.Services.Catalog
 
             services.AddMyIdentityServerAuthentication("http://localhost:5050", "api1");
 
-            services.AddTransient<Func<DbConnection, IIntegrationEventLogService>>(
-               sp => (DbConnection c) => new IntegrationEventLogService(c));
-
-            services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
-
-            services.AddMyIntegrationServices(Configuration);
             services.AddMyEventBus(Configuration);
+            services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
             services.AddTransient<ProductPriceChangedIntegrationEventHandler>();
 
             services.AddMySwagger("Catalog API", "v0");
@@ -119,11 +113,6 @@ namespace NetApp.Services.Catalog
 
             app.RegisterConsul(Configuration,lifetime);
 
-            ConfigureEventBus(app);
-        }
-
-        protected virtual void ConfigureEventBus(IApplicationBuilder app)
-        {
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
             eventBus.Subscribe<ProductPriceChangedIntegrationEvent, ProductPriceChangedIntegrationEventHandler>();
         }

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+//using SendGrid;
+//using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
@@ -26,6 +26,7 @@ namespace NetApp.Services.Identity.Services
 
         public Task Execute(string apiKey, string subject, string message, string email)
         {
+            /*
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
@@ -44,6 +45,8 @@ namespace NetApp.Services.Identity.Services
             };
 
             return client.SendEmailAsync(msg);
+            */
+            return Task.Delay(500);
         }
     }
 }

@@ -41,7 +41,6 @@ namespace NetApp.Services.Catalog.Events
                 var dbTransactionId = _repo.Database.CurrentTransaction?.TransactionId;
                 using (var transaction = _repo.Database.BeginTransaction())
                 {
-                    var dbTransactionId2 = _repo.Database.CurrentTransaction.TransactionId;
                     var dbTransaction = _repo.Database.CurrentTransaction.GetDbTransaction();
                     //TODO: really?
                     await _repo.SaveChangesAsync();

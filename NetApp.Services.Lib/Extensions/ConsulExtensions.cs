@@ -29,7 +29,7 @@ namespace NetApp.Services.Lib.Extensions
             Uri hostUrl = new Uri(servicHost);
 
             var consulClient = new ConsulClient(x => x.Address = new Uri(consulServer));//请求注册的 Consul 地址
-            var httpCheck = new AgentServiceCheck()
+            var httpCheck = new AgentServiceCheck
             {
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(3),//服务启动多久后注册
                 Interval = TimeSpan.FromSeconds(30),
@@ -38,7 +38,7 @@ namespace NetApp.Services.Lib.Extensions
             };
 
             // Register service with consul
-            var registration = new AgentServiceRegistration()
+            var registration = new AgentServiceRegistration
             {
                 Checks = new[] { httpCheck },
                 ID = Guid.NewGuid().ToString(),

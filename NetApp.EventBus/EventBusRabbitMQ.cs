@@ -20,8 +20,8 @@ namespace NetApp.EventBus
         const string BROKER_NAME = "netapp_event_bus";
 
         private readonly IRabbitMQPersistentConnection _persistentConnection;
-        private readonly ILogger<EventBusRabbitMQ> _logger;
         private readonly IEventBusSubscriptionsManager _subsManager;
+        private readonly ILogger<EventBusRabbitMQ> _logger;
         private readonly ILifetimeScope _autofac;
         private readonly string AUTOFAC_SCOPE_NAME = "netapp_event_bus";
         private readonly int _retryCount;
