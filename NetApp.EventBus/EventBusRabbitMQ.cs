@@ -51,9 +51,12 @@ namespace NetApp.EventBus
 
             var channel = _persistentConnection.CreateModel();
 
+            //交换器，用来接收生产者发送的消息并将这些消息路由给服务器中的队列
+            //direct: 路由键与队列名完全匹配
             channel.ExchangeDeclare(exchange: BROKER_NAME,
                                  type: "direct");
 
+            //消息队列
             channel.QueueDeclare(queue: _queueName,
                                  durable: true,
                                  exclusive: false,

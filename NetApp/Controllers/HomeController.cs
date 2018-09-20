@@ -13,10 +13,15 @@ namespace NetApp.Controllers
 {
     public class HomeController : Controller
     {
-        [Authorize]
         public IActionResult Index()
         {
             //OpenID Connect middleware asks for the profile scope by default.
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult Authorize()
+        {
             return View();
         }
 

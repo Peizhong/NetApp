@@ -11,18 +11,32 @@
     <link rel="stylesheet" href="~/css/bootstrap.css">
 </head>
 <body>
-    <div class="btn-group">
-        <button class="btn btn-primary">Hello</button>
-        <a class="btn btn-danger" href="home/OpenIDLogout">Sign Out</a>
+    <div>
+        <h2>hello world!</h2>
+        <div>
+            is this done by jenkins?
+            <div class="btn-group">
+                <button id="jenkins_yes" class="btn btn-primary">Yes</button>
+                <button id="jenkins_no" class="btn btn-danger">No</button>
+                <label id="jenkins_message">Yay</label>
+            </div>
+        </div>
+        <div>
+            @Html.ActionLink("Authorize", "Authorize")
+        </div>
     </div>
-    <dl>
-        @foreach (var claim in User.Claims)
-        {
-            <dt>@claim.Type</dt>
-            <dd>@claim.Value</dd>
-        }
-    </dl>
     <script src="~/js/jquery.js"></script>
     <script src="~/js/bootstrap.bundle.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#jenkins_message").hide();
+            $("#jenkins_yes").click(function () {
+                $("#jenkins_message").show();
+            });
+            $("#jenkins_no").click(function () {
+                $("#jenkins_message").hide();
+            });
+        });
+    </script>
 </body>
 </html>

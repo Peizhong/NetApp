@@ -1,0 +1,28 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="~/css/bootstrap.css">
+</head>
+<body>
+    <div class="btn-group">
+        <button class="btn btn-primary">Hello</button>
+        <a class="btn btn-danger" href="home/OpenIDLogout">Sign Out</a>
+    </div>
+    <dl>
+        @foreach (var claim in User.Claims)
+        {
+            <dt>@claim.Type</dt>
+            <dd>@claim.Value</dd>
+        }
+    </dl>
+    <script src="~/js/jquery.js"></script>
+    <script src="~/js/bootstrap.bundle.js"></script>
+</body>
+</html>
