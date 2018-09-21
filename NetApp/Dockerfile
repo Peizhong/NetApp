@@ -1,18 +1,18 @@
-
-FROM microsoft/aspnetcore:2.0 AS base
+FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
-EXPOSE 5000
+EXPOSE 80
 
-FROM microsoft/aspnetcore-build:2.0 AS build
+FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY NetApp.csproj NetApp/
-RUN dotnet restore NetApp/NetApp.csproj
-WORKDIR /src/NetApp
+COPY ["NetApp/NetApp.csproj", "NetApp/"]
+COPY ["NetApp.Common/NetApp.Common.csproj", "NetApp.Common/"]
+RUN dotnet restore "NetApp/NetApp.csproj"
 COPY . .
-RUN dotnet build NetApp.csproj -c Release -o /app
+WORKDIR "/src/NetApp"
+RUN dotnet build "NetApp.csproj" -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish NetApp.csproj -c Release -o /app
+RUN dotnet publish "NetApp.csproj" -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
