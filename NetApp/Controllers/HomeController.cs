@@ -8,6 +8,7 @@ using IdentityModel.Client;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
+using NetApp.Workflow;
 
 namespace NetApp.Controllers
 {
@@ -15,6 +16,8 @@ namespace NetApp.Controllers
     {
         public IActionResult Index()
         {
+            var create = WorkflowFactory.Instance.CreateWorkflow("aa", "bb");
+                
             //OpenID Connect middleware asks for the profile scope by default.
             return View();
         }
