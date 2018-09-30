@@ -43,6 +43,9 @@ namespace NetApp.Workflow
 
         public Flow CreateWorkflow(string flowName, string configName)
         {
+            Type t = Type.GetType("NetApp.Workflow.CreateOrderNode, NetApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+            var node =(Node)Activator.CreateInstance(t);
+
             var flow = new Flow(flowName, configName);
             workflowDict.TryAdd(flow.FlowId, flow);
             return flow;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NetApp.Workflow.Models
 {
@@ -16,6 +17,11 @@ namespace NetApp.Workflow.Models
 
     public class Flow
     {
+        public Flow()
+        {
+
+        }
+
         public Flow(string flowName, string configName)
         {
             FlowId = Guid.NewGuid().ToString();
@@ -37,16 +43,15 @@ namespace NetApp.Workflow.Models
         public void MoveOn(string command, string data)
         {
             List<Node> nextNodes = new List<Node>();
-            foreach(var node in _currentNode)
+            Parallel.ForEach(_currentNode, async node =>
             {
-                node.TryExcute(command, data);
                 //执行完毕后，定位下一次节点
-                if (node.NodeStatus == EnumNodeStatus.Complete)
+                if (EnumNodeStatus.Complete == await node.TryExecute(command, data))
                 {
                     //根据配置读取节点
-                   // nd.PreviousNode.Add(node);
+                    // nd.PreviousNode.Add(node);
                 }
-            }
+            });
             _currentNode = nextNodes;
         }
     }

@@ -13,7 +13,8 @@ namespace NetApp.Workflow.Models
         Suspend = 0x10,
         Complete = 0x100,
         Abort = 0x1000,
-        End = Complete | Abort
+        Error = 0x10000,
+        End = Complete | Abort | Error
     }
 
     public enum EnumNodeExcuteCondition
@@ -34,44 +35,78 @@ namespace NetApp.Workflow.Models
 
     public abstract class Node
     {
-        public string NodeId { get; set; }
+        public string NodeId { get; private set; }
 
-        public abstract string NodeTypeName { get; }
+        public Flow Flow { get; set; }
 
-        public EnumNodeStatus NodeStatus { get; set; }
+        public abstract string NodeName { get; }
+
+        public abstract string NodeDescription { get; protected set; }
+
+        /// <summary>
+        /// assemly
+        /// </summary>
+        public abstract string NodeType { get; protected set; }
+
+        public DateTime CreateTime { get; private set; }
+
+        /// <summary>
+        /// 当前状态时间
+        /// </summary>
+        public DateTime StatusTime { get; protected set; }
+
+        /// <summary>
+        /// 节点结束时间
+        /// </summary>
+        public DateTime? EndTime { get; protected set; }
 
         /// <summary>
         /// 执行的条件
         /// </summary>
-        public EnumNodeExcuteCondition ExcuteCondition { get; set; }
+        public EnumNodeExcuteCondition ExcuteCondition { get; protected set; }
         
+        public EnumNodeStatus NodeStatus { get; protected set; }
+
         public List<Node> PreviousNode { get; set; }
 
+        protected string _command;
+        protected string _data;
+
+        public Node()
+        {
+            NodeId = Guid.NewGuid().ToString();
+            CreateTime = DateTime.Now;
+            StatusTime = CreateTime;
+        }
+
+        /// <summary>
+        /// do noting, need to be overrided 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public virtual bool IsCanExcute(string command)
         {
-            if (PreviousNode != null)
-            {
-                if (ExcuteCondition == EnumNodeExcuteCondition.Direct)
-                    return true;
-                if (ExcuteCondition == EnumNodeExcuteCondition.All)
-                    return PreviousNode.All(n => n.NodeStatus == EnumNodeStatus.Complete);
-                if (ExcuteCondition == EnumNodeExcuteCondition.Any)
-                    return PreviousNode.Any(n => n.NodeStatus == EnumNodeStatus.Complete);
-            }
-            return false;
+            return true;
         }
 
-        public virtual string DoWork()
+        /// <summary>
+        /// base function do nothing, then completed the node
+        /// </summary>
+        public virtual Task DoWork()
         {
-            return "ok";
+            NodeStatus = EnumNodeStatus.Complete;
+            return Task.CompletedTask;
         }
 
-        public string TryExcute(string command, string data)
+        public async Task<EnumNodeStatus> TryExecute(string command, string data)
         {
-            var result = string.Empty;
             if (IsCanExcute(command))
-                return DoWork();
-            return result;
+            {
+                _command = command;
+                _data = data;
+                await DoWork();
+            }
+            return NodeStatus;
         }
     }
 }
