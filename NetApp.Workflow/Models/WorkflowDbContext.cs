@@ -12,6 +12,7 @@ namespace NetApp.Workflow.Models
             optionsBuilder.UseSqlite("Data Source=workflow.db");
         }
 
-        public DbSet<Flow> Flows { get; set; }
+        public DbSet<NodeEntity> NodeEntities { get; set; }
+        public DbSet<NodeRelationEntity> NodeRelationEntities { get; set; }
     }
 }

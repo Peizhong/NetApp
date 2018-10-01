@@ -23,28 +23,24 @@ namespace NetApp.Workflow.Models
     /// </summary>
     public class NodeEntity
     {
+        public NodeEntity()
+        {
+            NodeId = Guid.NewGuid().ToString();
+        }
+
         [Key]
-        public string NodeId { get; set; }
+        public string NodeId { get; private set; }
 
         public string FlowId { get; set; }
 
         public string NodeType { get; set; }
 
-        /// <summary>
-        /// NodeType-NextNodeType 多对多
-        /// </summary>
-        public string NextNodeType { get; set; }
+        public EnumNodeStatus NodeStatus { get; set; }
 
-        public EnumFlowStatus FlowStatus { get; set; }
-        
+        /// <summary>
+        /// 前面的节点完成了，下面的才能继续
+        /// </summary>
         public virtual ICollection<NodeEntity> PreviousFlows { get; set; }
 
-        public static implicit operator NodeEntity(Flow flow)
-        {
-            return new NodeEntity
-            {
-                NodeId = flow.FlowId
-            };
-        }
     }
 }

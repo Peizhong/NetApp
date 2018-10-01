@@ -1,0 +1,39 @@
+﻿{
+  "FlowName": "MessageGo",
+  "EntranceNode": "NetApp.Workflows.EditOrderNode, NetApp",
+  "AvailableNodes": [
+    {
+      "NodeType": "NetApp.Workflows.EditOrderNode, NetApp",
+      "NodeDescription": "编辑Message",
+      "NextNodes": [
+        "NetApp.Workflows.ApproveNode"
+      ]
+    },
+    {
+      "NodeType": "NetApp.Workflows.ApproveNode, NetApp",
+      "NodeDescription": "审批Message",
+      "NextNodes": [
+        "NetApp.Workflows.CompleteOrderNode, NetApp",
+        "NetApp.Workflows.RejectOrderNode, NetApp"
+      ]
+    },
+    {
+      "NodeType": "NetApp.Workflows.RejectOrderNode, NetApp",
+      "NodeDescription": "拒绝Message",
+      "NextNodes": [
+        "NetApp.Workflows.EditOrderNode, NetApp",
+        "NetApp.Workflows.CancelOrderNode, NetApp"
+      ]
+    },
+    {
+      "NodeType": "NetApp.Workflows.CompleteOrderNode, NetApp",
+      "NodeDescription": "完成Message",
+      "NextNodes": null
+    },
+    {
+      "NodeType": "NetApp.Workflows.CancelOrderNode, NetApp",
+      "NodeDescription": "放弃Message",
+      "NextNodes": null
+    }
+  ]
+}

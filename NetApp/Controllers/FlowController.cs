@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NetApp.Workflow;
+using NetApp.Workflows;
 
 namespace NetApp.Controllers
 {
@@ -19,8 +20,8 @@ namespace NetApp.Controllers
         // GET: Flow/Create
         public ActionResult Create()
         {
-            var t = typeof(CreateOrderNode);
-            var create = WorkflowFactory.Instance.CreateWorkflow("aa", "bb");
+            var demoflow = WorkflowFactory.Instance.CreateWorkflow("aa", "workflows/flowdemo.json");
+            var entrance = Activator.CreateInstance(Type.GetType(demoflow.EntranceNodeType));
 
             return View();
         }

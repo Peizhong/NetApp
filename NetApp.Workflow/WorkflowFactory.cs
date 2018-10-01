@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Concurrent;
 using NetApp.Workflow.Models;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace NetApp.Workflow
 {
@@ -27,6 +33,7 @@ namespace NetApp.Workflow
             }
         }
 
+        private ConcurrentDictionary<string, JObject> configDict;
         private ConcurrentDictionary<string, Flow> workflowDict;
 
         private WorkflowFactory()
@@ -37,16 +44,30 @@ namespace NetApp.Workflow
 
                 db.Database.EnsureCreated();
             }
-
+            configDict = new ConcurrentDictionary<string, JObject>();
             workflowDict = new ConcurrentDictionary<string, Flow>();
         }
 
         public Flow CreateWorkflow(string flowName, string configName)
         {
-            Type t = Type.GetType("NetApp.Workflow.CreateOrderNode, NetApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-            var node =(Node)Activator.CreateInstance(t);
-
-            var flow = new Flow(flowName, configName);
+            if (!configDict.TryGetValue(configName, out JObject obj))
+            {
+                var d = Directory.GetCurrentDirectory();
+                if (File.Exists(configName))
+                {
+                    string json = File.ReadAllText(configName);
+                    obj = JsonConvert.DeserializeObject<JObject>(json);
+                    configDict.TryAdd(configName, obj);
+                    //JArray array = obj["AvailableNodes"] as JArray;
+                }
+            }
+            var entranceNode = obj["EntranceNode"].ToString();
+            //Type t = Type.GetType(entranceNode);
+            var flow = new Flow
+            {
+                FlowName = obj["FlowName"].ToString(),
+                EntranceNodeType = entranceNode,
+            };
             workflowDict.TryAdd(flow.FlowId, flow);
             return flow;
         }
@@ -58,11 +79,34 @@ namespace NetApp.Workflow
             return null;
         }
 
-        public bool Append(Flow flow)
+        /// <summary>
+        /// 获取指定类型的节点
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<NodeEntity>> GetTypeNode(string path)
+        {
+            using (var db = new WorkflowDbContext())
+            {
+                var node = await db.NodeEntities.AsNoTracking().Where(n => n.NodeType.StartsWith(path)).ToListAsync();
+                return node;
+            }
+        }
+
+        /// <summary>
+        /// 尾部添加
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public bool Append(Node node)
         {
             return true;
         }
 
+        /// <summary>
+        /// 头部插入
+        /// </summary>
+        /// <param name="flow"></param>
+        /// <returns></returns>
         public bool Insert(Flow flow)
         {
             return true;

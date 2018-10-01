@@ -19,20 +19,16 @@ namespace NetApp.Workflow.Models
     {
         public Flow()
         {
-
-        }
-
-        public Flow(string flowName, string configName)
-        {
             FlowId = Guid.NewGuid().ToString();
-            FlowName = flowName;
         }
 
         public string FlowId { get; private set; }
 
-        public string FlowName { get; private set; }
-
+        public string FlowName { get; set; }
+        
         public EnumFlowStatus FlowStatus { get; set; }
+
+        public string EntranceNodeType { get; set; }
 
         private Node _entraceNode;
 

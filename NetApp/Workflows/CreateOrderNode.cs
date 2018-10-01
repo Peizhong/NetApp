@@ -8,31 +8,29 @@ using NetApp.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NetApp.Workflow
+namespace NetApp.Workflows
 {
-    public class CreateOrderNode : Node
+    public class EditOrderNode : Node
     {
         public override string NodeName => "CreateOrderNode";
         public override string NodeDescription { get; protected set; }
         public override string NodeType { get; protected set; }
 
         private const string _createCmd = "CreateOrder";
-        
-        private readonly ILogger<CreateOrderNode> _logger;
-        private readonly IServiceProvider _serviceProvider;
-        
-        public CreateOrderNode(ILogger<CreateOrderNode> logger, IServiceProvider serviceProvider)
-        {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
+        private const string _editCmd = "EditOrder";
 
+        private readonly ILogger<EditOrderNode> _logger;
+        private readonly IServiceProvider _serviceProvider;
+
+        public EditOrderNode()
+        {
             ExcuteCondition = EnumNodeExcuteCondition.Any;
         }
 
         public override bool IsCanExcute(string command)
         {
             //当前节点接受的命令类型
-            if (command == _createCmd)
+            if (command == _createCmd || command== _editCmd)
             {
                 _logger.LogDebug($"command {command} accepted");
                 return true;
@@ -47,9 +45,20 @@ namespace NetApp.Workflow
                 Message message = JsonConvert.DeserializeObject<Message>(_data);
                 using (var scope = _serviceProvider.CreateScope())
                 {
-                    using(var context = scope.ServiceProvider.GetRequiredService<NetAppDbContext>())
+                    using (var context = scope.ServiceProvider.GetRequiredService<NetAppDbContext>())
                     {
-                        await context.Messages.AddAsync(message);
+                        if (_lastUsedCommand == _createCmd)
+                        {
+                            await context.Messages.AddAsync(message);
+                        }
+                        else if (_lastUsedCommand == _editCmd)
+                        {
+                            var dbData = await context.Messages.FindAsync(message.Id);
+                            if (dbData != null)
+                            {
+                                context.Entry(dbData).CurrentValues.SetValues(message);
+                            }
+                        }
                         await context.SaveChangesAsync();
                     }
                 }
@@ -62,7 +71,6 @@ namespace NetApp.Workflow
             }
         }
     }
-
 
     public class ApproveNode : Node
     {
@@ -119,7 +127,7 @@ namespace NetApp.Workflow
 
         private readonly ILogger<RejectOrderNode> _logger;
         private readonly IServiceProvider _serviceProvider;
-        
+
 
         public RejectOrderNode(ILogger<RejectOrderNode> logger, IServiceProvider serviceProvider)
         {
@@ -206,7 +214,6 @@ namespace NetApp.Workflow
             }
         }
     }
-
 
     public class CancelOrderNode : Node
     {

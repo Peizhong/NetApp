@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NetApp.Workflow.Models
 {
@@ -67,9 +68,10 @@ namespace NetApp.Workflow.Models
         
         public EnumNodeStatus NodeStatus { get; protected set; }
 
+        [NotMapped]
         public List<Node> PreviousNode { get; set; }
 
-        protected string _command;
+        protected string _lastUsedCommand;
         protected string _data;
 
         public Node()
@@ -102,7 +104,7 @@ namespace NetApp.Workflow.Models
         {
             if (IsCanExcute(command))
             {
-                _command = command;
+                _lastUsedCommand = command;
                 _data = data;
                 await DoWork();
             }
