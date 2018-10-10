@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NetApp.Workflow;
-using NetApp.Workflows;
 
 namespace NetApp.Controllers
 {
