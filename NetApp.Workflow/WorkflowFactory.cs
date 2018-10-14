@@ -14,7 +14,7 @@ namespace NetApp.Workflow
 {
     public class WorkflowFactory
     {
-        private static object locker = new object();
+        private static object _locker = new object();
         private static WorkflowFactory _instance = null;
 
         public static WorkflowFactory Instance
@@ -23,7 +23,7 @@ namespace NetApp.Workflow
             {
                 if (_instance == null)
                 {
-                    lock (locker)
+                    lock (_locker)
                     {
                         if (_instance == null)
                             _instance = new WorkflowFactory();
@@ -33,8 +33,7 @@ namespace NetApp.Workflow
             }
         }
 
-        private ConcurrentDictionary<string, JObject> configDict;
-        private ConcurrentDictionary<string, Flow> workflowDict;
+        private ConcurrentDictionary<string, Flow> _workflowDict;
 
         private WorkflowFactory()
         {
@@ -44,37 +43,87 @@ namespace NetApp.Workflow
 
                 db.Database.EnsureCreated();
             }
-            configDict = new ConcurrentDictionary<string, JObject>();
-            workflowDict = new ConcurrentDictionary<string, Flow>();
+            _workflowDict = new ConcurrentDictionary<string, Flow>();
         }
 
-        public Flow CreateWorkflow(string flowName, string configName)
+        public FlowConfig LoadConfig(string path)
         {
-            if (!configDict.TryGetValue(configName, out JObject obj))
+            var d = Directory.GetCurrentDirectory();
+            if (!File.Exists(path))
+                return null;
+            string json = File.ReadAllText(path);
+            JObject raw = JsonConvert.DeserializeObject<JObject>(json);
+            FlowConfig flowConfig = new FlowConfig
             {
-                var d = Directory.GetCurrentDirectory();
-                if (File.Exists(configName))
+                FlowName = raw["FlowName"].ToString(),
+                EntranceNodeNodeType = raw["EntranceNode"].ToString(),
+                AvailableNodes = new List<NodeConfig>()
+            };
+            JArray availableNodes = raw["AvailableNodes"] as JArray;
+            foreach (var row in availableNodes)
+            {
+                EnumNodeStartMode enumStartMode = EnumNodeStartMode.Any;
+                var startMode = row["StartMode"].ToString();
+                if (!string.IsNullOrEmpty(startMode))
                 {
-                    string json = File.ReadAllText(configName);
-                    obj = JsonConvert.DeserializeObject<JObject>(json);
-                    configDict.TryAdd(configName, obj);
-                    //JArray array = obj["AvailableNodes"] as JArray;
+                    enumStartMode = (EnumNodeStartMode)Enum.Parse(typeof(EnumNodeStartMode), startMode);
+                }
+                var nc = new NodeConfig
+                {
+                    NodeType = row["NodeType"].ToString(),
+                    NodeDescription = row["NodeDescription"].ToString(),
+                    StartMode = enumStartMode,
+                    NextNodes = new Dictionary<string, NodeConfig>(),
+                };
+                flowConfig.AvailableNodes.Add(nc);
+            }
+            foreach (var row in availableNodes)
+            {
+                var nodeType = row["NodeType"].ToString();
+                var currentNode = flowConfig.AvailableNodes.FirstOrDefault(c => c.NodeType == nodeType);
+                if (currentNode == null)
+                    continue;
+                JArray nextNodes = row["NextNodes"] as JArray;
+                if (nextNodes == null)
+                    continue;
+                //JObject->JContainer->JToken
+                foreach (JObject nn in nextNodes)
+                {
+                    using (var enumerator = nn.GetEnumerator())
+                    {
+                        if (enumerator.MoveNext())
+                        {
+                            var item = enumerator.Current;
+                            var key = item.Key;
+                            var nextType = item.Value.ToString();
+                            var nextTarget = flowConfig.AvailableNodes.FirstOrDefault(c => c.NodeType == nextType);
+                            if (nextTarget != null)
+                            {
+                                currentNode.NextNodes.Add(key, nextTarget);
+
+                            }
+                        }
+                    }
                 }
             }
-            var entranceNode = obj["EntranceNode"].ToString();
-            //Type t = Type.GetType(entranceNode);
+            return flowConfig;
+        }
+
+        public Flow CreateWorkflow(string flowName, string configName, IServiceProvider serviceProvider)
+        {
             var flow = new Flow
             {
-                FlowName = obj["FlowName"].ToString(),
-                EntranceNodeType = entranceNode,
+                FlowName = flowName,
+                FlowConfig = LoadConfig(configName),
+                ServiceProvider = serviceProvider
             };
-            workflowDict.TryAdd(flow.FlowId, flow);
+            _workflowDict.TryAdd(flow.FlowId, flow);
             return flow;
         }
 
         public Flow FindFlow(string flowId)
         {
-            if (workflowDict.TryGetValue(flowId, out Flow flow))
+            if (_workflowDict.TryGetValue(flowId, out Flow flow))
                 return flow;
             return null;
         }

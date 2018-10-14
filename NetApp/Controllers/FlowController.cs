@@ -4,12 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NetApp.Models;
 using NetApp.Workflow;
+using Newtonsoft.Json;
 
 namespace NetApp.Controllers
 {
     public class FlowController : Controller
     {
+        private readonly IServiceProvider _serviceProvider;
+        
+        public FlowController(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         // GET: Flow
         public ActionResult Index()
         {
@@ -19,9 +28,15 @@ namespace NetApp.Controllers
         // GET: Flow/Create
         public ActionResult Create()
         {
-            var demoflow = WorkflowFactory.Instance.CreateWorkflow("aa", "workflows/flowdemo.json");
-            var entrance = Activator.CreateInstance(Type.GetType(demoflow.EntranceNodeType));
-
+            var flowConfig = WorkflowFactory.Instance.CreateWorkflow("test", "workflows/flowdemo.json", _serviceProvider);
+            Message hello = new Message
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Hi",
+                Value = "World",
+                Status = 0
+            };
+            flowConfig.MoveOn("CreateOrder", JsonConvert.SerializeObject(hello));
             return View();
         }
 

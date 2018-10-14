@@ -12,27 +12,14 @@ namespace NetApp.Workflows
 {
     public class EditOrderNode : Node
     {
-        public override string NodeName => "CreateOrderNode";
-        public override string NodeDescription { get; protected set; }
-        public override string NodeType { get; protected set; }
-
         private const string _createCmd = "CreateOrder";
         private const string _editCmd = "EditOrder";
 
-        private readonly ILogger<EditOrderNode> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
-        public EditOrderNode()
-        {
-            ExcuteCondition = EnumNodeExcuteCondition.Any;
-        }
-
-        public override bool IsCanExcute(string command)
+        public bool IsCanExcute(string command)
         {
             //当前节点接受的命令类型
             if (command == _createCmd || command== _editCmd)
             {
-                _logger.LogDebug($"command {command} accepted");
                 return true;
             }
             return false;
@@ -40,18 +27,20 @@ namespace NetApp.Workflows
 
         public override async Task DoWork()
         {
+            if (!IsCanExcute(_inputCommand))
+                return;
             try
             {
-                Message message = JsonConvert.DeserializeObject<Message>(_data);
-                using (var scope = _serviceProvider.CreateScope())
+                Message message = JsonConvert.DeserializeObject<Message>(_inputData);
+                using (var scope = Flow.ServiceProvider.CreateScope())
                 {
                     using (var context = scope.ServiceProvider.GetRequiredService<NetAppDbContext>())
                     {
-                        if (_lastUsedCommand == _createCmd)
+                        if (_inputCommand == _createCmd)
                         {
                             await context.Messages.AddAsync(message);
                         }
-                        else if (_lastUsedCommand == _editCmd)
+                        else if (_inputCommand == _editCmd)
                         {
                             var dbData = await context.Messages.FindAsync(message.Id);
                             if (dbData != null)
@@ -62,11 +51,13 @@ namespace NetApp.Workflows
                         await context.SaveChangesAsync();
                     }
                 }
+                OutputCommand = "DoIt";
+                OutputData = message.Id;
                 NodeStatus = EnumNodeStatus.Complete;
+                StatusTime = DateTime.Now;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
                 NodeStatus = EnumNodeStatus.Error;
             }
         }
@@ -74,36 +65,21 @@ namespace NetApp.Workflows
 
     public class ApproveNode : Node
     {
-        public override string NodeName => "ApproveNode";
-        public override string NodeDescription { get; protected set; }
-        public override string NodeType { get; protected set; }
-
-        private readonly ILogger<ApproveNode> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
-        public ApproveNode(ILogger<ApproveNode> logger, IServiceProvider serviceProvider)
-        {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-
-            ExcuteCondition = EnumNodeExcuteCondition.Any;
-        }
-
         public override async Task DoWork()
         {
             try
             {
-                var id = _data;
+                var id = _inputData;
                 if (!string.IsNullOrEmpty(id))
                 {
-                    using (var scope = _serviceProvider.CreateScope())
+                    using (var scope = Flow.ServiceProvider.CreateScope())
                     {
                         using (var context = scope.ServiceProvider.GetRequiredService<NetAppDbContext>())
                         {
                             var message = await context.Messages.FindAsync(id);
                             if (message != null)
                             {
-                                message.Status = 2;
+                                message.Status += 1;
                                 await context.SaveChangesAsync();
                                 NodeStatus = EnumNodeStatus.Complete;
                             }
@@ -113,7 +89,6 @@ namespace NetApp.Workflows
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
                 NodeStatus = EnumNodeStatus.Error;
             }
         }
@@ -121,27 +96,14 @@ namespace NetApp.Workflows
 
     public class RejectOrderNode : Node
     {
-        public override string NodeName => "RejectOrderNode";
-        public override string NodeDescription { get; protected set; }
-        public override string NodeType { get; protected set; }
-
         private readonly ILogger<RejectOrderNode> _logger;
         private readonly IServiceProvider _serviceProvider;
-
-
-        public RejectOrderNode(ILogger<RejectOrderNode> logger, IServiceProvider serviceProvider)
-        {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-
-            ExcuteCondition = EnumNodeExcuteCondition.Any;
-        }
-
+        
         public override async Task DoWork()
         {
             try
             {
-                var id = _data;
+                var id = _inputData;
                 if (!string.IsNullOrEmpty(id))
                 {
                     using (var scope = _serviceProvider.CreateScope())
@@ -169,27 +131,22 @@ namespace NetApp.Workflows
 
     public class CompleteOrderNode : Node
     {
-        public override string NodeName => "RejectOrderNode";
-        public override string NodeDescription { get; protected set; }
-        public override string NodeType { get; protected set; }
-
         private readonly ILogger<CompleteOrderNode> _logger;
         private readonly IServiceProvider _serviceProvider;
-
 
         public CompleteOrderNode(ILogger<CompleteOrderNode> logger, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
 
-            ExcuteCondition = EnumNodeExcuteCondition.Any;
+            StartMode = EnumNodeStartMode.Any;
         }
 
         public override async Task DoWork()
         {
             try
             {
-                var id = _data;
+                var id = _inputData;
                 if (!string.IsNullOrEmpty(id))
                 {
                     using (var scope = _serviceProvider.CreateScope())
@@ -217,27 +174,22 @@ namespace NetApp.Workflows
 
     public class CancelOrderNode : Node
     {
-        public override string NodeName => "RejectOrderNode";
-        public override string NodeDescription { get; protected set; }
-        public override string NodeType { get; protected set; }
-
         private readonly ILogger<CancelOrderNode> _logger;
         private readonly IServiceProvider _serviceProvider;
-
 
         public CancelOrderNode(ILogger<CancelOrderNode> logger, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
 
-            ExcuteCondition = EnumNodeExcuteCondition.Any;
+            StartMode = EnumNodeStartMode.Any;
         }
 
         public override async Task DoWork()
         {
             try
             {
-                var id = _data;
+                var id = _inputData;
                 if (!string.IsNullOrEmpty(id))
                 {
                     using (var scope = _serviceProvider.CreateScope())

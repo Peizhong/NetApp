@@ -11,14 +11,14 @@ namespace NetApp.Workflow.Models
     {
         None = 0,
         Create = 0x1,
-        Suspend = 0x10,
+        Excuting = 0x10,
         Complete = 0x100,
         Abort = 0x1000,
         Error = 0x10000,
         End = Complete | Abort | Error
     }
 
-    public enum EnumNodeExcuteCondition
+    public enum EnumNodeStartMode
     {
         /// <summary>
         /// 直接往下执行
@@ -34,62 +34,47 @@ namespace NetApp.Workflow.Models
         Any,
     }
 
-    public abstract class Node
+    public class Node
     {
-        public string NodeId { get; private set; }
-
-        public Flow Flow { get; set; }
-
-        public abstract string NodeName { get; }
-
-        public abstract string NodeDescription { get; protected set; }
-
-        /// <summary>
-        /// assemly
-        /// </summary>
-        public abstract string NodeType { get; protected set; }
-
-        public DateTime CreateTime { get; private set; }
-
-        /// <summary>
-        /// 当前状态时间
-        /// </summary>
-        public DateTime StatusTime { get; protected set; }
-
-        /// <summary>
-        /// 节点结束时间
-        /// </summary>
-        public DateTime? EndTime { get; protected set; }
-
-        /// <summary>
-        /// 执行的条件
-        /// </summary>
-        public EnumNodeExcuteCondition ExcuteCondition { get; protected set; }
-        
-        public EnumNodeStatus NodeStatus { get; protected set; }
-
-        [NotMapped]
-        public List<Node> PreviousNode { get; set; }
-
-        protected string _lastUsedCommand;
-        protected string _data;
-
         public Node()
         {
             NodeId = Guid.NewGuid().ToString();
             CreateTime = DateTime.Now;
-            StatusTime = CreateTime;
         }
 
+        public string NodeId { get; private set; }
+
+        public string FlowId { get; set; }
+
+        public Flow Flow { get; set; }
+
         /// <summary>
-        /// do noting, need to be overrided 
+        /// assemly
         /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public virtual bool IsCanExcute(string command)
-        {
-            return true;
-        }
+        public string NodeType { get; set; }
+
+        public DateTime CreateTime { get; private set; }
+        
+        /// <summary>
+        /// 当前状态时间
+        /// </summary>
+        public DateTime StatusTime { get; set; }
+
+        /// <summary>
+        /// 用三个节点进入的条件
+        /// </summary>
+        public EnumNodeStartMode StartMode { get; set; }
+        
+        public EnumNodeStatus NodeStatus { get; set; }
+
+        [NotMapped]
+        public List<Node> PreviousNode { get; set; } = new List<Node>();
+
+        protected string _inputCommand;
+        protected string _inputData;
+
+        public string OutputCommand { get; set; }
+        public string OutputData { get; set; }
 
         /// <summary>
         /// base function do nothing, then completed the node
@@ -102,12 +87,14 @@ namespace NetApp.Workflow.Models
 
         public async Task<EnumNodeStatus> TryExecute(string command, string data)
         {
-            if (IsCanExcute(command))
+            //新创建的节点，都先标记为执行中
+            if (NodeStatus == EnumNodeStatus.Create)
             {
-                _lastUsedCommand = command;
-                _data = data;
-                await DoWork();
+                NodeStatus = EnumNodeStatus.Excuting;
             }
+            _inputCommand = command;
+            _inputData = data;
+            await DoWork();
             return NodeStatus;
         }
     }

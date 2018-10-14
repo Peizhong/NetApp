@@ -5,34 +5,39 @@
     {
       "NodeType": "NetApp.Workflows.EditOrderNode, NetApp",
       "NodeDescription": "编辑Message",
+      "StartMode": "All", //上一个节点全部通过后才能继续
       "NextNodes": [
-        "NetApp.Workflows.ApproveNode"
+        { "Approve": "NetApp.Workflows.ApproveNode, NetApp" }
       ]
     },
     {
       "NodeType": "NetApp.Workflows.ApproveNode, NetApp",
       "NodeDescription": "审批Message",
+      "StartMode": "All",//上一个节点全部通过后才能继续
       "NextNodes": [
-        "NetApp.Workflows.CompleteOrderNode, NetApp",
-        "NetApp.Workflows.RejectOrderNode, NetApp"
+        { "Confirm": "NetApp.Workflows.CompleteOrderNode, NetApp" },
+        { "Reject": "NetApp.Workflows.RejectOrderNode, NetApp" }
       ]
     },
     {
       "NodeType": "NetApp.Workflows.RejectOrderNode, NetApp",
       "NodeDescription": "拒绝Message",
+      "StartMode": "Any",
       "NextNodes": [
-        "NetApp.Workflows.EditOrderNode, NetApp",
-        "NetApp.Workflows.CancelOrderNode, NetApp"
+        { "Edit": "NetApp.Workflows.EditOrderNode, NetApp" },
+        { "Cancel": "NetApp.Workflows.CancelOrderNode, NetApp" }
       ]
     },
     {
       "NodeType": "NetApp.Workflows.CompleteOrderNode, NetApp",
       "NodeDescription": "完成Message",
+      "StartMode": "Any",
       "NextNodes": null
     },
     {
       "NodeType": "NetApp.Workflows.CancelOrderNode, NetApp",
       "NodeDescription": "放弃Message",
+      "StartMode": "Any",
       "NextNodes": null
     }
   ]
