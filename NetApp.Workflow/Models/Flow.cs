@@ -4,31 +4,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 
 namespace NetApp.Workflow.Models
 {
     public class Flow
     {
-        public Flow()
-        {
-            FlowId = Guid.NewGuid().ToString();
-            CreateTime = DateTime.Now;
-        }
-
-        public string FlowId { get; private set; }
-
-        public DateTime CreateTime { get; private set; }
-
-        public string FlowName { get; set; }
-        
+        public string FlowId { get; set; }
+       
         public FlowConfig FlowConfig { get; set; }
         
+        public DateTime CreateTime { get; set; }
+
         public IServiceProvider ServiceProvider { get; set; }
+
+        public List<NodeEntity> NodeEntities { get; set; }
 
         private List<Node> _loadedNodes = new List<Node>();
 
-        public IEnumerable<Node> CurrentNodes => _loadedNodes.Where(n => n.NodeStatus != EnumNodeStatus.End);
+        public IEnumerable<Node> UnfinishedNode => _loadedNodes.Where(n => n.NodeStatus != EnumNodeStatus.End);
 
         /// <summary>
         /// 从配置中查找当前节点类型可能的上级节点
@@ -56,37 +49,61 @@ namespace NetApp.Workflow.Models
 
         private Node ActivateNode(string typeName)
         {
-            Node nextNode = (Node)Activator.CreateInstance(Type.GetType(typeName));
-            if (nextNode != null)
+            try
             {
+                Node nextNode = (Node)Activator.CreateInstance(Type.GetType(typeName));
+
                 nextNode.Flow = this;
                 nextNode.FlowId = this.FlowId;
                 nextNode.NodeType = typeName;
                 nextNode.StatusTime = DateTime.Now;
                 //nextNode.StartMode
                 //nextNode.NodeStatus = EnumNodeStatus.Create;
+                return nextNode;
             }
-            return nextNode;
+            catch
+            {
+                return null;
+            }
         }
 
         public void MoveOn(string command, string data)
         {
             //第一次加载入口节点
-            if (_loadedNodes.Count < 1)
+            if (NodeEntities.Count < 1)
             {
-                var nextNode = ActivateNode(FlowConfig.EntranceNodeNodeType);
-                nextNode.StartMode = EnumNodeStartMode.Direct;
-                nextNode.NodeStatus = EnumNodeStatus.Create;
-                _loadedNodes.Add(nextNode);
+                var entranceNode = ActivateNode(FlowConfig.EntranceNodeNodeType);
+                if (entranceNode != null)
+                {
+                    entranceNode.StartMode = EnumNodeStartMode.Direct;
+                    entranceNode.NodeStatus = EnumNodeStatus.Create;
+                    _loadedNodes.Add(entranceNode);
+                    NodeEntities.Add(new NodeEntity
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        NodeId = entranceNode.NodeId,
+                        FlowId = FlowId,
+                        NodeType = entranceNode.NodeType,
+                        NodeStatus = EnumNodeStatus.Create,
+                        CreateDate = DateTime.Now,
+                        StatusDate = DateTime.Now,
+                        //PreviousNodeId = "",
+                        //ReceivedCommand = "",
+                        //ReceivedData = ""
+                    });
+                }
             }
-            Parallel.ForEach(CurrentNodes, async node =>
+            Parallel.ForEach(UnfinishedNode, async node =>
             {
                 //执行完毕后，定位下一次节点
                 if (EnumNodeStatus.Complete == await node.TryExecute(command, data))
                 {
-                    var currentNode = FlowConfig.AvailableNodes.Single(n => n.NodeType == node.NodeType);
-                    //Todo: 要执行哪个?
-                    foreach (var nx in currentNode.NextNodes)
+                    //TODO: 是哪里决定下个节点？ 节点内部或工作流?
+                    //还有一种是动态创建工作流，在节点内部自己创建
+                    //FlowConfig最开始的数据是根据配置文件来的，
+                    var currentNodeConfig = FlowConfig.AvailableNodes.Single(n => n.NodeType == node.NodeType);
+                    //这个是根据配置文件生成下个节点
+                    foreach (var nx in currentNodeConfig.NextNodes)
                     {
                         //生成下一个执行节点
                         Node nextNode = ActivateNode(nx.Value.NodeType);

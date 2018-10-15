@@ -12,11 +12,11 @@ namespace NetApp.Controllers
 {
     public class FlowController : Controller
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly WorkflowFactory _workflowFactory;
         
-        public FlowController(IServiceProvider serviceProvider)
+        public FlowController(WorkflowFactory workflowFactory)
         {
-            _serviceProvider = serviceProvider;
+            _workflowFactory = workflowFactory;
         }
 
         // GET: Flow
@@ -26,9 +26,9 @@ namespace NetApp.Controllers
         }
 
         // GET: Flow/Create
-        public ActionResult Create()
+        public ActionResult Create(string flowId)
         {
-            var flowConfig = WorkflowFactory.Instance.CreateWorkflow("test", "workflows/flowdemo.json", _serviceProvider);
+            var flowConfig = string.IsNullOrEmpty(flowId) ? _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json") : _workflowFactory.FindWorkflow(flowId);
             Message hello = new Message
             {
                 Id = Guid.NewGuid().ToString(),
@@ -36,7 +36,7 @@ namespace NetApp.Controllers
                 Value = "World",
                 Status = 0
             };
-            flowConfig.MoveOn("CreateOrder", JsonConvert.SerializeObject(hello));
+            flowConfig?.MoveOn("CreateOrder", JsonConvert.SerializeObject(hello));
             return View();
         }
 

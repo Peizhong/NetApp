@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using NetApp.Models;
+using NetApp.Workflow;
 
 namespace NetApp
 {
@@ -22,6 +23,8 @@ namespace NetApp
             {
                 opt.UseInMemoryDatabase("NetApp");
             });
+
+            services.AddSingleton<WorkflowFactory>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -43,7 +46,7 @@ namespace NetApp
                 options.ClientId = "mvc";
                 options.SaveTokens = true;
             });
-
+            
             services.AddHttpClient();
         }
 

@@ -14,7 +14,8 @@ namespace NetApp.Workflow.Models
 
     public class FlowConfig
     {
-        public string FlowName { get; set; }
+        public string ConfigName { get; set; }
+        public string ConfigJson { get; set; }
         public string EntranceNodeNodeType { get; set; }
         public List<NodeConfig> AvailableNodes { get; set; }
     }
