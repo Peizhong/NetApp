@@ -13,6 +13,5 @@ namespace NetApp.Workflow.Models
         }
 
         public DbSet<NodeEntity> NodeEntities { get; set; }
-        public DbSet<NodeRelationEntity> NodeRelationEntities { get; set; }
     }
 }

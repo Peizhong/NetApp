@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace NetApp.Workflow.Models
 {
@@ -54,7 +54,7 @@ namespace NetApp.Workflow.Models
         public string NodeType { get; set; }
 
         public DateTime CreateTime { get; private set; }
-        
+
         /// <summary>
         /// 当前状态时间
         /// </summary>
@@ -64,18 +64,71 @@ namespace NetApp.Workflow.Models
         /// 用三个节点进入的条件
         /// </summary>
         public EnumNodeStartMode StartMode { get; set; }
-        
+
         public EnumNodeStatus NodeStatus { get; set; }
 
-        [NotMapped]
         public List<Node> PreviousNode { get; set; } = new List<Node>();
+
+        public Dictionary<string, NodeConfig> AvailableNextNode
+            => Flow.FlowConfig.AvailableNodes.First(n => n.NodeType == NodeType).NextNodes;
+
+        /// <summary>
+        /// 多个输入源
+        /// </summary>
+        public bool IsMultiInput =>
+            Flow.FlowConfig.AvailableNodes.SelectMany(n => n.NextNodes.Select(t => t.Key)).Count(n => n == NodeType) > 1;
+
+        /// <summary>
+        /// 创建独立子节点
+        /// </summary>
+        /// <param name="nextNodeType"></param>
+        /// <param name="data"></param>
+        public void CreateNextNode(string nextNodeType, string data)
+        {
+            NodeEntity entity = new NodeEntity
+            {
+                Id = Guid.NewGuid().ToString(),
+                PreviousNodeId = NodeId,
+                NodeType = nextNodeType,
+                ReceivedData = data,
+            };
+            //如果新建的节点是多个节点的汇聚
+            var previousNodeConfig = Flow.GetPreviousNodeConfig(nextNodeType);
+            if (previousNodeConfig.Count() > 1)
+            {
+                //找到已创建的节点，连接上
+                entity.NodeId = Flow.GetExistedNodeId(nextNodeType);
+            }
+            //不是汇聚节点或者汇聚节点还没创建
+            if (string.IsNullOrEmpty(entity.NodeId))
+            {
+                entity.NodeId = Guid.NewGuid().ToString();
+            }
+        }
 
         protected string _inputCommand;
         protected string _inputData;
 
+        private Dictionary<string, string> inputDataDict;
+        public Dictionary<string, string> InputDataDict
+        {
+            get
+            {
+                if (inputDataDict == null)
+                {
+                    try
+                    {
+                        inputDataDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(_inputData);
+                    }
+                    catch { inputDataDict = new Dictionary<string, string>(); };
+                }
+                return inputDataDict;
+            }
+        }
+
         public string OutputCommand { get; set; }
         public string OutputData { get; set; }
-
+        
         /// <summary>
         /// base function do nothing, then completed the node
         /// </summary>

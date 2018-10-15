@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace NetApp.Workflow.Models
 {
@@ -21,12 +23,36 @@ namespace NetApp.Workflow.Models
         public string FlowName { get; set; }
         
         public FlowConfig FlowConfig { get; set; }
-
+        
         public IServiceProvider ServiceProvider { get; set; }
 
         private List<Node> _loadedNodes = new List<Node>();
 
         public IEnumerable<Node> CurrentNodes => _loadedNodes.Where(n => n.NodeStatus != EnumNodeStatus.End);
+
+        /// <summary>
+        /// 从配置中查找当前节点类型可能的上级节点
+        /// </summary>
+        /// <param name="nodeType"></param>
+        /// <returns></returns>
+        public IEnumerable<NodeConfig> GetPreviousNodeConfig(string nodeType)
+        {
+            return FlowConfig.AvailableNodes.SelectMany(n => n.NextNodes).Where(n => n.Key == nodeType).Select(k => k.Value);
+        }
+
+        /// <summary>
+        /// 查找已创建的节点
+        /// </summary>
+        /// <param name="nodeType"></param>
+        /// <returns></returns>
+        public string GetExistedNodeId(string nodeType)
+        {
+            using (var context = ServiceProvider.GetRequiredService<WorkflowDbContext>())
+            {
+                var node = context.NodeEntities.SingleOrDefault(n => n.FlowId == FlowId && n.NodeType == nodeType && n.NodeStatus != EnumNodeStatus.Complete);
+                return node?.NodeId;
+            }
+        }
 
         private Node ActivateNode(string typeName)
         {
