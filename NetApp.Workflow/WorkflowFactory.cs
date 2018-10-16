@@ -18,7 +18,6 @@ namespace NetApp.Workflow
         private readonly ILogger<WorkflowFactory> _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly ConcurrentDictionary<string, FlowConfig> _workflowConfigDict;
-        private readonly ConcurrentDictionary<string, Flow> _workflowDict;
 
         public WorkflowFactory(ILogger<WorkflowFactory> logger, IServiceProvider serviceProvider)
         {
@@ -28,12 +27,10 @@ namespace NetApp.Workflow
             {
                 //db.Database.EnsureDeleted();
 
-               // db.Database.EnsureCreated();
+                //db.Database.EnsureCreated();
             }
             _serviceProvider = serviceProvider;
             _workflowConfigDict = new ConcurrentDictionary<string, FlowConfig>();
-            _workflowDict = new ConcurrentDictionary<string, Flow>();
-            LoadFlowFromDb();
         }
 
         private FlowConfig LoadFlowConfigFromJson(string data)
@@ -122,64 +119,60 @@ namespace NetApp.Workflow
             }
         }
 
-        /// <summary>
-        /// 从数据库中加载工作流
-        /// </summary>
-        private void LoadFlowFromDb()
-        {
-            using (var db = new WorkflowDbContext())
-            {
-                var flowsInDb = db.FlowEntities.AsNoTracking().ToList();
-                foreach (var fl in flowsInDb)
-                {
-                    FlowConfig flowConfig = null;
-                    if (!string.IsNullOrEmpty(fl.ConfigJson))
-                    {
-                        flowConfig = LoadFlowConfigFromJson(fl.ConfigJson);
-                    }
-                    else
-                    {
-                        flowConfig = _workflowConfigDict.GetOrAdd(fl.ConfigName, name => LoadFlowConfigFromFile(name));
-                    }
-                    var flow = new Flow
-                    {
-                        FlowId = fl.FlowId,
-                        CreateTime = fl.CreateTime,
-                        FlowConfig = flowConfig,
-                        NodeEntities = db.NodeEntities.AsNoTracking().Where(n => n.FlowId == fl.FlowId).ToList(),
-                        ServiceProvider = _serviceProvider,
-                    };
-                    _workflowDict.TryAdd(flow.FlowId, flow);
-                }
-            }
-        }
-
         public Flow CreateWorkflow(string flowName, string configName)
         {
             var config = _workflowConfigDict.GetOrAdd(configName, name => LoadFlowConfigFromFile(name));
             var flow = new Flow
             {
                 FlowId = Guid.NewGuid().ToString(),
+                CreateTime = DateTime.Now,
                 FlowConfig = config,
-                ServiceProvider = _serviceProvider
+                ServiceProvider = _serviceProvider,
+                Nodes = new List<NodeEntity>(),
             };
-            _workflowDict.TryAdd(flow.FlowId, flow);
+            var entranceNode = new NodeEntity
+            {
+                Id = Guid.NewGuid().ToString(),
+                NodeId = Guid.NewGuid().ToString(),
+                FlowId = flow.FlowId,
+                NodeType = flow.FlowConfig.EntranceNodeNodeType,
+                NodeStatus = EnumNodeStatus.Create,
+                CreateTime = DateTime.Now,
+                StatusTime = DateTime.Now,
+                //PreviousNodeId = "",
+                //ReceivedCommand = "",
+                //ReceivedData = ""
+            };
+            flow.Nodes.Add(entranceNode);
             SaveFlowToDb(flow);
             return flow;
         }
 
-        public Flow FindWorkflow(string flowId)
+        public async Task<Flow> FindWorkflow(string flowId)
         {
-            _workflowDict.TryGetValue(flowId, out Flow flow);
-            return flow;
-        }
-
-        public void MoveOn(string flowId, string command, string data)
-        {
-            if (_workflowDict.TryGetValue(flowId, out Flow flow))
+            using (var db = new WorkflowDbContext())
             {
-                flow.MoveOn(command, data);
-                //TODO: 更新数据库
+                var flowsInDb = await db.FlowEntities.AsNoTracking().Where(f => f.FlowId == flowId).SingleOrDefaultAsync();
+                if (flowsInDb == null)
+                    return null;
+                FlowConfig flowConfig = null;
+                if (!string.IsNullOrEmpty(flowsInDb.ConfigJson))
+                {
+                    flowConfig = LoadFlowConfigFromJson(flowsInDb.ConfigJson);
+                }
+                else
+                {
+                    flowConfig = _workflowConfigDict.GetOrAdd(flowsInDb.ConfigName, name => LoadFlowConfigFromFile(name));
+                }
+                var flow = new Flow
+                {
+                    FlowId = flowsInDb.FlowId,
+                    CreateTime = flowsInDb.CreateTime,
+                    FlowConfig = flowConfig,
+                    Nodes = db.NodeEntities.Where(n => n.FlowId == flowId).ToList(),
+                    ServiceProvider = _serviceProvider,
+                };
+                return flow;
             }
         }
     }

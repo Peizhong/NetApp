@@ -15,26 +15,32 @@ namespace NetApp.Workflow.Models
 
         public string NodeId { get; set; }
 
+        public string NodeType { get; set; }
+
+        public string FlowId { get; set; }
+
         public string PreviousNodeId { get; set; }
 
         /// <summary>
         /// 前面节点传过来的命令
         /// </summary>
-        public string ReceivedCommand { get; set; }
+        public string InputCommand { get; set; }
 
         /// <summary>
         /// 前面节点传过来的数据
         /// </summary>
-        public string ReceivedData { get; set; }
+        public string InputData { get; set; }
 
-        public string FlowId { get; set; }
+        public string OutputCommand { get; set;}
 
-        public string NodeType { get; set; }
-
+        public string OutputData { get; set; }
+        
         public EnumNodeStatus NodeStatus { get; set; }
 
-        public DateTime CreateDate { get; set; }
+        public EnumNodeStartMode StartMode { get; set; }
 
-        public DateTime StatusDate { get; set; }
+        public DateTime CreateTime { get; set; }
+
+        public DateTime StatusTime { get; set; }
     }
 }

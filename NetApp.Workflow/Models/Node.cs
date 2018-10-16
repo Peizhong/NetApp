@@ -15,7 +15,6 @@ namespace NetApp.Workflow.Models
         Complete = 0x100,
         Abort = 0x1000,
         Error = 0x10000,
-        End = Complete | Abort | Error
     }
 
     public enum EnumNodeStartMode
@@ -38,8 +37,6 @@ namespace NetApp.Workflow.Models
     {
         public Node()
         {
-            NodeId = Guid.NewGuid().ToString();
-            CreateTime = DateTime.Now;
         }
 
         public string NodeId { get; private set; }
@@ -52,9 +49,7 @@ namespace NetApp.Workflow.Models
         /// assemly
         /// </summary>
         public string NodeType { get; set; }
-
-        public DateTime CreateTime { get; private set; }
-
+        
         /// <summary>
         /// 当前状态时间
         /// </summary>
@@ -66,45 +61,6 @@ namespace NetApp.Workflow.Models
         public EnumNodeStartMode StartMode { get; set; }
 
         public EnumNodeStatus NodeStatus { get; set; }
-
-        public List<Node> PreviousNode { get; set; } = new List<Node>();
-
-        public Dictionary<string, NodeConfig> AvailableNextNode
-            => Flow.FlowConfig.AvailableNodes.First(n => n.NodeType == NodeType).NextNodes;
-
-        /// <summary>
-        /// 多个输入源
-        /// </summary>
-        public bool IsMultiInput =>
-            Flow.FlowConfig.AvailableNodes.SelectMany(n => n.NextNodes.Select(t => t.Key)).Count(n => n == NodeType) > 1;
-
-        /// <summary>
-        /// 创建独立子节点
-        /// </summary>
-        /// <param name="nextNodeType"></param>
-        /// <param name="data"></param>
-        public void CreateNextNode(string nextNodeType, string data)
-        {
-            NodeEntity entity = new NodeEntity
-            {
-                Id = Guid.NewGuid().ToString(),
-                PreviousNodeId = NodeId,
-                NodeType = nextNodeType,
-                ReceivedData = data,
-            };
-            //如果新建的节点是多个节点的汇聚
-            var previousNodeConfig = Flow.GetPreviousNodeConfig(nextNodeType);
-            if (previousNodeConfig.Count() > 1)
-            {
-                //找到已创建的节点，连接上
-                entity.NodeId = Flow.GetExistedNodeId(nextNodeType);
-            }
-            //不是汇聚节点或者汇聚节点还没创建
-            if (string.IsNullOrEmpty(entity.NodeId))
-            {
-                entity.NodeId = Guid.NewGuid().ToString();
-            }
-        }
 
         protected string _inputCommand;
         protected string _inputData;
@@ -138,17 +94,16 @@ namespace NetApp.Workflow.Models
             return Task.CompletedTask;
         }
 
-        public async Task<EnumNodeStatus> TryExecute(string command, string data)
+        public async Task TryExecute(string command, string data)
         {
-            //新创建的节点，都先标记为执行中
             if (NodeStatus == EnumNodeStatus.Create)
             {
                 NodeStatus = EnumNodeStatus.Excuting;
+                StatusTime = DateTime.Now;
             }
             _inputCommand = command;
             _inputData = data;
             await DoWork();
-            return NodeStatus;
         }
     }
 }

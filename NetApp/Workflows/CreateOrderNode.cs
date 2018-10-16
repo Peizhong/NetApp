@@ -81,7 +81,7 @@ namespace NetApp.Workflows
                             {
                                 message.Status += 1;
                                 await context.SaveChangesAsync();
-                                NodeStatus = EnumNodeStatus.Complete;
+                                NodeStatus = EnumNodeStatus.Excuting;
                             }
                         }
                     }

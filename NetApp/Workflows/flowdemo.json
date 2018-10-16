@@ -16,7 +16,6 @@
       "StartMode": "All",//上一个节点全部通过后才能继续
       "NextNodes": [
         { "Confirm": "NetApp.Workflows.CompleteOrderNode, NetApp" },
-        { "Reject": "NetApp.Workflows.RejectOrderNode, NetApp" }
       ]
     },
     {
@@ -25,7 +24,6 @@
       "StartMode": "Any",
       "NextNodes": [
         { "Edit": "NetApp.Workflows.EditOrderNode, NetApp" },
-        { "Cancel": "NetApp.Workflows.CancelOrderNode, NetApp" }
       ]
     },
     {

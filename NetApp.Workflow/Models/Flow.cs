@@ -4,60 +4,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace NetApp.Workflow.Models
 {
     public class Flow
     {
         public string FlowId { get; set; }
-       
+
         public FlowConfig FlowConfig { get; set; }
-        
+
         public DateTime CreateTime { get; set; }
 
         public IServiceProvider ServiceProvider { get; set; }
-
-        public List<NodeEntity> NodeEntities { get; set; }
-
-        private List<Node> _loadedNodes = new List<Node>();
-
-        public IEnumerable<Node> UnfinishedNode => _loadedNodes.Where(n => n.NodeStatus != EnumNodeStatus.End);
-
-        /// <summary>
-        /// 从配置中查找当前节点类型可能的上级节点
-        /// </summary>
-        /// <param name="nodeType"></param>
-        /// <returns></returns>
-        public IEnumerable<NodeConfig> GetPreviousNodeConfig(string nodeType)
-        {
-            return FlowConfig.AvailableNodes.SelectMany(n => n.NextNodes).Where(n => n.Key == nodeType).Select(k => k.Value);
-        }
-
-        /// <summary>
-        /// 查找已创建的节点
-        /// </summary>
-        /// <param name="nodeType"></param>
-        /// <returns></returns>
-        public string GetExistedNodeId(string nodeType)
-        {
-            using (var context = ServiceProvider.GetRequiredService<WorkflowDbContext>())
-            {
-                var node = context.NodeEntities.SingleOrDefault(n => n.FlowId == FlowId && n.NodeType == nodeType && n.NodeStatus != EnumNodeStatus.Complete);
-                return node?.NodeId;
-            }
-        }
+        
+        public List<NodeEntity> Nodes { get; set; }
 
         private Node ActivateNode(string typeName)
         {
             try
             {
                 Node nextNode = (Node)Activator.CreateInstance(Type.GetType(typeName));
-
                 nextNode.Flow = this;
-                nextNode.FlowId = this.FlowId;
                 nextNode.NodeType = typeName;
-                nextNode.StatusTime = DateTime.Now;
-                //nextNode.StartMode
                 //nextNode.NodeStatus = EnumNodeStatus.Create;
                 return nextNode;
             }
@@ -66,78 +35,86 @@ namespace NetApp.Workflow.Models
                 return null;
             }
         }
-
-        public void MoveOn(string command, string data)
+        
+        /// <summary>
+        /// 执行当前节点，如果完成了，生成下个节点继续执行
+        /// </summary>
+        /// <param name="nodeType"></param>
+        /// <param name="command"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private async Task RecursiveMoveOn(string nodeType, string command, string data)
         {
-            //第一次加载入口节点
-            if (NodeEntities.Count < 1)
+            var targetNode = Nodes.SingleOrDefault(n => n.NodeType == nodeType && n.NodeStatus != EnumNodeStatus.Complete);
+            if (targetNode == null)
+                return;
+            var workingNode = ActivateNode(nodeType);
+            if (workingNode == null)
+                return;
+            await workingNode.TryExecute(command, data);
+            //执行后，更新entity
+            targetNode.NodeStatus = workingNode.NodeStatus;
+            targetNode.StatusTime = workingNode.StatusTime;
+            targetNode.OutputCommand = workingNode.OutputCommand;
+            targetNode.OutputData = workingNode.OutputData;
+            if (workingNode.NodeStatus == EnumNodeStatus.Complete)
             {
-                var entranceNode = ActivateNode(FlowConfig.EntranceNodeNodeType);
-                if (entranceNode != null)
+                //FlowConfig最开始的数据是根据配置文件来的，
+                var currentNodeConfig = FlowConfig.AvailableNodes.SingleOrDefault(n => n.NodeType == nodeType);
+                if (currentNodeConfig == null)
+                    return;
+                //下级节点全部要执行
+                foreach (var nx in currentNodeConfig.NextNodes.Values)
                 {
-                    entranceNode.StartMode = EnumNodeStartMode.Direct;
-                    entranceNode.NodeStatus = EnumNodeStatus.Create;
-                    _loadedNodes.Add(entranceNode);
-                    NodeEntities.Add(new NodeEntity
+                    var nextNode = new NodeEntity
                     {
                         Id = Guid.NewGuid().ToString(),
-                        NodeId = entranceNode.NodeId,
+                        NodeId = Guid.NewGuid().ToString(),
                         FlowId = FlowId,
-                        NodeType = entranceNode.NodeType,
+                        NodeType = nx.NodeType,
                         NodeStatus = EnumNodeStatus.Create,
-                        CreateDate = DateTime.Now,
-                        StatusDate = DateTime.Now,
-                        //PreviousNodeId = "",
-                        //ReceivedCommand = "",
-                        //ReceivedData = ""
-                    });
+                        CreateTime = DateTime.Now,
+                        StatusTime = DateTime.Now,
+                        PreviousNodeId = targetNode.NodeId,
+                        InputCommand = targetNode.OutputCommand,
+                        InputData = targetNode.OutputData
+                    };
+                    Nodes.Add(nextNode);
+                    await RecursiveMoveOn(nx.NodeType, targetNode.OutputCommand, targetNode.OutputData);
                 }
             }
-            Parallel.ForEach(UnfinishedNode, async node =>
+        }
+
+        private async Task UpdateNodeEntityDb()
+        {
+            using (var context = new WorkflowDbContext())
             {
-                //执行完毕后，定位下一次节点
-                if (EnumNodeStatus.Complete == await node.TryExecute(command, data))
+                foreach (var node in Nodes)
                 {
-                    //TODO: 是哪里决定下个节点？ 节点内部或工作流?
-                    //还有一种是动态创建工作流，在节点内部自己创建
-                    //FlowConfig最开始的数据是根据配置文件来的，
-                    var currentNodeConfig = FlowConfig.AvailableNodes.Single(n => n.NodeType == node.NodeType);
-                    //这个是根据配置文件生成下个节点
-                    foreach (var nx in currentNodeConfig.NextNodes)
+                    var dbNode = context.NodeEntities.Find(node.Id);
+                    if (dbNode == null)
                     {
-                        //生成下一个执行节点
-                        Node nextNode = ActivateNode(nx.Value.NodeType);
-                        nextNode.StartMode = nx.Value.StartMode;
-                        nextNode.NodeStatus = EnumNodeStatus.Create;
-                        nextNode.PreviousNode.Add(node);
-                        _loadedNodes.Add(nextNode);
+                        context.NodeEntities.Add(node);
+                    }
+                    else
+                    {
+                        context.Entry(dbNode).CurrentValues.SetValues(node);
                     }
                 }
-            });
-            //执行新创建的节点
-            var newNode = _loadedNodes.Where(n => n.NodeStatus == EnumNodeStatus.Create);
-            while (newNode.Any())
-            {
-                Parallel.ForEach(newNode, async node =>
-                {                    
-                    //执行完毕后，定位下一次节点
-                    var previousNode = node.PreviousNode.Where(p => p.NodeStatus == EnumNodeStatus.Complete).OrderByDescending(p => p.StatusTime).FirstOrDefault();
-                    if (EnumNodeStatus.Complete == await node.TryExecute(previousNode?.OutputCommand, previousNode?.OutputData))
-                    {
-                        var nextNodes = FlowConfig.AvailableNodes.Where(n => n.NodeType == node.NodeType);
-                        foreach (var nx in nextNodes)
-                        {
-                            //生成下一个执行节点
-                            Node nextNode = ActivateNode(nx.NodeType);
-                            nextNode.StartMode = nx.StartMode;
-                            nextNode.NodeStatus = EnumNodeStatus.Create;
-                            nextNode.PreviousNode.Add(node);
-                            _loadedNodes.Add(nextNode);
-                        }
-                    }
-                });
-                newNode = _loadedNodes.Where(n => n.NodeStatus == EnumNodeStatus.Create);
+                await context.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        /// 每个工作流，每种类型的节点只有一个是正在运行的
+        /// </summary>
+        /// <param name="nodeType"></param>
+        /// <param name="data"></param>
+        public async Task MoveOn(string nodeType, string command, string data)
+        {
+            //每次moveon，先写入内存，最后保存数据库
+            await RecursiveMoveOn(nodeType, command, data);
+            await UpdateNodeEntityDb();
         }
     }
 }

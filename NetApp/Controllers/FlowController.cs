@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NetApp.Models;
 using NetApp.Workflow;
+using NetApp.Workflow.Models;
 using Newtonsoft.Json;
 
 namespace NetApp.Controllers
@@ -26,9 +27,17 @@ namespace NetApp.Controllers
         }
 
         // GET: Flow/Create
-        public ActionResult Create(string flowId)
+        public async Task<ActionResult> Create(string flowId)
         {
-            var flowConfig = string.IsNullOrEmpty(flowId) ? _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json") : _workflowFactory.FindWorkflow(flowId);
+            Flow workflow = null;
+            if (string.IsNullOrEmpty(flowId))
+            {
+                workflow = _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json");
+            }
+            else
+            {
+                workflow = await _workflowFactory.FindWorkflow(flowId);
+            }
             Message hello = new Message
             {
                 Id = Guid.NewGuid().ToString(),
@@ -36,7 +45,7 @@ namespace NetApp.Controllers
                 Value = "World",
                 Status = 0
             };
-            flowConfig?.MoveOn("CreateOrder", JsonConvert.SerializeObject(hello));
+            workflow?.MoveOn("NetApp.Workflows.EditOrderNode, NetApp", "CreateOrder", JsonConvert.SerializeObject(hello));
             return View();
         }
 
