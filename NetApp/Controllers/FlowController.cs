@@ -27,17 +27,9 @@ namespace NetApp.Controllers
         }
 
         // GET: Flow/Create
-        public async Task<ActionResult> Create(string flowId)
+        public ActionResult Create()
         {
-            Flow workflow = null;
-            if (string.IsNullOrEmpty(flowId))
-            {
-                workflow = _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json");
-            }
-            else
-            {
-                workflow = await _workflowFactory.FindWorkflow(flowId);
-            }
+            Flow workflow = _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json");
             Message hello = new Message
             {
                 Id = Guid.NewGuid().ToString(),
@@ -47,6 +39,15 @@ namespace NetApp.Controllers
             };
             workflow?.MoveOn("NetApp.Workflows.EditOrderNode, NetApp", "CreateOrder", JsonConvert.SerializeObject(hello));
             return View();
+        }
+
+        public async Task<ActionResult> Approve(string flowId)
+        {
+            if (string.IsNullOrEmpty(flowId))
+                return NotFound();
+            Flow workflow = await _workflowFactory.FindWorkflow(flowId);
+            workflow?.MoveOn("NetApp.Workflows.ApproveNode, NetApp", "CreateOrder", "487e6ca2-4b88-4d4d-a656-24b2e9992730 ");
+            return Content("Approved");
         }
 
         // POST: Flow/Create

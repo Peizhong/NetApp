@@ -35,7 +35,7 @@ namespace NetApp.Workflow.Models
                 return null;
             }
         }
-        
+
         /// <summary>
         /// 执行当前节点，如果完成了，生成下个节点继续执行
         /// </summary>
@@ -49,6 +49,7 @@ namespace NetApp.Workflow.Models
             if (targetNode == null)
                 return;
             var workingNode = ActivateNode(nodeType);
+            //如果生成不了，上次的命令怎么处理？
             if (workingNode == null)
                 return;
             await workingNode.TryExecute(command, data);
