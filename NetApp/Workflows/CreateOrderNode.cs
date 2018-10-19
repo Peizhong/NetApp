@@ -79,9 +79,12 @@ namespace NetApp.Workflows
                             var message = await context.Messages.FindAsync(id);
                             if (message != null)
                             {
-                                message.Status += 1;
-                                await context.SaveChangesAsync();
-                                NodeStatus = EnumNodeStatus.Complete;
+                                if (message.Value == "ok")
+                                {
+                                    message.Status += 1;
+                                    await context.SaveChangesAsync();
+                                    NodeStatus = EnumNodeStatus.Complete;
+                                }
                             }
                         }
                     }

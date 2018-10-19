@@ -52,6 +52,7 @@ namespace NetApp.Workflow.Models
             //如果生成不了，上次的命令怎么处理？
             if (workingNode == null)
                 return;
+            workingNode.NodeStatus = targetNode.NodeStatus;
             await workingNode.TryExecute(command, data);
             //执行后，更新entity
             targetNode.NodeStatus = workingNode.NodeStatus;

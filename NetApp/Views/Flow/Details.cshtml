@@ -1,17 +1,15 @@
 ﻿@model NetApp.Models.Message
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Details";
+    IEnumerable<NetApp.Workflow.Models.NodeEntity> nodes = ViewBag.Nodes;
 }
 
-<h2>Create</h2>
-
-<h4>Message</h4>
-<hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Details">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -22,15 +20,23 @@
                 <input asp-for="Value" class="form-control" />
                 <span asp-validation-for="Value" class="text-danger"></span>
             </div>
-            <input type="hidden" asp-for="Status" />
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input name="btnSubmit" type="submit" value="Save" class="btn btn-primary"/>
+                <input name="btnSubmit" type="submit" value="Approve" class="btn btn-success"/>
             </div>
         </form>
     </div>
 </div>
 
+@await Html.PartialAsync("WorkflowDetails", nodes)
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
 

@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +20,7 @@ namespace NetApp
         {
             services.AddDbContext<NetAppDbContext>(opt =>
             {
-                opt.UseInMemoryDatabase("NetApp");
+                opt.UseSqlite("Data Source=workflow.db");
             });
 
             services.AddSingleton<WorkflowFactory>();

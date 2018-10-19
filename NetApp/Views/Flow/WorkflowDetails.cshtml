@@ -1,0 +1,72 @@
+﻿@model IEnumerable<NetApp.Workflow.Models.NodeEntity>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NodeType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InputCommand)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InputData)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OutputCommand)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OutputData)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NodeStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartMode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StatusTime)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NodeType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InputCommand)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InputData)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OutputCommand)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OutputData)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NodeStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartMode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StatusTime)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
