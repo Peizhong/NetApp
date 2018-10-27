@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NetApp.Common.Abstractions;
+using NetApp.Models.Abstractions;
 using Newtonsoft.Json;
+using ProtoBuf;
 
-namespace NetApp.Common.Models
+namespace NetApp.Models
 {
+    [ProtoContract]
     public class Product : IBase
     {
+        [ProtoMember(1)]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; set; }
 
+        [ProtoMember(2)]
         [Required]
         public string Name { get; set; }
 
+        [ProtoMember(3)]
         public int DataStatus { get; set; }
 
         [NotMapped]

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetApp.Common.Models
+namespace NetApp.Models
 {
     public class BasketCheckout
     {

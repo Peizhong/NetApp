@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using NetApp.Common.Abstractions;
-using NetApp.Common.Models;
+using NetApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

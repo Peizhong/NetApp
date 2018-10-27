@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
 using NetApp.Common.Abstractions;
 using AutoMapper;
+using NetApp.Models.Abstractions;
 
 namespace NetApp.Services.Lib.Controllers
 {

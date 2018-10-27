@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NetApp.Common.Abstractions;
+using NetApp.Models.Abstractions;
 
 namespace NetApp.Repository
 {

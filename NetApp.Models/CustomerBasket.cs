@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NetApp.Common.Models
+namespace NetApp.Models
 {
     public class CustomerBasket
     {

@@ -119,6 +119,12 @@ namespace NetApp.Workflow
             }
         }
 
+        /// <summary>
+        /// 创建工作流，并设置第一个节点
+        /// </summary>
+        /// <param name="flowName"></param>
+        /// <param name="configName"></param>
+        /// <returns></returns>
         public Flow CreateWorkflow(string flowName, string configName)
         {
             var config = _workflowConfigDict.GetOrAdd(configName, name => LoadFlowConfigFromFile(name));

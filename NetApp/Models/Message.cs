@@ -7,6 +7,17 @@ using System.Threading.Tasks;
 
 namespace NetApp.Models
 {
+    public enum MessageStatus
+    {
+        Create = 1,
+        Edit = 2,
+        Approving = 3,
+        Approved = 4,
+        Reject = 5,
+        Complete = 6,
+        Cancel = 7
+    }
+
     public class Message
     {
         [Key]
@@ -16,6 +27,6 @@ namespace NetApp.Models
 
         public string Value { get; set; }
 
-        public int Status { get; set; }
+        public MessageStatus Status { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace NetApp.Common.Models
+namespace NetApp.Models
 {
     public class BasketItem : IValidatableObject
     {

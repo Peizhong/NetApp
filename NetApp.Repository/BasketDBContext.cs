@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NetApp.Common.Models;
+using NetApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

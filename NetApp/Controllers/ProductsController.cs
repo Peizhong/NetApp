@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NetApp.Common.Abstractions;
-using NetApp.Common.Models;
+using NetApp.Models;
 
 namespace NetApp.Controllers
 {

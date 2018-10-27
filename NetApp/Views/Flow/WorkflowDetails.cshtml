@@ -30,7 +30,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.StatusTime)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -62,9 +61,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StatusTime)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
             </td>
         </tr>
 }

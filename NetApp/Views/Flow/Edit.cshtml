@@ -1,13 +1,13 @@
 ﻿@model NetApp.Models.Message
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detail";
     IEnumerable<NetApp.Workflow.Models.NodeEntity> nodes = ViewBag.Nodes;
 }
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Details">
+        <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -26,8 +26,8 @@
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input name="btnSubmit" type="submit" value="Save" class="btn btn-primary"/>
-                <input name="btnSubmit" type="submit" value="Approve" class="btn btn-success"/>
+                <input name="btnSubmit" type="submit" value="Save" class="btn btn-primary" />
+                <input name="btnSubmit" type="submit" value="Submit" class="btn btn-success" />
             </div>
         </form>
     </div>

@@ -5,9 +5,9 @@ using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
-using NetApp.Common.Abstractions;
+using NetApp.Models.Abstractions;
 
-namespace NetApp.Common.Models
+namespace NetApp.Models
 {
     public class Category : ITreeNode<Category>
     {

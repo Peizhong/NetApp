@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetApp.Common.Abstractions
+namespace NetApp.Models.Abstractions
 {
     public interface ITreeNode : IBase
     {

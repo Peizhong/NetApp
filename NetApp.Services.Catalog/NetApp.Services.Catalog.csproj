@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetApp.Common\NetApp.Common.csproj" />
     <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
     <ProjectReference Include="..\NetApp.Services.Lib\NetApp.Services.Lib.csproj" />
   </ItemGroup>

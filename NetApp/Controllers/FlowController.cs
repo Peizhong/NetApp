@@ -48,27 +48,34 @@ namespace NetApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(IFormCollection collection)
         {
-            Flow workflow = _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json");
             Message hello = new Message
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = collection["Name"],
                 Value = collection["Value"],
-                Status = 0
+                Status = MessageStatus.Create
             };
-            await _netAppDbContext.WorkflowRefs.AddAsync(new WorkflowRef
+            _netAppDbContext.Messages.Add(hello);
+            Flow workflow = _workflowFactory.CreateWorkflow("test", "workflows/flowdemo.json");
+            _netAppDbContext.WorkflowRefs.Add(new WorkflowRef
             {
                 Id = Guid.NewGuid().ToString(),
                 WorkflowId = workflow.FlowId,
                 ObjectId = hello.Id
             });
             await _netAppDbContext.SaveChangesAsync();
-            await workflow?.MoveOn("NetApp.Workflows.EditOrderNode, NetApp", "CreateOrder", JsonConvert.SerializeObject(hello));
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Flow/Edit/5
-        public async Task<ActionResult> Details(string id)
+        public ActionResult Detail(string id, int status)
+        {
+            if (status == 1)
+                return RedirectToAction("Edit", new { id });
+            else
+                return RedirectToAction("Approve", new { id });
+        }
+
+        public async Task<ActionResult> Edit(string id)
         {
             var flowRef = await _netAppDbContext.WorkflowRefs.FirstOrDefaultAsync(w => w.ObjectId == id);
             Flow workflow = await _workflowFactory.FindWorkflow(flowRef.WorkflowId);
@@ -81,10 +88,49 @@ namespace NetApp.Controllers
             return NotFound();
         }
 
-        // POST: Flow/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Details(string id, IFormCollection collection)
+        public async Task<ActionResult> Edit(string id, IFormCollection collection)
+        {
+            try
+            {
+                var message = await _netAppDbContext.Messages.FindAsync(id);
+                //默认先保存数据
+                string btnSubmit = collection["btnSubmit"];
+                message.Name = collection["Name"];
+                message.Value = collection["Value"];
+                _netAppDbContext.Messages.Update(message);
+                await _netAppDbContext.SaveChangesAsync();
+                if (!string.IsNullOrEmpty(btnSubmit))
+                {
+                    var flowRef = await _netAppDbContext.WorkflowRefs.FirstOrDefaultAsync(w => w.ObjectId == id);
+                    Flow workflow = await _workflowFactory.FindWorkflow(flowRef.WorkflowId);
+                    await workflow?.MoveOn("NetApp.Workflows.EditOrderNode, NetApp", btnSubmit, id);
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        
+        public async Task<ActionResult> Approve(string id)
+        {
+            var flowRef = await _netAppDbContext.WorkflowRefs.FirstOrDefaultAsync(w => w.ObjectId == id);
+            Flow workflow = await _workflowFactory.FindWorkflow(flowRef.WorkflowId);
+            ViewBag.Nodes = workflow.Nodes;
+            var message = await _netAppDbContext.Messages.FindAsync(id);
+            if (message != null)
+            {
+                return View(message);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Approve(string id, IFormCollection collection)
         {
             try
             {
@@ -101,6 +147,12 @@ namespace NetApp.Controllers
                     Flow workflow = await _workflowFactory.FindWorkflow(flowRef.WorkflowId);
                     await workflow?.MoveOn("NetApp.Workflows.ApproveNode, NetApp", "CreateOrder", id);
                 }
+                else if (btnSubmit == "Reject")
+                {
+                    var flowRef = await _netAppDbContext.WorkflowRefs.FirstOrDefaultAsync(w => w.ObjectId == id);
+                    Flow workflow = await _workflowFactory.FindWorkflow(flowRef.WorkflowId);
+                    await workflow?.MoveOn("NetApp.Workflows.RejectOrderNode, NetApp", "CreateOrder", id);
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -108,7 +160,7 @@ namespace NetApp.Controllers
                 return View();
             }
         }
-        
+
         public async Task<PartialViewResult> WorkflowDetails(string id)
         {
             var flowRef = await _netAppDbContext.WorkflowRefs.FirstOrDefaultAsync(w => w.ObjectId == id);

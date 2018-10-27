@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NetApp.Common.Abstractions;
-using NetApp.Common.Models;
+using NetApp.Models;
 using NetApp.EventBus;
 using NetApp.EventBus.Abstractions;
 using NetApp.Repository;

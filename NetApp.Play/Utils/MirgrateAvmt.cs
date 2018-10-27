@@ -97,7 +97,7 @@ namespace NetApp.Play.Utils
             {
                 var classifyToCategory = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<Classify, Common.Models.Category>()
+                    cfg.CreateMap<Classify, Models.Category>()
                     .ForMember(c => c.CategoryId, opt => opt.MapFrom(src => src.Id))
                     .ForMember(c => c.CategoryName, opt => opt.MapFrom(src => src.Name))
                     .ForMember(c => c.CategoryType, opt => opt.MapFrom(src => src.ClassifyType))
@@ -114,7 +114,7 @@ namespace NetApp.Play.Utils
                 mysqlBuilder.UseMySql("Server=;Database=malldb;User=root;Password=;");
                 using (var context = new MallDBContext(mysqlBuilder.Options))
                 {
-                    var categories = mapper.Map<IList<Common.Models.Category>>(classifies);
+                    var categories = mapper.Map<IList<Models.Category>>(classifies);
                     context.Categories.AddRange(categories);
                     context.SaveChanges();
                 }
@@ -145,7 +145,7 @@ namespace NetApp.Play.Utils
             {
                 var classifyToCategory = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<Device, Common.Models.Product>()
+                    cfg.CreateMap<Device, Models.Product>()
                     .ForMember(c => c.ProductId, opt => opt.MapFrom(src => src.Id))
                     .ForMember(c => c.Name, opt => opt.MapFrom(src => src.DeviceName))
                     .ForMember(c => c.CategoryId, opt => opt.MapFrom(src => src.ClassifyId))
@@ -165,7 +165,7 @@ namespace NetApp.Play.Utils
                 mysqlBuilder.UseMySql("Server=;Database=malldb;User=root;Password=;");
                 using (var context = new MallDBContext(mysqlBuilder.Options))
                 {
-                    var products = mapper.Map<IList<Common.Models.Product>>(devices);
+                    var products = mapper.Map<IList<Models.Product>>(devices);
                     var oneIdProducts = products.GroupBy(p => p.Id).Select(g => g.First());
                     context.Products.AddRange(oneIdProducts);
                     context.SaveChanges();
