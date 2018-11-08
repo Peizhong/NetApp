@@ -83,7 +83,7 @@ namespace NetApp.Services.Catalog
                 };
             });
 
-            services.AddMyIdentityServerAuthentication("http://localhost:5050", "api1");
+            services.AddMyIdentityServerAuthentication("http://192.168.1.100:5050", "api1");
 
             services.AddMyEventBus(Configuration);
             services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();

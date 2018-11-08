@@ -72,11 +72,11 @@ namespace NetApp.Services.Identity
             // configure identity server with in-memory stores, keys, clients and scopes
             // IdentityServer is overwriting some configuration from ASP.NET Identity
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
+                .AddDeveloperSigningCredential()//为令牌签名创建临时密钥
                 .AddInMemoryPersistedGrants()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients())
+                .AddInMemoryClients(Config.GetClients())//客户机密码验证
                 .AddAspNetIdentity<IdentityUser>();
         }
 

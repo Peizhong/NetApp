@@ -2,7 +2,7 @@
   "name": "NetApp.React",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://192.168.1.102:5000",
+  "proxy": "http://192.168.1.100:5010/ClientService",
   "dependencies": {
     "antd": "^3.8.2",
     "react": "^16.0.0",

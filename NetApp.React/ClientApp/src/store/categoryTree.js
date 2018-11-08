@@ -12,7 +12,7 @@ export const actionCreators = {
 
     dispatch({ type: requestChildTreeType, selectedId });
 
-    const url = `api/Categories/${selectedId}/children/lite`;
+    const url = `Categories/${selectedId}/children/lite`;
     const response = await fetch(url);
     const raw = await response.json();
     const trees = raw.items;

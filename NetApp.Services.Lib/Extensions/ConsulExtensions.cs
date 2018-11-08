@@ -22,10 +22,6 @@ namespace NetApp.Services.Lib.Extensions
             var servicHost = config["host"];
             if (string.IsNullOrEmpty(servicHost) || string.IsNullOrEmpty(consulServer) || string.IsNullOrEmpty(serviceName))
                 throw new ArgumentNullException("Consul appsetting is empty");
-            if (string.IsNullOrEmpty(servicHost))
-                servicHost = "http://localhost:5100";
-            if (!servicHost.StartsWith("http"))
-                servicHost = $"http://{servicHost}";
             Uri hostUrl = new Uri(servicHost);
 
             var consulClient = new ConsulClient(x => x.Address = new Uri(consulServer));//请求注册的 Consul 地址
