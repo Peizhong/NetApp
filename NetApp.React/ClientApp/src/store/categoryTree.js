@@ -1,5 +1,5 @@
-const requestChildTreeType = 'REQUEST_CHILD_TREE';
-const receiveChildTreeType = 'RECEIVE_CHILD_TREE';
+const requestChildTreeType = "REQUEST_CHILD_TREE";
+const receiveChildTreeType = "RECEIVE_CHILD_TREE";
 
 const initialState = { trees: [], isLoading: false };
 
@@ -18,7 +18,7 @@ export const actionCreators = {
     const trees = raw.items;
 
     dispatch({ type: receiveChildTreeType, selectedId, trees });
-  },
+  }
 };
 
 export const reducer = (state, action) => {
@@ -28,7 +28,7 @@ export const reducer = (state, action) => {
     return {
       ...state,
       selectedId: action.selectedId,
-      isLoading: true,
+      isLoading: true
     };
   }
 
@@ -60,7 +60,7 @@ export const reducer = (state, action) => {
         ...state,
         selectedId: action.selectedId,
         trees: newTree,
-        isLoading: false,
+        isLoading: false
       };
     }
   }
