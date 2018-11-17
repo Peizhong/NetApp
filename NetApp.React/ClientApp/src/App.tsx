@@ -1,12 +1,12 @@
-import React, { Component } from "react";
+import { Icon, Layout, Menu, Modal, Skeleton } from "antd";
+import { instanceOf } from "prop-types";
+import * as React from "react";
+import { Cookies, withCookies } from "react-cookie";
 import { connect } from "react-redux";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Layout, Menu, Icon, Modal, Skeleton } from "antd";
-
-import NormalLoginForm from "./components/NormalLoginForm";
-
-import coldplay from "./Coldplay.gif";
+import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import "./App.css";
+import coldplay from "./Coldplay.gif";
+import NormalLoginForm from "./components/NormalLoginForm";
 
 const { Content, Sider } = Layout;
 
@@ -14,28 +14,40 @@ const Index = () => <h2>Hello</h2>;
 const About = () => <h2>About</h2>;
 const Users = () => <h2>Users</h2>;
 
-class App extends React.Component {
-  constructor(props) {
+interface IState {
+  account: any;
+}
+
+class App extends React.Component<{}, IState> {
+  public static propTypes = {
+    cookies: instanceOf(Cookies).isRequired
+  };
+
+  constructor(props: any) {
     super(props);
+
+    const { cookies } = props;
+    this.state = {
+      account: cookies.get("account")
+    };
   }
 
-  render() {
-    const { showLogin } = this.props;
+  public render() {
     return (
       <Router>
         <Layout>
           <Sider
             style={{
-              overflow: "auto",
               height: "100vh",
-              position: "fixed",
-              left: 0
+              left: 0,
+              overflow: "auto",
+              position: "fixed"
             }}
           >
             <div className="logo">
               <img src={coldplay} className="App-logo" alt="logo" />
             </div>
-            {!showLogin && (
+            {this.state.account && (
               <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
                 <Menu.Item key="1">
                   <Link to="/">
@@ -61,17 +73,19 @@ class App extends React.Component {
           <Layout style={{ marginLeft: "200px", height: "100vh" }}>
             <Modal
               title="Login Required"
-              visible={showLogin}
-              onOk={this.handleOk}
-              onCancel={this.handleCancel}
+              visible={!this.state.account}
               closable={false}
               footer={null}
             >
               <NormalLoginForm />
             </Modal>
             <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
-              <Skeleton loading={showLogin} active>
-                <Route path="/" exact component={Index} />
+              <Skeleton
+                loading={!this.state.account}
+                active={true}
+                paragraph={{ rows: 16 }}
+              >
+                <Route path="/" exact={true} component={Index} />
                 <Route path="/about/" component={About} />
                 <Route path="/users/" component={Users} />
               </Skeleton>
@@ -83,8 +97,8 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   showLogin: !state.account.profile
 });
 
-export default connect(mapStateToProps)(App);
+export default withCookies(connect(mapStateToProps)(App));

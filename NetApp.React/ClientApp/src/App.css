@@ -17,14 +17,3 @@
     transform: rotate(360deg);
   }
 }
-
-.login-form {
-  max-width: 300px;
-  margin: 0px auto;
-}
-.login-form-forgot {
-  float: right;
-}
-.login-form-button {
-  width: 100%;
-}

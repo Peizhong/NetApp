@@ -1,12 +1,13 @@
-import { SEND_LOGIN, REVC_LOGIN } from "../actionTypes";
+import { IAction} from '../../interfaces'
+import { REVC_LOGIN,SEND_LOGIN } from "../actionTypes";
 
 const initialState = {
-  profile: null,
+  isLoading: false,
   permissions: [],
-  isLoading: false
+  profile: null,
 };
 
-export default function(state = initialState, action) {
+export default function(state = initialState, action:IAction) {
   switch (action.type) {
     case SEND_LOGIN: {
       return {
@@ -15,14 +16,14 @@ export default function(state = initialState, action) {
       };
     }
     case REVC_LOGIN: {
-      const load = action.payload;
+      // const load = action.payload;
       return {
         ...state,
+        isLoading: false,
         profile: {
           name: "wpz",
           sex: "male"
-        },
-        isLoading: false
+        }
       };
     }
     default:
