@@ -1,2 +1,2 @@
-export const POST_LOGIN = "POST_LOGIN";
-export const RECIVE_LOGIN = "RECIVE_LOGIN";
+export const SEND_LOGIN = "SEND_LOGIN";
+export const REVC_LOGIN = "RECV_LOGIN";

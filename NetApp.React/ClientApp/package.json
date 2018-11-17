@@ -1,33 +1,38 @@
 {
-  "name": "NetApp.React",
+  "name": "clientapp",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://192.168.1.100:5010/ClientService",
   "dependencies": {
-    "antd": "^3.8.2",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
-    "react-redux": "^5.0.6",
-    "react-router-dom": "^4.2.2",
-    "react-router-redux": "^5.0.0-alpha.8",
-    "react-scripts": "^1.1.5",
-    "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0",
-    "rimraf": "^2.6.2"
+    "antd": "^3.10.7",
+    "babel-plugin-import": "^1.11.0",
+    "react": "^16.6.3",
+    "react-app-rewired": "^1.6.2",
+    "react-dom": "^16.6.3",
+    "react-redux": "^5.1.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "2.1.1",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "rimraf ./build && react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
   "devDependencies": {
-    "eslint": "^5.8.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
-    "eslint-plugin-react": "^7.11.1",
-    "prettier-eslint": "^8.8.2",
-    "redux-devtools": "^3.4.1"
+    "eslint-plugin-react": "^7.11.1"
   }
 }
