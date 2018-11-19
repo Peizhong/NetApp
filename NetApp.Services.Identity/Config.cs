@@ -66,6 +66,23 @@ namespace NetApp.Services.Identity
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                     }
+                },// JavaScript Client
+                new Client
+                {
+                    ClientId = "js",
+                    ClientName = "JavaScript Client",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                    AllowAccessTokensViaBrowser = true,
+                    RequireConsent =false,
+                    RedirectUris =           { "http://localhost:3000", },
+                    PostLogoutRedirectUris = { "http://localhost:3000/logout" },
+                    AllowedCorsOrigins =     { "http://localhost:3000" },
+                    AllowedScopes =
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "api1"
+                    }
                 }
             };
         }
