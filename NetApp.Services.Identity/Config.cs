@@ -74,7 +74,7 @@ namespace NetApp.Services.Identity
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent =false,
-                    RedirectUris =           { "http://localhost:3000", },
+                    RedirectUris =           { "http://localhost:3000/callback", },
                     PostLogoutRedirectUris = { "http://localhost:3000/logout" },
                     AllowedCorsOrigins =     { "http://localhost:3000" },
                     AllowedScopes =

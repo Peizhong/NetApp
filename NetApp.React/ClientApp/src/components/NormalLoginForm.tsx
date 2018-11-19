@@ -2,7 +2,7 @@ import { Button, Checkbox, Form, Icon, Input } from "antd";
 import { FormComponentProps } from "antd/lib/form/Form";
 import * as React from "react";
 import { connect } from "react-redux";
-import { sendLogin } from "../redux/actions";
+import { checkIdentity, sendLogin } from "../redux/actions";
 import "./components.css";
 
 const FormItem = Form.Item;
@@ -10,6 +10,7 @@ const FormItem = Form.Item;
 export interface IProps extends FormComponentProps {
   isLoading: boolean;
   sendLogin: (content: string) => void;
+  checkIdentity: () => void;
 }
 
 export interface IState {
@@ -66,6 +67,7 @@ class NormalLoginForm extends React.Component<IProps, IState> {
             <a className="login-form-forgot" href="">
               Forgot password
             </a>
+            <br />
             <Button
               type="primary"
               htmlType="submit"
@@ -74,7 +76,9 @@ class NormalLoginForm extends React.Component<IProps, IState> {
             >
               Log in
             </Button>
-            Or <a href="">register now!</a>
+            <Button className="login-form-button" onClick={this.handleIdentity}>
+              Click Me
+            </Button>
           </FormItem>
         </Form>
       </div>
@@ -89,6 +93,9 @@ class NormalLoginForm extends React.Component<IProps, IState> {
       }
     });
   };
+  private handleIdentity = (e: any) => {
+    this.props.checkIdentity();
+  };
 }
 
 const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
@@ -99,5 +106,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
   mapStateToProps,
-  { sendLogin }
+  { checkIdentity, sendLogin }
 )(WrappedNormalLoginForm);
