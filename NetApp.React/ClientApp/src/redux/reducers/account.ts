@@ -1,14 +1,20 @@
-import { IAction} from '../../interfaces'
-import { REVC_LOGIN,SEND_LOGIN } from "../actionTypes";
+import { IAction } from "../../interfaces";
+import { CHECK_LOGIN, REVC_LOGIN, SEND_LOGIN } from "../actionTypes";
 
 const initialState = {
   isLoading: false,
   permissions: [],
-  profile: null,
+  profile: null
 };
 
-export default function(state = initialState, action:IAction) {
+export default function(state = initialState, action: IAction) {
   switch (action.type) {
+    case CHECK_LOGIN: {
+      return {
+        ...state,
+        isLoading: true
+      };
+    }
     case SEND_LOGIN: {
       return {
         ...state,
@@ -20,10 +26,8 @@ export default function(state = initialState, action:IAction) {
       return {
         ...state,
         isLoading: false,
-        profile: {
-          name: "wpz",
-          sex: "male"
-        }
+        permissions: action.payload.permissions,
+        profile: action.payload.profile
       };
     }
     default:

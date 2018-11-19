@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import "./App.css";
 import coldplay from "./Coldplay.gif";
 import NormalLoginForm from "./components/NormalLoginForm";
+import { checkLogin } from "./redux/actions";
 
 const { Content, Sider } = Layout;
 
@@ -14,25 +15,27 @@ const Index = () => <h2>Hello</h2>;
 const About = () => <h2>About</h2>;
 const Users = () => <h2>Users</h2>;
 
-interface IState {
-  account: any;
+interface IProps {
+  checkLogin: () => void;
+  cookies: Cookies;
+  profile: any;
 }
 
-class App extends React.Component<{}, IState> {
+class App extends React.Component<IProps> {
   public static propTypes = {
     cookies: instanceOf(Cookies).isRequired
   };
 
   constructor(props: any) {
     super(props);
+  }
 
-    const { cookies } = props;
-    this.state = {
-      account: cookies.get("account")
-    };
+  public componentWillMount() {
+    this.props.checkLogin();
   }
 
   public render() {
+    const offlined = !this.props.profile;
     return (
       <Router>
         <Layout>
@@ -47,7 +50,7 @@ class App extends React.Component<{}, IState> {
             <div className="logo">
               <img src={coldplay} className="App-logo" alt="logo" />
             </div>
-            {this.state.account && (
+            {!offlined && (
               <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
                 <Menu.Item key="1">
                   <Link to="/">
@@ -73,7 +76,7 @@ class App extends React.Component<{}, IState> {
           <Layout style={{ marginLeft: "200px", height: "100vh" }}>
             <Modal
               title="Login Required"
-              visible={!this.state.account}
+              visible={offlined}
               closable={false}
               footer={null}
             >
@@ -81,7 +84,7 @@ class App extends React.Component<{}, IState> {
             </Modal>
             <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
               <Skeleton
-                loading={!this.state.account}
+                loading={offlined}
                 active={true}
                 paragraph={{ rows: 16 }}
               >
@@ -98,7 +101,12 @@ class App extends React.Component<{}, IState> {
 }
 
 const mapStateToProps = (state: any) => ({
-  showLogin: !state.account.profile
+  profile: state.account.profile
 });
 
-export default withCookies(connect(mapStateToProps)(App));
+export default withCookies(
+  connect(
+    mapStateToProps,
+    { checkLogin }
+  )(App)
+);
