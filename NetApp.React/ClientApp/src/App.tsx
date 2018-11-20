@@ -6,7 +6,6 @@ import { connect } from "react-redux";
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import "./App.css";
 import coldplay from "./Coldplay.gif";
-import IndetityCallback from './components/IdentityCallback'
 import NormalLoginForm from "./components/NormalLoginForm";
 import { checkLogin } from "./redux/actions";
 
@@ -36,7 +35,9 @@ class App extends React.Component<IProps> {
   }
 
   public render() {
-    const offlined = !this.props.profile;
+    const {profile} = this.props;
+    const offlined = !profile;
+    const userName = profile?profile.name:'nobody'
     return (
       <Router>
         <Layout>
@@ -62,19 +63,13 @@ class App extends React.Component<IProps> {
                 <Menu.Item key="2">
                   <Link to="/users/">
                     <Icon type="user" />
-                    <span className="nav-text">Users</span>
+                    <span className="nav-text">{userName}</span>
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="3">
                   <Link to="/about/">
                     <Icon type="cloud-o" />
                     <span className="nav-text">About</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="4">
-                  <Link to="/callback/">
-                    <Icon type="cloud-o" />
-                    <span className="nav-text">Callback</span>
                   </Link>
                 </Menu.Item>
               </Menu>
@@ -98,7 +93,6 @@ class App extends React.Component<IProps> {
                 <Route path="/" exact={true} component={Index} />
                 <Route path="/about/" component={About} />
                 <Route path="/users/" component={Users} />
-                <Route path="/callback/" component={IndetityCallback} />
               </Skeleton>
             </Content>
           </Layout>

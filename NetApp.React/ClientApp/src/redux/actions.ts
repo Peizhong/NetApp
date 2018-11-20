@@ -1,3 +1,4 @@
+import { createBrowserHistory } from "history";
 import { UserManager } from "oidc-client";
 import { CHECK_LOGIN, REVC_LOGIN, SEND_LOGIN } from "./actionTypes";
 
@@ -9,6 +10,8 @@ const config = {
   response_type: "id_token token",
   scope: "openid profile api1"
 };
+
+const history = createBrowserHistory();
 const mgr = new UserManager(config);
 
 export const checkLogin = () => {
@@ -17,30 +20,34 @@ export const checkLogin = () => {
       payload: null,
       type: CHECK_LOGIN
     });
-    mgr.getUser().then(user => {
-      if (user) {
-        dispatch(
-          recvLogin({
-            profile: user.profile
-          })
-        );
-      } else {
-        mgr
-          .signinRedirectCallback()
-          .then(() => {
-            mgr.getUser().then(user2 => {
-              dispatch(
-                recvLogin({
-                  profile: user2.profile
-                })
-              );
-            });
-          })
-          .catch(error => {
-            dispatch(recvLogin(error));
+    const location = history.location;
+    if (location.pathname.includes("callback")) {
+      mgr
+        .signinRedirectCallback()
+        .then(() => {
+          mgr.getUser().then(user2 => {
+            dispatch(
+              recvLogin({
+                profile: user2.profile
+              })
+            );
+            history.push("/");
           });
-      }
-    });
+        })
+        .catch(error => {
+          dispatch(recvLogin(error));
+        });
+    } else {
+      mgr.getUser().then(user => {
+        if (user) {
+          dispatch(
+            recvLogin({
+              profile: user.profile
+            })
+          );
+        }
+      });
+    }
   };
 };
 
