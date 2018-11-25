@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import "./App.css";
 import coldplay from "./Coldplay.gif";
 import NormalLoginForm from "./components/NormalLoginForm";
+import PlayOne from "./components/PlayOne";
 import { checkLogin } from "./redux/actions";
 
 const { Content, Sider } = Layout;
@@ -67,6 +68,12 @@ class App extends React.Component<IProps> {
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="3">
+                  <Link to="/playone/">
+                    <Icon type="user" />
+                    <span className="nav-text">Play One</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="4">
                   <Link to="/about/">
                     <Icon type="cloud-o" />
                     <span className="nav-text">About</span>
@@ -92,6 +99,7 @@ class App extends React.Component<IProps> {
               >
                 <Route path="/" exact={true} component={Index} />
                 <Route path="/about/" component={About} />
+                <Route path="/playone/" component={PlayOne} />
                 <Route path="/users/" component={Users} />
               </Skeleton>
             </Content>

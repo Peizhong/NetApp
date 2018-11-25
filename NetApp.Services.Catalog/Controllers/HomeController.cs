@@ -20,9 +20,11 @@ namespace NetApp.Services.Catalog.Controllers
 
         [Authorize]
         [HttpGet]
-        public string SecretService()
+        public IActionResult SecretService()
         {
-            return $"oh you found it on {Request.Path} of {Request.Host.Value} at {DateTime.Now}";
+            //var user = from c in User.Claims select new { c.Type, c.Value };
+            return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
+            //return $"oh you found it on {Request.Path} of {Request.Host.Value} at {DateTime.Now}";
         }
     }
 }

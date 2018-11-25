@@ -1,4 +1,3 @@
-import { IAction } from "../../interfaces";
 import { CHECK_LOGIN, REVC_LOGIN, SEND_LOGIN } from "../actionTypes";
 
 const initialState = {
@@ -7,7 +6,7 @@ const initialState = {
   profile: null
 };
 
-export default function(state = initialState, action: IAction) {
+export default function(state = initialState, action: any) {
   switch (action.type) {
     case CHECK_LOGIN: {
       return {

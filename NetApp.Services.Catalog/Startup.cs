@@ -83,7 +83,19 @@ namespace NetApp.Services.Catalog
                 };
             });
 
-            services.AddMyIdentityServerAuthentication("http://192.168.1.100:5050", "api1");
+            services.AddMyIdentityServerAuthentication("http://localhost:5050", "api1");
+
+            //allow Ajax calls 
+            services.AddCors(options =>
+            {
+                // this defines a CORS policy called "default"
+                options.AddPolicy("default", policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000","http://localhost:5000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             services.AddMyEventBus(Configuration);
             services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
@@ -103,6 +115,8 @@ namespace NetApp.Services.Catalog
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("default");
 
             app.UseAuthentication();
 

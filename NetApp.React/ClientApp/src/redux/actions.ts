@@ -1,6 +1,12 @@
 import { createBrowserHistory } from "history";
 import { UserManager } from "oidc-client";
-import { CHECK_LOGIN, REVC_LOGIN, SEND_LOGIN } from "./actionTypes";
+import {
+  CALL_API,
+  CHECK_LOGIN,
+  RECV_API,
+  REVC_LOGIN,
+  SEND_LOGIN
+} from "./actionTypes";
 
 const config = {
   authority: "http://localhost:5050",
@@ -70,16 +76,7 @@ export const sendLogin = (content: any) => {
 };
 
 export const checkIdentity = () => {
-  return (dispatch: any) => {
-    dispatch(
-      recvLogin({
-        profile: {
-          name: "test"
-        }
-      })
-    );
-    mgr.signinRedirect();
-  };
+  mgr.signinRedirect();
 };
 
 export const recvIdentity = () => {
@@ -103,3 +100,28 @@ export const recvLogin = (content: any) => ({
   },
   type: REVC_LOGIN
 });
+
+export const callApi = () => {
+  return (dispatch: any) => {
+    dispatch({
+      payload: null,
+      type: CALL_API
+    });
+    mgr.getUser().then(user => {
+      const url = "http://localhost:5100/api/home/SecretService";
+      fetch(url, {
+        headers: {
+          Authorization: "Bearer " + user.access_token,
+          method: "GET"
+        }
+      })
+        .then(response => response.json())
+        .then(data =>
+          dispatch({
+            payload: data,
+            type: RECV_API
+          })
+        );
+    });
+  };
+};

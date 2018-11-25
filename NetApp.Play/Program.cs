@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace NetApp.Play
 {
     // Contravariant interface.
+    // 父类可以赋给子类
     interface IContravariant<in A> 
     {
         string whoareyou();
@@ -50,19 +51,20 @@ namespace NetApp.Play
     {
         static void Main(string[] args)
         {
-            IContravariant<A> iobj = new Sample<A>();
-            IContravariant<B> istr = new Sample<B>();
+            IContravariant<A> parent = new Sample<A>();
+            IContravariant<B> child = new Sample<B>();
 
-            var ob = iobj.whoareyou();
-            var st = istr.whoareyou();
+            var ob = parent.whoareyou();
+            var st = child.whoareyou();
             // You can assign iobj to istr because
             // the IContravariant interface is contravariant.
-            istr = iobj;
+            child = parent;
             //iobj = istr;
 
-            var ost = istr.whoareyou();
-            var m = new Utils.MirgrateAvmt();
-            var cs = m.GetDevices();
+            var ost = child.whoareyou();
+
+            Book.LearnExpression learnExpression = new Book.LearnExpression();
+            learnExpression.Hello();
         }
     }
 }

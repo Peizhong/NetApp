@@ -66,7 +66,8 @@ namespace NetApp.Services.Identity
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                     }
-                },// JavaScript Client
+                },
+                // JavaScript Client
                 new Client
                 {
                     ClientId = "js",
@@ -77,6 +78,7 @@ namespace NetApp.Services.Identity
                     RedirectUris =           { "http://localhost:3000/callback","http://localhost:5000/callback" },
                     PostLogoutRedirectUris = { "http://localhost:3000/logout","http://localhost:5000/logout" },
                     AllowedCorsOrigins =     { "http://localhost:3000","http://localhost:5000" },
+                    // scopes that client has access to
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
