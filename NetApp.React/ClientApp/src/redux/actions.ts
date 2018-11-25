@@ -2,8 +2,10 @@ import { createBrowserHistory } from "history";
 import { UserManager } from "oidc-client";
 import {
   CALL_API,
+  CALL_IDENTITY_API,
   CHECK_LOGIN,
   RECV_API,
+  RECV_IDENTITY_API,
   REVC_LOGIN,
   SEND_LOGIN
 } from "./actionTypes";
@@ -101,11 +103,11 @@ export const recvLogin = (content: any) => ({
   type: REVC_LOGIN
 });
 
-export const callApi = () => {
+export const callIdentityApi = () => {
   return (dispatch: any) => {
     dispatch({
       payload: null,
-      type: CALL_API
+      type: CALL_IDENTITY_API
     });
     mgr.getUser().then(user => {
       const url = "http://localhost:5100/api/home/SecretService";
@@ -118,10 +120,65 @@ export const callApi = () => {
         .then(response => response.json())
         .then(data =>
           dispatch({
-            payload: data,
-            type: RECV_API
+            payload: { data },
+            type: RECV_IDENTITY_API
           })
-        );
+        )
+        .catch(err => {
+          dispatch({
+            payload: { message: err.message },
+            type: RECV_IDENTITY_API
+          });
+        });
     });
+  };
+};
+
+export const callCategoriesApi = () => {
+  return (dispatch: any) => {
+    dispatch({
+      payload: null,
+      type: CALL_API
+    });
+    const url = "http://192.168.1.100:5100/api/Categories/1/children/lite";
+    fetch(url)
+      .then(response => response.json())
+      .then(data =>
+        dispatch({
+          payload: { data: data.items },
+          type: RECV_API
+        })
+      )
+      .catch(err => {
+        dispatch({
+          payload: { message: err.message },
+          type: RECV_API
+        });
+      });
+  };
+};
+
+export const callGatewayCategoriesApi = () => {
+  return (dispatch: any) => {
+    dispatch({
+      payload: null,
+      type: CALL_API
+    });
+    const url =
+      "http://192.168.1.100:5010/clientservice/Categories/1/children/lite";
+    fetch(url)
+      .then(response => response.json())
+      .then(data =>
+        dispatch({
+          payload: { data: data.items },
+          type: RECV_API
+        })
+      )
+      .catch(err => {
+        dispatch({
+          payload: { message: err.message },
+          type: RECV_API
+        });
+      });
   };
 };

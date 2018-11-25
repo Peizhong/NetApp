@@ -1,12 +1,14 @@
 import { Button, Spin } from "antd";
 import * as React from "react";
 import { connect } from "react-redux";
-import { callApi } from "../redux/actions";
+import { callCategoriesApi, callGatewayCategoriesApi } from "../redux/actions";
 
 export interface IProps {
   isLoading: boolean;
-  callApi: () => void;
-  response: any[];
+  callCategoriesApi: () => void;
+  callGatewayCategoriesApi: () => void;
+  data: any[];
+  message: string;
 }
 
 const exampleStyle = {
@@ -23,33 +25,45 @@ class PlayOne extends React.Component<IProps> {
     let keyIndex = 0;
     return (
       <div>
-        <Button type="primary" onClick={this.handleCallApi}>
-          Primary
-        </Button>
+        <Button.Group>
+          <Button type="primary" value="direct" onClick={this.handleCallApi}>
+            Direct
+          </Button>
+          <Button type="primary" value="gateway" onClick={this.handleCallApi}>
+            Gateway
+          </Button>
+        </Button.Group>
         <Spin spinning={this.props.isLoading}>
           <div style={exampleStyle}>
-            {this.props.response &&
-              this.props.response.map(r => (
-                <div key={keyIndex++}>
-                  {r.type}: {r.value}
-                </div>
-              ))}
+            {this.props.message ||
+              (this.props.data &&
+                this.props.data.map(r => (
+                  <div key={keyIndex++}>
+                    {r.id}: {r.name}
+                  </div>
+                )))}
           </div>
         </Spin>
       </div>
     );
   }
   private handleCallApi = (e: any) => {
-    this.props.callApi();
+    const {value} = e.target;
+    if (value === "direct") {
+      this.props.callCategoriesApi();
+    } else if (value === "gateway") {
+      this.props.callGatewayCategoriesApi();
+    }
   };
 }
 
 const mapStateToProps = (state: any) => ({
+  data: state.playone.data,
   isLoading: state.playone.isLoading,
-  response: state.playone.data
+  message: state.playone.message
 });
 
 export default connect(
   mapStateToProps,
-  { callApi }
+  { callCategoriesApi, callGatewayCategoriesApi }
 )(PlayOne);

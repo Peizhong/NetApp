@@ -1,25 +1,40 @@
 ﻿{
+  //take incoming http requests and forward them on to a downstream service
   "ReRoutes": [
+    //routing of one request to another
     // API: Browse Service
     {
       "DownstreamPathTemplate": "/api/{url}",
       "DownstreamScheme": "http",
       "UpstreamPathTemplate": "/ClientService/{url}",
-      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "UpstreamHttpMethod": [ "Get", "Post", "OPTIONS" ],
       "ServiceName": "NetApp.Services.Catalog",
       "ReRoutesCaseSensitive": false, // non case sensitive
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
+      "FileCacheOptions": {
+        "TtlSeconds": 15,
+        "Region": "somename"
+      },
       "UseServiceDiscovery": true // use Consul service discovery
     }
   ],
   "GlobalConfiguration": {
+    //in order to do Header find & replace and for certain administration configurations
+    "BaseUrl": "https://192.168.1.100:5010",
     //"AdministrationPath": "/administration",
+    "QoSOptions": {
+      "ExceptionsAllowedBeforeBreaking": 0,
+      "DurationOfBreak": 0,
+      "TimeoutValue": 0
+    },
     "ServiceDiscoveryProvider": {
       "Host": "192.168.1.108", // Consul Service IP
       "Port": 8500, // Consul Service Port
-      "Type": "Consul"
+      // poll consul for the latest services
+      "Type": "PollConsul",
+      "PollingInterval": 1000
     }
   }
 }

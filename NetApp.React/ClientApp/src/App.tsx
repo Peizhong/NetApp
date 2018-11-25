@@ -8,13 +8,13 @@ import "./App.css";
 import coldplay from "./Coldplay.gif";
 import NormalLoginForm from "./components/NormalLoginForm";
 import PlayOne from "./components/PlayOne";
+import UserInfo from "./components/UserInfo";
 import { checkLogin } from "./redux/actions";
 
 const { Content, Sider } = Layout;
 
 const Index = () => <h2>Hello</h2>;
 const About = () => <h2>About</h2>;
-const Users = () => <h2>Users</h2>;
 
 interface IProps {
   checkLogin: () => void;
@@ -69,7 +69,7 @@ class App extends React.Component<IProps> {
                 </Menu.Item>
                 <Menu.Item key="3">
                   <Link to="/playone/">
-                    <Icon type="user" />
+                    <Icon type="star" />
                     <span className="nav-text">Play One</span>
                   </Link>
                 </Menu.Item>
@@ -100,7 +100,7 @@ class App extends React.Component<IProps> {
                 <Route path="/" exact={true} component={Index} />
                 <Route path="/about/" component={About} />
                 <Route path="/playone/" component={PlayOne} />
-                <Route path="/users/" component={Users} />
+                <Route path="/users/" component={UserInfo} />
               </Skeleton>
             </Content>
           </Layout>

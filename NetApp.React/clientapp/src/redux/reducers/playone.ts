@@ -2,7 +2,8 @@ import { CALL_API, RECV_API } from "../actionTypes";
 
 const initialState = {
   data: null,
-  isLoading: false
+  isLoading: false,
+  message: null
 };
 
 export default function(state = initialState, action: any) {
@@ -16,8 +17,9 @@ export default function(state = initialState, action: any) {
     case RECV_API:
       return {
         ...state,
-        data: action.payload,
-        isLoading: false
+        data: action.payload.data,
+        isLoading: false,
+        message: action.payload.message
       };
     default:
       return state;

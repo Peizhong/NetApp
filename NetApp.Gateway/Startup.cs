@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Ocelot.Provider.Consul;
+using Ocelot.Cache.CacheManager;
 
 namespace NetApp.Gateway
 {
@@ -26,7 +27,12 @@ namespace NetApp.Gateway
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOcelot(Configuration).AddConsul();
+            //services.AddMyIdentityServerAuthentication("http://localhost:5050", "api1");
+
+            services.AddOcelot().AddCacheManager(x =>
+            {
+                x.WithDictionaryHandle();
+            }).AddConsul();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
