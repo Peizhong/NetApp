@@ -19,6 +19,10 @@ namespace NetApp.PlayWeb
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("ocelot.json");
+                })
                 .UseStartup<Startup>();
     }
 }
