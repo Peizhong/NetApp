@@ -77,6 +77,7 @@ namespace NetApp.Services.Lib.Controllers
         public async Task<PageableQueryResult<LiteTreeNode>> ChildrenLite(string id)
         {
             var fullResult = await Children(id);
+            fullResult.Message += $"from {HttpContext.Connection.RemoteIpAddress}:{HttpContext.Connection.RemotePort}";
             var liteResult = _mapper.Map<PageableQueryResult<LiteTreeNode>>(fullResult);
             return liteResult;
         }
