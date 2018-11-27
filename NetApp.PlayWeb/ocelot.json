@@ -9,7 +9,7 @@
           "Port": 5100
         }
       ],
-      "UpstreamPathTemplate": "/{url}",
+      "UpstreamPathTemplate": "/ClientService/{url}",
       "UpstreamHttpMethod": [ "Get" ]
     }
   ],
