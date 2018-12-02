@@ -182,3 +182,28 @@ export const callGatewayCategoriesApi = () => {
       });
   };
 };
+
+export const callMyGatewayApi = () => {
+  return (dispatch: any) => {
+    dispatch({
+      payload: null,
+      type: CALL_API
+    });
+    const url =
+      "http://192.168.1.100:5000/myservice/Categories/1/children/lite";
+    fetch(url)
+      .then(response => response.json())
+      .then(data =>
+        dispatch({
+          payload: { data: data.items },
+          type: RECV_API
+        })
+      )
+      .catch(err => {
+        dispatch({
+          payload: { message: err.message },
+          type: RECV_API
+        });
+      });
+  };
+};

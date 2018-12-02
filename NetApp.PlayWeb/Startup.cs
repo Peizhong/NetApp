@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using NetApp.PlayWeb.Gateway;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
@@ -27,6 +28,8 @@ namespace NetApp.PlayWeb
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMyGateway();
 
             app.UseOcelot().Wait();
         }

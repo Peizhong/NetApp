@@ -1,12 +1,13 @@
-import { Button, Spin } from "antd";
+import { Button, Col, Icon, Row, Spin } from "antd";
 import * as React from "react";
 import { connect } from "react-redux";
-import { callCategoriesApi, callGatewayCategoriesApi } from "../redux/actions";
+import { callCategoriesApi, callGatewayCategoriesApi, callMyGatewayApi } from "../redux/actions";
 
 export interface IProps {
   isLoading: boolean;
   callCategoriesApi: () => void;
   callGatewayCategoriesApi: () => void;
+  callMyGatewayApi: () => void;
   data: any[];
   message: string;
 }
@@ -25,34 +26,62 @@ class PlayOne extends React.Component<IProps> {
     let keyIndex = 0;
     return (
       <div>
-        <Button.Group>
-          <Button type="primary" value="direct" onClick={this.handleCallApi}>
-            Direct
-          </Button>
-          <Button type="primary" value="gateway" onClick={this.handleCallApi}>
-            Gateway
-          </Button>
-        </Button.Group>
-        <Spin spinning={this.props.isLoading}>
-          <div style={exampleStyle}>
-            {this.props.message ||
-              (this.props.data &&
-                this.props.data.map(r => (
-                  <div key={keyIndex++}>
-                    {r.id}: {r.name}
-                  </div>
-                )))}
-          </div>
-        </Spin>
+        <Row>
+          <Col span={24}>
+            <Button.Group>
+              <Button
+                type="primary"
+                value="direct"
+                onClick={this.handleCallApi}
+              >
+                <Icon type="api" />
+                Direct
+              </Button>
+              <Button
+                type="primary"
+                value="gateway"
+                onClick={this.handleCallApi}
+              >
+                <Icon type="cluster" />
+                Gateway
+              </Button>              
+              <Button
+                type="primary"
+                value="netapp"
+                onClick={this.handleCallApi}
+              >
+                <Icon type="star" />
+                NetApp
+              </Button>
+            </Button.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Spin spinning={this.props.isLoading}>
+              <div style={exampleStyle}>
+                {this.props.message ||
+                  (this.props.data &&
+                    this.props.data.map(r => (
+                      <div key={keyIndex++}>
+                        {r.id}: {r.name}
+                      </div>
+                    )))}
+              </div>
+            </Spin>
+          </Col>
+        </Row>
       </div>
     );
   }
   private handleCallApi = (e: any) => {
-    const {value} = e.target;
+    const { value } = e.target;
     if (value === "direct") {
       this.props.callCategoriesApi();
     } else if (value === "gateway") {
       this.props.callGatewayCategoriesApi();
+    } else if(value==='netapp'){
+      this.props.callMyGatewayApi();
     }
   };
 }
@@ -65,5 +94,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
   mapStateToProps,
-  { callCategoriesApi, callGatewayCategoriesApi }
+  { callCategoriesApi, callGatewayCategoriesApi, callMyGatewayApi }
 )(PlayOne);

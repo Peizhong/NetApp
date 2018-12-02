@@ -8,7 +8,7 @@
       "DownstreamScheme": "http",
       "UpstreamPathTemplate": "/ClientService/{url}",
       "UpstreamHttpMethod": [ "Get", "Post", "OPTIONS" ],
-      "ServiceName": "NetApp.Services.Catalog",
+      "ServiceName": "NetApp.Services.Catalog", //http://consul:8500/v1/catalog/service/NetApp.Services.Catalog
       "ReRoutesCaseSensitive": false, // non case sensitive
       "LoadBalancerOptions": {
         "Type": "RoundRobin"

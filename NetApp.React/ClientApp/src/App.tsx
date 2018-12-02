@@ -1,7 +1,5 @@
 import { Icon, Layout, Menu, Modal, Skeleton } from "antd";
-import { instanceOf } from "prop-types";
 import * as React from "react";
-import { Cookies, withCookies } from "react-cookie";
 import { connect } from "react-redux";
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import "./App.css";
@@ -18,14 +16,10 @@ const About = () => <h2>About</h2>;
 
 interface IProps {
   checkLogin: () => void;
-  cookies: Cookies;
   profile: any;
 }
 
 class App extends React.Component<IProps> {
-  public static propTypes = {
-    cookies: instanceOf(Cookies).isRequired
-  };
 
   constructor(props: any) {
     super(props);
@@ -114,9 +108,7 @@ const mapStateToProps = (state: any) => ({
   profile: state.account.profile
 });
 
-export default withCookies(
-  connect(
+export default connect(
     mapStateToProps,
     { checkLogin }
-  )(App)
-);
+  )(App);
