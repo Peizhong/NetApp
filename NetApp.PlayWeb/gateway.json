@@ -1,0 +1,19 @@
+{
+  "Author": "wpz",
+  "ReRoutes": [
+    {
+      "ServiceName": "",
+      "UpstreamPathTemplate": "/mygateway/{url}",
+      "DownstreamPathTemplate": "/api/{url}",
+      // might load balance
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "host",
+          "Port": "8080"
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+  }
+}

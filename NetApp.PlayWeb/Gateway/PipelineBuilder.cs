@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,8 @@ namespace NetApp.PlayWeb.Gateway
 
         public PipelineDelegate BuildPipeline(IServiceProvider serviceProvider)
         {
-            // 这项虽然能嵌套了，但还不能注入
+            //var fileConfig = serviceProvider.GetService<IOptions<GatewayOption>>();
+
             // 创建middleware，生成对象时输入依赖，再取其delegate
             IEnumerable<Type> middlewares = new[]
             {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,20 +65,33 @@ namespace NetApp.PlayWeb.Gateway
         }
     }
 
-    public class ReRouteMiddleware: PipelineMiddleware
+    public class ReRouteMiddleware : PipelineMiddleware
     {
         private readonly ILogger<ReRouteMiddleware> _logger;
+        private readonly GatewayOption _options;
         private readonly PipelineDelegate _next;
 
-        public ReRouteMiddleware(ILogger<ReRouteMiddleware> logger, PipelineDelegate next)
+        public ReRouteMiddleware(ILogger<ReRouteMiddleware> logger, IOptions<GatewayOption> options, PipelineDelegate next)
         {
             _logger = logger;
+            _options = options.Value;
             _next = next;
         }
 
         public override async Task Invoke(PipelineContext context)
         {
             _logger.LogInformation("hello ReRouteMiddleware");
+            _logger.LogInformation("config from " + _options.Author);
+
+            string requestPath = context.HttpContext.Request.Path;
+            foreach(var route in _options.ReRoutes)
+            {
+                if (route.UpstreamPathTemplate.StartsWith(requestPath))
+                {
+                    _logger.LogInformation("match url");
+                }
+            }
+
             await _next?.Invoke(context);
         }
     }
