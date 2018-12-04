@@ -9,7 +9,7 @@
           "Port": 5100
         }
       ],
-      "UpstreamPathTemplate": "/myservice/{url}",
+      "UpstreamPathTemplate": "/myservice/{url}/cache/",
       "UpstreamHttpMethod": [ "Get" ]
     }
   ],

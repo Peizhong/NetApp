@@ -11,3 +11,6 @@
 
 # Todo
 1. event
+
+# DevOps
+自动化编译、发布制品库(artifactory)、静态代码扫描(sonar)、自动化部署、单元测试、自动化测试

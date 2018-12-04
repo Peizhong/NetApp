@@ -3,6 +3,7 @@
   "ReRoutes": [
     {
       "ServiceName": "",
+      // https://regexr.com/
       "UpstreamPathTemplate": "/mygateway/{url}",
       "DownstreamPathTemplate": "/api/{url}",
       // might load balance

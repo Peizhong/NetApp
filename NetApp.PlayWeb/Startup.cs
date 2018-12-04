@@ -31,9 +31,9 @@ namespace NetApp.PlayWeb
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMyGateway();
+            //app.UseMyGateway();
 
-            //app.UseOcelot().Wait();
+            app.UseOcelot().Wait();
         }
     }
 }
