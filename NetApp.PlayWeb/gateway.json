@@ -1,20 +1,19 @@
-{
+﻿{
   "Author": "wpz",
-  "ReRoutes": [
+  "Routes": [
     {
       "ServiceName": "",
       // https://regexr.com/
-      "UpstreamPathTemplate": "/mygateway/{url}",
-      "DownstreamPathTemplate": "/api/{url}",
+      // 简化版，只替换开头
+      "UpstreamPathTemplate": "/mygateway/",
+      "DownstreamPathTemplate": "/api/",
       // might load balance
       "DownstreamHostAndPorts": [
         {
-          "Host": "host",
+          "Host": "localhost",
           "Port": "8080"
         }
       ]
     }
-  ],
-  "GlobalConfiguration": {
-  }
+  ]
 }

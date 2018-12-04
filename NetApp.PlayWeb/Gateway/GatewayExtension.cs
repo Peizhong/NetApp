@@ -16,6 +16,8 @@ namespace NetApp.PlayWeb.Gateway
             IConfiguration configuration = (IConfiguration)service.ImplementationInstance;
 
             services.Configure<GatewayOption>(configuration);
+
+            services.AddSingleton<IDownstreamSelector, DownstreamSelector>();
         }
 
         public static IApplicationBuilder UseMyGateway(this IApplicationBuilder app)

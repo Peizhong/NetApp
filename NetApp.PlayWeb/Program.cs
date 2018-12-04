@@ -22,7 +22,7 @@ namespace NetApp.PlayWeb
                 .ConfigureAppConfiguration((context, config) =>
                 {
                     config.AddJsonFile("ocelot.json");
-                    //config.AddJsonFile("gateway.json");
+                    config.AddJsonFile("gateway.json");
                 })
                 .UseStartup<Startup>();
     }

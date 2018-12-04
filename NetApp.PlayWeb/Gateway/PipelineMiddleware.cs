@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NetApp.PlayWeb.Gateway
@@ -69,12 +70,18 @@ namespace NetApp.PlayWeb.Gateway
     {
         private readonly ILogger<ReRouteMiddleware> _logger;
         private readonly GatewayOption _options;
+        private readonly IDownstreamSelector _downstreamSelector;
         private readonly PipelineDelegate _next;
 
-        public ReRouteMiddleware(ILogger<ReRouteMiddleware> logger, IOptions<GatewayOption> options, PipelineDelegate next)
+        public ReRouteMiddleware(
+            ILogger<ReRouteMiddleware> logger, 
+            IOptions<GatewayOption> options, 
+            IDownstreamSelector downstreamSelector, 
+            PipelineDelegate next)
         {
             _logger = logger;
             _options = options.Value;
+            _downstreamSelector = downstreamSelector;
             _next = next;
         }
 
@@ -84,11 +91,19 @@ namespace NetApp.PlayWeb.Gateway
             _logger.LogInformation("config from " + _options.Author);
 
             string requestPath = context.HttpContext.Request.Path;
-            foreach(var route in _options.ReRoutes)
+            foreach (var route in _options.Routes)
             {
-                if (route.UpstreamPathTemplate.StartsWith(requestPath))
+                // 暂时不做复杂转换，只改开头
+                if (requestPath.StartsWith(route.UpstreamPathTemplate))
                 {
-                    _logger.LogInformation("match url");
+                    string downstreamPath = requestPath.Replace(route.UpstreamPathTemplate, route.DownstreamPathTemplate);
+                    _logger.LogInformation($"match url: from {requestPath} to {downstreamPath}");
+
+                    context.DownstreamPath = downstreamPath;
+                    context.DownstreamQueryString = context.HttpContext.Request.QueryString.Value;
+                    var downstream = _downstreamSelector.GetHostAndPort(route.ServiceName, route.DownstreamHostAndPorts);
+                    context.DownstreamHost = downstream.Host;
+                    context.DownstreamPort = downstream.Port;
                 }
             }
 
@@ -113,6 +128,18 @@ namespace NetApp.PlayWeb.Gateway
         public override async Task Invoke(PipelineContext context)
         {
             _logger.LogInformation("hello RequestMiddleware");
+
+            using (HttpClient client = new HttpClient())
+            {
+                var request = new HttpRequestMessage
+                {
+                    Method = new HttpMethod(context.HttpContext.Request.Method),
+                    RequestUri = new Uri($"http://{context.DownstreamHost}:{context.DownstreamPort}{context.DownstreamPath}{context.DownstreamQueryString}"),
+                    //Headers,
+                };
+                _logger.LogInformation($"request url is: {request.RequestUri}");
+                var response = await client.SendAsync(request);
+            }
             await _next?.Invoke(context);
         }
     }

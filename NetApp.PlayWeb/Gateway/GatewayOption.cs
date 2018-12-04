@@ -27,6 +27,6 @@ namespace NetApp.PlayWeb.Gateway
     {
         public string Author { get; set; }
 
-        public List<Route> ReRoutes { get; set; }
+        public List<Route> Routes { get; set; }
     }
 }
