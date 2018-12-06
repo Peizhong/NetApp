@@ -6,12 +6,13 @@
       // https://regexr.com/
       // 简化版，只替换开头
       "UpstreamPathTemplate": "/mygateway/",
+      // try: http://localhost:5100/api/Categories/1/children
       "DownstreamPathTemplate": "/api/",
       // might load balance
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": "8080"
+          "Port": "5100"
         }
       ]
     }

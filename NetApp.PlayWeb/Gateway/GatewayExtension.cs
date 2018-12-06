@@ -27,6 +27,13 @@ namespace NetApp.PlayWeb.Gateway
 
             app.Use(async (context, task) =>
             {
+                var startTime = DateTime.Now;
+                context.Response.OnStarting(() =>
+                {
+                    var end = DateTime.Now - startTime;
+                    context.Response.Headers.Add("ResponseTime", end.ToString());
+                    return Task.CompletedTask;
+                });
                 var pipelineContext = new PipelineContext(context);
                 await entryPoint.Invoke(pipelineContext);
             });

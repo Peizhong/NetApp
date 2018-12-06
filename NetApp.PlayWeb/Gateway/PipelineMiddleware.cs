@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NetApp.PlayWeb.Gateway
@@ -139,6 +141,18 @@ namespace NetApp.PlayWeb.Gateway
                 };
                 _logger.LogInformation($"request url is: {request.RequestUri}");
                 var response = await client.SendAsync(request);
+                foreach (var head in response.Headers)
+                {
+
+                }
+                foreach (var head in response.Content.Headers)
+                {
+
+                }
+                var responseContent = await response.Content.ReadAsStringAsync();
+                context.HttpContext.Response.StatusCode = 200;
+                context.HttpContext.Response.ContentLength = Encoding.UTF8.GetByteCount(responseContent);
+                await context.HttpContext.Response.WriteAsync(responseContent);
             }
             await _next?.Invoke(context);
         }
