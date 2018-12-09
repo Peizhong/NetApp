@@ -8,6 +8,7 @@ namespace NetApp.PlayWeb.Gateway
 {
     public interface IDownstreamSelector
     {
+        // apply load balance
         DownStream GetHostAndPort(string serivceName, IList<DownStream> downStreams);
     }
 

@@ -2,13 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NetApp.PlayWeb.Gateway
 {
     public class PipelineContext
     {
-        public HttpContext HttpContext { get; }
+        public HttpContext UpstreamHttpContext { get; }
+
+        public HttpResponseMessage DownstreamResponse { get; set; }
 
         public string DownstreamHost { get; set; }
 
@@ -20,7 +23,7 @@ namespace NetApp.PlayWeb.Gateway
 
         public PipelineContext(HttpContext context)
         {
-            HttpContext = context;
+            UpstreamHttpContext = context;
         }
     }
 }
