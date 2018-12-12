@@ -15,6 +15,8 @@ namespace NetApp.PlayWeb.Gateway
     public class Route
     {
         public string ServiceName { get; set; }
+        
+        public List<string> UpstreamHttpMethod { get; set; }
 
         public string UpstreamPathTemplate { get; set; }
 

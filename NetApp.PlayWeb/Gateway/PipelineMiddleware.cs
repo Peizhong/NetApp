@@ -96,24 +96,30 @@ namespace NetApp.PlayWeb.Gateway
             string requestPath = context.UpstreamHttpContext.Request.Path;
             foreach (var route in _options.Routes)
             {
-                // 暂时不做复杂转换，只改开头
-                if (requestPath.StartsWith(route.UpstreamPathTemplate))
+                // 暂时不做复杂转换，只改开头，不比较大小写
+                if (requestPath.ToLower().StartsWith(route.UpstreamPathTemplate.ToLower()))
                 {
-                    string downstreamPath = requestPath.Replace(route.UpstreamPathTemplate, route.DownstreamPathTemplate);
-                    _logger.LogInformation($"match url: from {requestPath} to {downstreamPath}");
+                    if (route.UpstreamHttpMethod.Count == 0 ||
+                        route.UpstreamHttpMethod.Contains(context.UpstreamHttpContext.Request.Method))
+                    {
+                        string downstreamPath = requestPath.Replace(route.UpstreamPathTemplate, route.DownstreamPathTemplate);
+                        _logger.LogInformation($"match method: {context.UpstreamHttpContext.Request.Method}, url: from {requestPath} to {downstreamPath}");
 
-                    context.DownstreamPath = downstreamPath;
-                    context.DownstreamQueryString = context.UpstreamHttpContext.Request.QueryString.Value;
-                    var downstream = _downstreamSelector.GetHostAndPort(route.ServiceName, route.DownstreamHostAndPorts);
-                    context.DownstreamHost = downstream.Host;
-                    context.DownstreamPort = downstream.Port;
+                        context.DownstreamPath = downstreamPath;
+                        context.DownstreamQueryString = context.UpstreamHttpContext.Request.QueryString.Value;
+                        var downstream = _downstreamSelector.GetHostAndPort(route.ServiceName, route.DownstreamHostAndPorts);
+                        context.DownstreamHost = downstream.Host;
+                        context.DownstreamPort = downstream.Port;
+                        context.RouteConfig = route;
+                        break;
+                    }
                 }
             }
-
+            _logger.LogInformation("reroute complete");
             await _next?.Invoke(context);
         }
     }
-    
+
     /// <summary>
     /// 获得downstream返回数据
     /// </summary>
@@ -121,6 +127,12 @@ namespace NetApp.PlayWeb.Gateway
     {
         private readonly ILogger<RequestMiddleware> _logger;
         private readonly PipelineDelegate _next;
+
+        private readonly string[] _unsupportedRequestHeaders =
+        {
+            "Cookie",
+            "Transfer-Encoding"
+        };
 
         public RequestMiddleware(ILogger<RequestMiddleware> logger, PipelineDelegate next)
         {
@@ -138,13 +150,30 @@ namespace NetApp.PlayWeb.Gateway
                 {
                     Method = new HttpMethod(context.UpstreamHttpContext.Request.Method),
                     RequestUri = new Uri($"http://{context.DownstreamHost}:{context.DownstreamPort}{context.DownstreamPath}{context.DownstreamQueryString}"),
-                    //Headers,
                 };
+                foreach (var head in context.UpstreamHttpContext.Request.Headers)
+                {
+                    if (_unsupportedRequestHeaders.Contains(head.Key))
+                    {
+                        _logger.LogInformation($"remove header '{head.Key}' in request.headers");
+                        continue;
+                    }
+                    request.Headers.Add(head.Key, head.Value.ToArray());
+                    _logger.LogInformation($"set header '{head.Key}' in request.headers");
+                }
+                //todo: custom cookies?
+                var cookies = context.UpstreamHttpContext.Request.Cookies.Select(c => $"{c.Key}={c.Value}");
+                cookies = cookies.Append("gateway=test");
+                var cookieStr = string.Join(';', cookies);
+                if (!string.IsNullOrEmpty(cookieStr))
+                {
+                    request.Headers.Add("Cookie", cookieStr);
+                }
                 _logger.LogInformation($"request url is: {request.RequestUri}");
                 var response = await client.SendAsync(request);
                 context.DownstreamResponse = response;
-                _logger.LogInformation("request complete");
             }
+            _logger.LogInformation("request complete");
             await _next?.Invoke(context);
         }
     }
@@ -172,6 +201,7 @@ namespace NetApp.PlayWeb.Gateway
         {
             _logger.LogInformation("hello ResponseMiddleware");
 
+            //添加downstream返回的文件头
             foreach (var head in context.DownstreamResponse.Headers)
             {
                 if (_unsupportedRequestHeaders.Contains(head.Key))
@@ -180,7 +210,7 @@ namespace NetApp.PlayWeb.Gateway
                     continue;
                 }
                 context.UpstreamHttpContext.Response.Headers.TryAdd(head.Key, head.Value.FirstOrDefault());
-                _logger.LogInformation($"set header '{head.Key}' in respones.content.headers");
+                _logger.LogInformation($"set header '{head.Key}' in respones.headers");
             }
             foreach (var head in context.DownstreamResponse.Content.Headers)
             {
@@ -192,7 +222,7 @@ namespace NetApp.PlayWeb.Gateway
                 context.UpstreamHttpContext.Response.Headers.TryAdd(head.Key, head.Value.FirstOrDefault());
                 _logger.LogInformation($"set header '{head.Key}' in respones.content.headers");
             }
-
+            //拷贝content
             using (var content = await context.DownstreamResponse.Content.ReadAsStreamAsync())
             {
                 context.UpstreamHttpContext.Response.ContentLength = context.DownstreamResponse.Content.Headers.ContentLength;

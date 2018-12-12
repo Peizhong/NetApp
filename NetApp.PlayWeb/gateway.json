@@ -2,7 +2,7 @@
   "Author": "wpz",
   "Routes": [
     {
-      "ServiceName": "",
+      "ServiceName": "Demo",
       // https://regexr.com/
       // 简化版，只替换开头
       "UpstreamPathTemplate": "/myservice/",
@@ -14,7 +14,23 @@
           "Host": "localhost",
           "Port": "5100"
         }
-      ]
+      ],
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "ServiceName": "Demo2",
+      // https://regexr.com/
+      // 简化版，只替换开头
+      "UpstreamPathTemplate": "/netapp/",
+      "DownstreamPathTemplate": "/",
+      // might load balance
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "5000"
+        }
+      ],
+      "UpstreamHttpMethod": [ "GET" ]
     }
   ]
 }

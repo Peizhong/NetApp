@@ -19,6 +19,12 @@ namespace NetApp.Controllers
             _client = clientFactory.CreateClient();
         }
 
+        public ActionResult Play()
+        {
+            Response.Cookies.Append("I", "see you");
+            return Ok();
+        }
+
         // GET: Products
         public async Task<ActionResult> Index()
         {

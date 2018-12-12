@@ -9,6 +9,8 @@ namespace NetApp.PlayWeb.Gateway
 {
     public class PipelineContext
     {
+        public Route RouteConfig { get; set; }
+
         public HttpContext UpstreamHttpContext { get; }
 
         public HttpResponseMessage DownstreamResponse { get; set; }
