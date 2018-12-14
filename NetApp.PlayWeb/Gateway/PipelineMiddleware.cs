@@ -46,9 +46,11 @@ namespace NetApp.PlayWeb.Gateway
         private readonly ILogger<CacheMiddleware> _logger;
         private readonly PipelineDelegate _next;
 
-        public bool IsCached { get; set; }
+        private Dictionary<string, string> _cache = new Dictionary<string, string>();
 
-        public CacheMiddleware(ILogger<CacheMiddleware> logger, PipelineDelegate next)
+        public CacheMiddleware(
+            ILogger<CacheMiddleware> logger,
+            PipelineDelegate next)
         {
             _logger = logger;
             _next = next;
@@ -57,7 +59,7 @@ namespace NetApp.PlayWeb.Gateway
         public override async Task Invoke(PipelineContext context)
         {
             _logger.LogInformation("hello CacheMiddleware");
-            if (IsCached)
+            if (context.RouteConfig.CacheTtlSeconds>0)
             {
                 //get something from cache
                 ;
@@ -73,18 +75,15 @@ namespace NetApp.PlayWeb.Gateway
     {
         private readonly ILogger<ReRouteMiddleware> _logger;
         private readonly GatewayOption _options;
-        private readonly IDownstreamSelector _downstreamSelector;
         private readonly PipelineDelegate _next;
 
         public ReRouteMiddleware(
             ILogger<ReRouteMiddleware> logger, 
             IOptions<GatewayOption> options, 
-            IDownstreamSelector downstreamSelector, 
             PipelineDelegate next)
         {
             _logger = logger;
             _options = options.Value;
-            _downstreamSelector = downstreamSelector;
             _next = next;
         }
 
@@ -107,9 +106,6 @@ namespace NetApp.PlayWeb.Gateway
 
                         context.DownstreamPath = downstreamPath;
                         context.DownstreamQueryString = context.UpstreamHttpContext.Request.QueryString.Value;
-                        var downstream = _downstreamSelector.GetHostAndPort(route.ServiceName, route.DownstreamHostAndPorts);
-                        context.DownstreamHost = downstream.Host;
-                        context.DownstreamPort = downstream.Port;
                         context.RouteConfig = route;
                         break;
                     }
@@ -126,6 +122,7 @@ namespace NetApp.PlayWeb.Gateway
     public class RequestMiddleware : PipelineMiddleware
     {
         private readonly ILogger<RequestMiddleware> _logger;
+        private readonly IDownstreamSelector _downstreamSelector;
         private readonly PipelineDelegate _next;
 
         private readonly string[] _unsupportedRequestHeaders =
@@ -134,15 +131,23 @@ namespace NetApp.PlayWeb.Gateway
             "Transfer-Encoding"
         };
 
-        public RequestMiddleware(ILogger<RequestMiddleware> logger, PipelineDelegate next)
+        public RequestMiddleware(
+            ILogger<RequestMiddleware> logger,
+            IDownstreamSelector downstreamSelector,
+            PipelineDelegate next)
         {
             _logger = logger;
+            _downstreamSelector = downstreamSelector;
             _next = next;
         }
 
         public override async Task Invoke(PipelineContext context)
         {
             _logger.LogInformation("hello RequestMiddleware");
+
+            var downstream = _downstreamSelector.GetHostAndPort(context.RouteConfig.ServiceName, context.RouteConfig.DownstreamHostAndPorts);
+            context.DownstreamHost = downstream.Host;
+            context.DownstreamPort = downstream.Port;
 
             using (HttpClient client = new HttpClient())
             {

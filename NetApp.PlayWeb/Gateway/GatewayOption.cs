@@ -15,7 +15,7 @@ namespace NetApp.PlayWeb.Gateway
     public class Route
     {
         public string ServiceName { get; set; }
-        
+
         public List<string> UpstreamHttpMethod { get; set; }
 
         public string UpstreamPathTemplate { get; set; }
@@ -23,6 +23,11 @@ namespace NetApp.PlayWeb.Gateway
         public string DownstreamPathTemplate { get; set; }
 
         public List<DownStream> DownstreamHostAndPorts { get; set; }
+
+        /// <summary>
+        /// 缓存
+        /// </summary>
+        public int? CacheTtlSeconds { get; set; }
     }
 
     public class GatewayOption

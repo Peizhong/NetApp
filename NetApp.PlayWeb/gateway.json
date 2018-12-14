@@ -19,8 +19,6 @@
     },
     {
       "ServiceName": "Demo2",
-      // https://regexr.com/
-      // 简化版，只替换开头
       "UpstreamPathTemplate": "/netapp/",
       "DownstreamPathTemplate": "/",
       // might load balance
@@ -30,7 +28,8 @@
           "Port": "5000"
         }
       ],
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "CacheTtlSeconds": 60
     }
   ]
 }

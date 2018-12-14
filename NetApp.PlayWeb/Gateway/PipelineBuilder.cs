@@ -26,8 +26,8 @@ namespace NetApp.PlayWeb.Gateway
             IEnumerable<Type> middlewares = new[]
             {
                 typeof(ExceptionMiddleware),
-                typeof(CacheMiddleware),
                 typeof(ReRouteMiddleware),
+                typeof(CacheMiddleware),
                 typeof(RequestMiddleware),
                 typeof(ResponseMiddleware)
             };
