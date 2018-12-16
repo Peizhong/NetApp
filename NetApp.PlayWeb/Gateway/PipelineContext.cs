@@ -13,7 +13,7 @@ namespace NetApp.PlayWeb.Gateway
 
         public HttpContext UpstreamHttpContext { get; }
 
-        public HttpResponseMessage DownstreamResponse { get; set; }
+        public DownStreamResponse DownstreamResponse { get; set; }
 
         public string DownstreamHost { get; set; }
 

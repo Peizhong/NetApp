@@ -22,7 +22,7 @@ namespace NetApp.Controllers
         public ActionResult Play()
         {
             Response.Cookies.Append("I", "see you");
-            return Ok();
+            return Ok("play me");
         }
 
         // GET: Products

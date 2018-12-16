@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -41,36 +42,6 @@ namespace NetApp.PlayWeb.Gateway
         }
     }
 
-    public class CacheMiddleware : PipelineMiddleware
-    {
-        private readonly ILogger<CacheMiddleware> _logger;
-        private readonly PipelineDelegate _next;
-
-        private Dictionary<string, string> _cache = new Dictionary<string, string>();
-
-        public CacheMiddleware(
-            ILogger<CacheMiddleware> logger,
-            PipelineDelegate next)
-        {
-            _logger = logger;
-            _next = next;
-        }
-
-        public override async Task Invoke(PipelineContext context)
-        {
-            _logger.LogInformation("hello CacheMiddleware");
-            if (context.RouteConfig.CacheTtlSeconds>0)
-            {
-                //get something from cache
-                ;
-                return;
-            }
-            await _next?.Invoke(context);
-            //set something to cache
-            ;
-        }
-    }
-
     public class ReRouteMiddleware : PipelineMiddleware
     {
         private readonly ILogger<ReRouteMiddleware> _logger;
@@ -78,8 +49,8 @@ namespace NetApp.PlayWeb.Gateway
         private readonly PipelineDelegate _next;
 
         public ReRouteMiddleware(
-            ILogger<ReRouteMiddleware> logger, 
-            IOptions<GatewayOption> options, 
+            ILogger<ReRouteMiddleware> logger,
+            IOptions<GatewayOption> options,
             PipelineDelegate next)
         {
             _logger = logger;
@@ -116,6 +87,61 @@ namespace NetApp.PlayWeb.Gateway
         }
     }
 
+    public class CacheMiddleware : PipelineMiddleware
+    {
+        private readonly ILogger<CacheMiddleware> _logger;
+        private readonly PipelineDelegate _next;
+
+        private readonly CacheStore<CacheResponse> _cacheStore;
+
+        public CacheMiddleware(
+            ILogger<CacheMiddleware> logger,
+            PipelineDelegate next)
+        {
+            _logger = logger;
+            _next = next;
+
+            _cacheStore = new CacheStore<CacheResponse>();
+        }
+
+        private CacheResponse createCacheFromDownStream(string key, PipelineContext context)
+        {
+            var response = new CacheResponse(
+                key,
+                headers: context.DownstreamResponse.Headers,
+                contentHeaders: context.DownstreamResponse.Headers,
+                statusCode: context.DownstreamResponse.StatusCode,
+                reasonPhrase: context.DownstreamResponse.ReasonPhrase,
+                contentBytes: context.DownstreamResponse.ContentBytes,
+                expire: DateTime.Now.AddSeconds(context.RouteConfig.CacheTtlSeconds.Value));
+            return response;
+        }
+
+        public override async Task Invoke(PipelineContext context)
+        {
+            _logger.LogInformation("hello CacheMiddleware");
+            //如果配置了缓存时间
+            if (context.RouteConfig.CacheTtlSeconds > 0)
+            {
+                var key = $"{context.UpstreamHttpContext.Request.Method}_{context.UpstreamHttpContext.Request.Path}";
+                var value = _cacheStore.Get(key);
+                if (value != null)
+                {
+                    //直接写response然后返回
+                    context.DownstreamResponse = value;
+                    return;
+                }
+                await _next?.Invoke(context);
+                var cacheResponse = createCacheFromDownStream(key, context);
+                _cacheStore.Add(key, cacheResponse);
+            }
+            else
+            {
+                await _next?.Invoke(context);
+            }
+        }
+    }
+
     /// <summary>
     /// 获得downstream返回数据
     /// </summary>
@@ -139,6 +165,17 @@ namespace NetApp.PlayWeb.Gateway
             _logger = logger;
             _downstreamSelector = downstreamSelector;
             _next = next;
+        }
+
+        private async Task<DownStreamResponse> createDownStreamResponse(PipelineContext context, HttpResponseMessage downStream)
+        {
+            var response = new DownStreamResponse(
+                headers: downStream.Headers.ToDictionary(h => h.Key, h => h.Value),
+                contentHeaders: downStream.Content.Headers.ToDictionary(h => h.Key, h => h.Value),
+                statusCode: (int)downStream.StatusCode,
+                reasonPhrase: downStream.ReasonPhrase,
+                contentBytes: await downStream.Content.ReadAsByteArrayAsync());
+            return response;
         }
 
         public override async Task Invoke(PipelineContext context)
@@ -176,7 +213,7 @@ namespace NetApp.PlayWeb.Gateway
                 }
                 _logger.LogInformation($"request url is: {request.RequestUri}");
                 var response = await client.SendAsync(request);
-                context.DownstreamResponse = response;
+                context.DownstreamResponse = await createDownStreamResponse(context, response);
             }
             _logger.LogInformation("request complete");
             await _next?.Invoke(context);
@@ -202,11 +239,8 @@ namespace NetApp.PlayWeb.Gateway
             _next = next;
         }
 
-        public override async Task Invoke(PipelineContext context)
+        private async Task setUpStreamResponse(PipelineContext context)
         {
-            _logger.LogInformation("hello ResponseMiddleware");
-
-            //添加downstream返回的文件头
             foreach (var head in context.DownstreamResponse.Headers)
             {
                 if (_unsupportedRequestHeaders.Contains(head.Key))
@@ -217,33 +251,52 @@ namespace NetApp.PlayWeb.Gateway
                 context.UpstreamHttpContext.Response.Headers.TryAdd(head.Key, head.Value.FirstOrDefault());
                 _logger.LogInformation($"set header '{head.Key}' in respones.headers");
             }
-            foreach (var head in context.DownstreamResponse.Content.Headers)
+            foreach (var head in context.DownstreamResponse.ContentHeaders)
             {
                 if (_unsupportedRequestHeaders.Contains(head.Key))
                 {
-                    _logger.LogInformation($"remove header '{head.Key}' in respones.content.headers");
+                    _logger.LogInformation($"remove header '{head.Key}' in respones.headers");
                     continue;
                 }
                 context.UpstreamHttpContext.Response.Headers.TryAdd(head.Key, head.Value.FirstOrDefault());
                 _logger.LogInformation($"set header '{head.Key}' in respones.content.headers");
             }
-            //拷贝content
-            using (var content = await context.DownstreamResponse.Content.ReadAsStreamAsync())
-            {
-                context.UpstreamHttpContext.Response.ContentLength = context.DownstreamResponse.Content.Headers.ContentLength;
 
+            using (var stream = new MemoryStream(context.DownstreamResponse.ContentBytes))
+            {
                 context.UpstreamHttpContext.Response.StatusCode = (int)context.DownstreamResponse.StatusCode;
 
                 context.UpstreamHttpContext.Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = context.DownstreamResponse.ReasonPhrase;
 
+                if (context.UpstreamHttpContext.Response.ContentLength == null)
+                {
+                    context.UpstreamHttpContext.Response.ContentLength = context.DownstreamResponse.ContentBytes.LongLength;
+                }
+
                 if (context.UpstreamHttpContext.Response.StatusCode != (int)HttpStatusCode.NotModified && context.UpstreamHttpContext.Response.ContentLength != 0)
                 {
-                    await content.CopyToAsync(context.UpstreamHttpContext.Response.Body);
+                    try
+                    {
+                        await stream.CopyToAsync(context.UpstreamHttpContext.Response.Body);
+                    }
+                    catch (Exception ex)
+                    {
+                        var e = ex.Message;
+                    }
                 }
             }
+        }
 
-            _logger.LogInformation("response complete");
+        public override async Task Invoke(PipelineContext context)
+        {
+            _logger.LogInformation("hello ResponseMiddleware");
+
+            _logger.LogInformation("wait next");
             await _next?.Invoke(context);
+            _logger.LogInformation("next complete");
+
+            await setUpStreamResponse(context);
+            _logger.LogInformation("response complete");
         }
     }
 }
