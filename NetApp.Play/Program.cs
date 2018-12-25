@@ -3,6 +3,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using NetApp.CeleryTask.Extensions;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace NetApp.Play
 {
@@ -51,20 +55,20 @@ namespace NetApp.Play
     {
         static void Main(string[] args)
         {
-            IContravariant<A> parent = new Sample<A>();
-            IContravariant<B> child = new Sample<B>();
+            
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(c =>
+                {
+                    var builder = new ConfigurationBuilder()
+                    .SetBasePath(Path.Combine(AppContext.BaseDirectory))
+                    .AddJsonFile("appsettings.json");
 
-            var ob = parent.whoareyou();
-            var st = child.whoareyou();
-            // You can assign iobj to istr because
-            // the IContravariant interface is contravariant.
-            child = parent;
-            //iobj = istr;
+                    var config = builder.Build();
+                    return config;
+                })
+                .BuildServiceProvider();
 
-            var ost = child.whoareyou();
-
-            Book.LearnExpression learnExpression = new Book.LearnExpression();
-            learnExpression.Hello();
+            serviceProvider.ConfigCeleryWorker();
         }
     }
 }
