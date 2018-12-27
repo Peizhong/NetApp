@@ -14,14 +14,11 @@ namespace NetApp.CeleryTask.Extensions
     {
         private static List<CTask> loadRegisteredTask()
         {
-            var tasks= new List<CTask>();
-            //var dir
-
-
-            var ass = Assembly.GetEntryAssembly();
-            foreach (var t in ass.DefinedTypes)
+            var tasks = new List<CTask>();
+            var asm = Assembly.GetEntryAssembly();
+            foreach (var t in asm.DefinedTypes)
             {
-                var methods = t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public);
+                var methods = t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
                 foreach (var m in methods)
                 {
                     var cTaskAttr = m.GetCustomAttribute<SharedTaskAttribute>();
@@ -31,12 +28,23 @@ namespace NetApp.CeleryTask.Extensions
                         {
                             Assembly = t.FullName,
                             Name = m.Name,
+                            Type = m.DeclaringType,
+                            Params = m.GetParameters().Select(p => p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null).ToList()
                         });
                     }
                 }
 
             }
+            Console.WriteLine($"found {tasks.Count} tasks");
+            tasks.ForEach(t => Console.WriteLine($"{t.Assembly}: {t.Name}"));
             return tasks;
+        }
+
+        private static void tryActivate(IServiceProvider provider, CTask task)
+        {
+            var instance = ActivatorUtilities.CreateInstance(provider, task.Type);
+            var method = task.Type.GetMethod(task.Name);
+            var res = method.Invoke(instance, task.Params?.ToArray());
         }
 
         public static IServiceProvider ConfigCeleryWorker(this IServiceProvider services)
@@ -48,6 +56,7 @@ namespace NetApp.CeleryTask.Extensions
                 broker = "localhost";
             }
             var tasks = loadRegisteredTask();
+            tasks.ForEach(t => tryActivate(services,t));
             return services;
         }
     }

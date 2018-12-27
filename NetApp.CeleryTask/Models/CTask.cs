@@ -8,8 +8,10 @@ namespace NetApp.CeleryTask.Models
     {
         public string Assembly { get; set; }
 
+        public Type Type { get; set; }
+
         public string Name { get; set; }
 
-        public object Params { get; set; }
+        public IList<object> Params { get; set; }
     }
 }

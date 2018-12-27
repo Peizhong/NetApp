@@ -14,16 +14,15 @@ namespace NetApp.Play.Utils
 
     public class CeleryWorker
     {
-        [SharedTask]
+        [SharedTask(Interval = 1000)]
         public void HelloString(string world)
         {
-
         }
 
         [SharedTask]
         public string HelloMulit(int num, string str)
         {
-            return string.Empty;
+            return $"int is {num}, str is {str}";
         }
 
         [SharedTask]

@@ -7,5 +7,6 @@ namespace NetApp.CeleryTask.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public class SharedTaskAttribute : Attribute
     {
+        public int Interval { get; set; }
     }
 }

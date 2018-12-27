@@ -55,17 +55,14 @@ namespace NetApp.Play
     {
         static void Main(string[] args)
         {
-            
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton<IConfiguration>(c =>
-                {
-                    var builder = new ConfigurationBuilder()
-                    .SetBasePath(Path.Combine(AppContext.BaseDirectory))
-                    .AddJsonFile("appsettings.json");
 
-                    var config = builder.Build();
-                    return config;
-                })
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Path.Combine(AppContext.BaseDirectory))
+            .AddJsonFile("appsettings.json");
+            var config = builder.Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(config)
                 .BuildServiceProvider();
 
             serviceProvider.ConfigCeleryWorker();
