@@ -1,17 +1,22 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace NetApp.CeleryTask.Models
 {
+    [ProtoContract]
     public class CTask
     {
-        public string Assembly { get; set; }
+        [ProtoMember(1)]
+        public string TaskName { get; set; }
 
-        public Type Type { get; set; }
+        [ProtoMember(2)]
+        public string TypeName { get; set; }
 
-        public string Name { get; set; }
-
+        [ProtoMember(3)]
+        public string MethodName { get; set; }
+        
         public IList<object> Params { get; set; }
     }
 }

@@ -2,8 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,6 +14,10 @@ namespace NetApp.CeleryTask.Extensions
 {
     public static class CeleryExtension
     {
+        /// <summary>
+        /// 查找当前程序集中已标记[SharedTask]的方法
+        /// </summary>
+        /// <returns></returns>
         private static List<CTask> loadRegisteredTask()
         {
             var tasks = new List<CTask>();
@@ -26,24 +32,64 @@ namespace NetApp.CeleryTask.Extensions
                     {
                         tasks.Add(new CTask
                         {
-                            Assembly = t.FullName,
-                            Name = m.Name,
-                            Type = m.DeclaringType,
+                            TaskName = cTaskAttr.TaskName ?? m.Name,
+                            MethodName = m.Name,
+                            TypeName = m.DeclaringType.AssemblyQualifiedName,
                             Params = m.GetParameters().Select(p => p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null).ToList()
                         });
                     }
                 }
-
             }
             Console.WriteLine($"found {tasks.Count} tasks");
-            tasks.ForEach(t => Console.WriteLine($"{t.Assembly}: {t.Name}"));
+            tasks.ForEach(t => Console.WriteLine($"{t.TypeName}"));
             return tasks;
         }
 
+        /// <summary>
+        /// Declaring rabbitmq queue,
+        /// is idempotent - it will only be created if it doesn't exist already
+        /// </summary>
+        /// <param name="tasks"></param>
+        private static void updateServerTask(IEnumerable<CTask> tasks)
+        {
+            using (var stream = new MemoryStream())
+            {
+                Serializer.Serialize(stream, tasks);
+                var data = stream.GetBuffer();
+                using (var rStream = new MemoryStream(data))
+                {
+                    var rTasks = Serializer.Deserialize<IEnumerable<CTask>>(rStream);
+                }
+            }
+
+            RabbitHelper.Instance.ExcuteOnce(channel =>
+            {
+                foreach (var t in tasks)
+                {
+                    channel.QueueDeclare(queue: t.TaskName,
+                                         durable: false,
+                                         exclusive: false,
+                                         autoDelete: false,
+                                         arguments: null);
+                }
+            });
+        }
+
+        private static void registerServerTask(IEnumerable<CTask> tasks)
+        {
+
+        }
+
+        /// <summary>
+        /// 测试用，触发任务
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="task"></param>
         private static void tryActivate(IServiceProvider provider, CTask task)
         {
-            var instance = ActivatorUtilities.CreateInstance(provider, task.Type);
-            var method = task.Type.GetMethod(task.Name);
+            var type = Type.GetType(task.TypeName);
+            var instance = ActivatorUtilities.CreateInstance(provider, type);
+            var method = instance.GetType().GetMethod(task.MethodName);
             var res = method.Invoke(instance, task.Params?.ToArray());
         }
 
@@ -55,8 +101,11 @@ namespace NetApp.CeleryTask.Extensions
             {
                 broker = "localhost";
             }
+            RabbitHelper.Instance.Init(broker);
+
             var tasks = loadRegisteredTask();
-            tasks.ForEach(t => tryActivate(services,t));
+            tasks.ForEach(t => tryActivate(services, t));
+            updateServerTask(broker, tasks);
             return services;
         }
     }

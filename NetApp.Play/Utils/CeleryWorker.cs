@@ -19,13 +19,13 @@ namespace NetApp.Play.Utils
         {
         }
 
-        [SharedTask]
+        [SharedTask(TaskName ="IntAndString")]
         public string HelloMulit(int num, string str)
         {
             return $"int is {num}, str is {str}";
         }
 
-        [SharedTask]
+        [SharedTask(TaskName ="DoClass")]
         public void HelloClass(Demo demo)
         {
 

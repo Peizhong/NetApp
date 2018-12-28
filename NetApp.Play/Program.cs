@@ -66,6 +66,8 @@ namespace NetApp.Play
                 .BuildServiceProvider();
 
             serviceProvider.ConfigCeleryWorker();
+
+            Console.ReadLine();
         }
     }
 }
