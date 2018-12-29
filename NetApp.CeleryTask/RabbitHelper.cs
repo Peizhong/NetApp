@@ -2,6 +2,7 @@
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,43 +12,74 @@ namespace NetApp.CeleryTask
     {
         public static readonly RabbitHelper Instance = new RabbitHelper();
 
-        private string _host;
         private ConnectionFactory _factory;
+        private IConnection _connection;
+
+        private Dictionary<string, EventingBasicConsumer> _consumerDict;
 
         public void Init(string rabbitHost)
         {
-            _host = rabbitHost;
-            _factory = new ConnectionFactory() { HostName = _host };
+            _factory = new ConnectionFactory() { HostName = rabbitHost };
+            _consumerDict = new Dictionary<string, EventingBasicConsumer>();
         }
 
-        public void ExcuteOnce(Action<IModel> action)
+        public IConnection OpenedConnection
         {
-            using (var connection = _factory.CreateConnection())
+            get
             {
-                using (var channel = connection.CreateModel())
+                if (_connection?.IsOpen != true)
                 {
-                    action?.Invoke(channel);
+                    _connection = _factory.CreateConnection();
                 }
+                return _connection;
             }
         }
 
-        public void RegisterQueue(string queue, Action<byte[]> action)
+        /// <summary>
+        /// 声明支持的任务
+        /// </summary>
+        /// <param name="queueName"></param>
+        /// <returns></returns>
+        public QueueDeclareOk DeclareQueue(string queueName)
         {
-            using (var connection = _factory.CreateConnection())
+            using (var channel = OpenedConnection.CreateModel())
             {
-                using (var channel = connection.CreateModel())
-                {
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body;
-                        action?.Invoke(body);
-                    };
-                    channel.BasicConsume(queue: queue,
-                                         autoAck: true,
-                                         consumer: consumer);
-                }
+                var res = channel.QueueDeclare(queue: queueName,
+                                      durable: false,
+                                      exclusive: false,
+                                      autoDelete: false,
+                                      arguments: null);
+                return res;
             }
+        }
+
+        /// <summary>
+        /// 订阅任务
+        /// </summary>
+        /// <param name="queueName"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public string RegisterQueue(string queueName, Action<byte[]> action)
+        {
+            var key = _consumerDict.Keys.FirstOrDefault(k => k.StartsWith(queueName));
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                return key;
+            }
+            var channel = OpenedConnection.CreateModel();
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body;
+                action?.Invoke(body);
+            };
+            key = $"{queueName}_{Guid.NewGuid().ToString("N")}";
+            var res = channel.BasicConsume(queue: queueName,
+                                 autoAck: true,
+                                 consumer: consumer,
+                                 consumerTag: key);
+            _consumerDict.Add(key, consumer);
+            return res;
         }
     }
 }

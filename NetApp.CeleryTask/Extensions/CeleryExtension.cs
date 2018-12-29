@@ -62,22 +62,22 @@ namespace NetApp.CeleryTask.Extensions
                 }
             }
 
-            RabbitHelper.Instance.ExcuteOnce(channel =>
+            foreach (var t in tasks)
             {
-                foreach (var t in tasks)
-                {
-                    channel.QueueDeclare(queue: t.TaskName,
-                                         durable: false,
-                                         exclusive: false,
-                                         autoDelete: false,
-                                         arguments: null);
-                }
-            });
+                RabbitHelper.Instance.DeclareQueue(t.TaskName);
+            }
         }
 
-        private static void registerServerTask(IEnumerable<CTask> tasks)
+        private static void registerServerTask(IServiceProvider provider, IEnumerable<CTask> tasks)
         {
-
+            foreach (var t in tasks)
+            {
+                RabbitHelper.Instance.RegisterQueue(t.TaskName, data =>
+                {
+                    Console.WriteLine($"{t.TaskName} recive {data?.Length} bytes data");
+                    tryActivate(provider, t, data);
+                });
+            }
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace NetApp.CeleryTask.Extensions
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="task"></param>
-        private static void tryActivate(IServiceProvider provider, CTask task)
+        private static void tryActivate(IServiceProvider provider, CTask task, byte[] data = null)
         {
             var type = Type.GetType(task.TypeName);
             var instance = ActivatorUtilities.CreateInstance(provider, type);
@@ -105,7 +105,8 @@ namespace NetApp.CeleryTask.Extensions
 
             var tasks = loadRegisteredTask();
             tasks.ForEach(t => tryActivate(services, t));
-            updateServerTask(broker, tasks);
+            updateServerTask(tasks);
+            registerServerTask(services, tasks);
             return services;
         }
     }
