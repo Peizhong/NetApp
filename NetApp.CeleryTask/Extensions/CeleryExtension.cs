@@ -1,14 +1,19 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
+using Newtonsoft.Json;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NetApp.CeleryTask.Extensions
 {
@@ -35,7 +40,12 @@ namespace NetApp.CeleryTask.Extensions
                             TaskName = cTaskAttr.TaskName ?? m.Name,
                             MethodName = m.Name,
                             TypeName = m.DeclaringType.AssemblyQualifiedName,
-                            Params = m.GetParameters().Select(p => p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null).ToList()
+                            Params = m.GetParameters().Select(p => new CTaskParam
+                            {
+                                TypeName = p.ParameterType.AssemblyQualifiedName,
+                                ParamName = p.Name,
+                                Value = p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null
+                            }).ToList()
                         });
                     }
                 }
@@ -52,6 +62,7 @@ namespace NetApp.CeleryTask.Extensions
         /// <param name="tasks"></param>
         private static void updateServerTask(IEnumerable<CTask> tasks)
         {
+            /*
             using (var stream = new MemoryStream())
             {
                 Serializer.Serialize(stream, tasks);
@@ -61,6 +72,7 @@ namespace NetApp.CeleryTask.Extensions
                     var rTasks = Serializer.Deserialize<IEnumerable<CTask>>(rStream);
                 }
             }
+            */
 
             foreach (var t in tasks)
             {
@@ -87,15 +99,50 @@ namespace NetApp.CeleryTask.Extensions
         /// <param name="task"></param>
         private static void tryActivate(IServiceProvider provider, CTask task, byte[] data = null)
         {
+            //do remote task
+            var remoteTask = new RemoteCTask
+            {
+                TaskName = task.TaskName,
+            };
+            var demoParams = new Dictionary<string, object>();
+            foreach (var p in task.Params)
+            {
+                demoParams.Add(p.ParamName, p.Value);
+            }
+            remoteTask.ParamsJSON = JsonConvert.SerializeObject(demoParams);
+
+            var remoteParam = remoteTask.Params;
+            foreach (var p in task.Params)
+            {
+                var ptype = Type.GetType(p.TypeName);
+                var converter = TypeDescriptor.GetConverter(ptype);
+                if (remoteParam.TryGetValue(p.ParamName, out var value))
+                {
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        p.Value = converter.ConvertFrom(value);
+                    }
+                }
+                else
+                {
+                    p.Value = ptype.IsValueType ? Activator.CreateInstance(ptype) : null;
+                }
+            }
+
             var type = Type.GetType(task.TypeName);
             var instance = ActivatorUtilities.CreateInstance(provider, type);
             var method = instance.GetType().GetMethod(task.MethodName);
-            var res = method.Invoke(instance, task.Params?.ToArray());
+            var res = method.Invoke(instance, task.Params.Select(p => p.Value).ToArray());
         }
 
-        public static IServiceProvider ConfigCeleryWorker(this IServiceProvider services)
+        /// <summary>
+        /// collect task from rabbit then do it
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        public static void ConfigCeleryWorker(this IServiceProvider provider)
         {
-            var configuration = services.GetRequiredService<IConfiguration>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
             var broker = configuration["celery_broker"];
             if (string.IsNullOrEmpty(broker))
             {
@@ -104,9 +151,43 @@ namespace NetApp.CeleryTask.Extensions
             RabbitHelper.Instance.Init(broker);
 
             var tasks = loadRegisteredTask();
-            tasks.ForEach(t => tryActivate(services, t));
+            tasks.ForEach(t => tryActivate(provider, t));
             updateServerTask(tasks);
-            registerServerTask(services, tasks);
+            registerServerTask(provider, tasks);
+        }
+
+        /// <summary>
+        /// read database, then create task
+        /// </summary>
+        /// <param name="provider"></param>
+        public static void ConfigCeleryBeater(this IServiceProvider provider)
+        {
+            var celeryDbContext = provider.GetRequiredService<CeleryDbContext>();
+            //celeryDbContext.Database.EnsureDeleted();
+            celeryDbContext.Database.EnsureCreated();
+
+            var beater = provider.GetRequiredService<TaskBeater>();
+            beater.Run();
+            
+            //beater.Stop();
+        }
+
+        /// <summary>
+        /// create task to rabbit
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddCeleryBeater(this IServiceCollection services)
+        {
+            services.AddDbContext<CeleryDbContext>(opt =>
+            {
+                opt.UseSqlite("Data Source=celery.db");
+            });
+            services.AddLogging(cfg =>
+            {
+                cfg.AddConsole();
+            });
+            services.AddScoped<TaskBeater>();
             return services;
         }
     }

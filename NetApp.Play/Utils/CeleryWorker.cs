@@ -24,11 +24,5 @@ namespace NetApp.Play.Utils
         {
             return $"int is {num}, str is {str}";
         }
-
-        [SharedTask(TaskName ="DoClass")]
-        public void HelloClass(Demo demo)
-        {
-
-        }
     }
 }

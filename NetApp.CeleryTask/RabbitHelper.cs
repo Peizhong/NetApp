@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using NetApp.CeleryTask.Models;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,19 @@ namespace NetApp.CeleryTask
                                       autoDelete: false,
                                       arguments: null);
                 return res;
+            }
+        }
+
+        public void Pubilsh(PeriodicTask task)
+        {
+            using (var channel = OpenedConnection.CreateModel())
+            {
+                var body = Encoding.UTF8.GetBytes( "hello");
+
+                channel.BasicPublish(exchange: "",
+                                      routingKey: task.TaskName,
+                                      basicProperties: null,
+                                      body: body);
             }
         }
 

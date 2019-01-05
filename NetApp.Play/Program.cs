@@ -63,9 +63,11 @@ namespace NetApp.Play
 
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IConfiguration>(config)
+                .AddCeleryBeater()
                 .BuildServiceProvider();
 
             serviceProvider.ConfigCeleryWorker();
+            serviceProvider.ConfigCeleryBeater();
 
             Console.ReadLine();
         }
