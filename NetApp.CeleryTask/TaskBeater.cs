@@ -66,6 +66,56 @@ namespace NetApp.CeleryTask
             }
         }
 
+        private void setNextTime(PeriodicTask task)
+        {
+            var now = DateTime.Now;
+            Func<IntervalSchedule, int> convertMilliseconds = (schedule) =>
+            {
+                int seconds = 1;
+                switch (schedule.Period)
+                {
+                    case EnumPeriod.Seconds:
+                        seconds = 1;
+                        break;
+                    case EnumPeriod.Minutes:
+                        seconds = 60;
+                        break;
+                    case EnumPeriod.Hours:
+                        seconds = 60 * 60;
+                        break;
+                    case EnumPeriod.Days:
+                        seconds = 60 * 60 * 24;
+                        break;
+                    default:
+                        break;
+                }
+                return seconds * schedule.Every;
+            };
+            if (task.IntervalSchedule != null)
+            {
+                task.NextTime = now.AddSeconds(convertMilliseconds(task.IntervalSchedule));
+            }
+            else if (task.CrontabSchedule != null)
+            {
+                if (task.CrontabSchedule.DayOfMonth == "*")
+                {
+
+                }
+                if (task.CrontabSchedule.DayOfWeek == "*")
+                {
+
+                }
+                if (task.CrontabSchedule.Hour == "*")
+                {
+
+                }
+                if (task.CrontabSchedule.Minute == "*")
+                {
+
+                }
+            }
+        }
+
         public ExcuteResult Run()
         {
             _logger.LogInformation("Beater Run");
@@ -88,11 +138,16 @@ namespace NetApp.CeleryTask
                                 {
                                     continue;
                                 }
+                                if (todo.NextTime.HasValue && todo.NextTime > now)
+                                {
+                                    continue;
+                                }
                                 if (todo.Expires.HasValue && todo.Expires < now)
                                 {
                                     continue;
                                 }
                                 createTask(todo);
+                                setNextTime(todo);
                             }
                             await Task.Delay(IntervalMilliseconds);
                         }

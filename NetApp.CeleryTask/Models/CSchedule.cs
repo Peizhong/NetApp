@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace NetApp.CeleryTask.Models
 {
     public class PeriodicTask
     {
+        [Key]
         public string Id { get; set; }
 
         public string TaskName { get; set; }
@@ -16,6 +18,9 @@ namespace NetApp.CeleryTask.Models
         public bool IsActive { get; set; }
 
         public DateTime? StartTime { get; set; }
+
+        [NotMapped]
+        public DateTime? NextTime { get; set; }
 
         public DateTime? Expires { get; set; }
 
@@ -29,9 +34,12 @@ namespace NetApp.CeleryTask.Models
         [Key]
         public string Id { get; set; }
 
-        public int Minute { get; set; }
+        /// <summary>
+        /// * every 
+        /// </summary>
+        public string Minute { get; set; }
 
-        public int Hour { get; set; }
+        public string Hour { get; set; }
 
         public string DayOfWeek { get; set; }
 

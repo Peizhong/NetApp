@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
 using Newtonsoft.Json;
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -167,8 +166,9 @@ namespace NetApp.CeleryTask.Extensions
             celeryDbContext.Database.EnsureCreated();
 
             var beater = provider.GetRequiredService<TaskBeater>();
+            //beater.SayHi(loadRegisteredTask());
             beater.Run();
-            
+
             //beater.Stop();
         }
 
