@@ -12,7 +12,7 @@ namespace NetApp.CeleryTask
     public class RabbitHelper
     {
         public static readonly RabbitHelper Instance = new RabbitHelper();
-
+        
         private ConnectionFactory _factory;
         private IConnection _connection;
 
@@ -46,7 +46,7 @@ namespace NetApp.CeleryTask
             using (var channel = OpenedConnection.CreateModel())
             {
                 var res = channel.QueueDeclare(queue: queueName,
-                                      durable: false,
+                                      durable: true, // don't lose the queue where server stops
                                       exclusive: false,
                                       autoDelete: false,
                                       arguments: null);
@@ -60,9 +60,12 @@ namespace NetApp.CeleryTask
             {
                 var body = Encoding.UTF8.GetBytes( "hello");
 
+                var properties = channel.CreateBasicProperties();
+                properties.Persistent = true;
+
                 channel.BasicPublish(exchange: "",
                                       routingKey: task.TaskName,
-                                      basicProperties: null,
+                                      basicProperties: properties,
                                       body: body);
             }
         }
@@ -81,15 +84,24 @@ namespace NetApp.CeleryTask
                 return key;
             }
             var channel = OpenedConnection.CreateModel();
+            // consumer might start before publisher 
+            channel.QueueDeclare(queue: queueName,
+                     durable: true,
+                     exclusive: false,
+                     autoDelete: false,
+                     arguments: null);
+
             var consumer = new EventingBasicConsumer(channel);
+            //server publish messages asynchronously, round-robin
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body;
                 action?.Invoke(body);
+                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
             key = $"{queueName}_{Guid.NewGuid().ToString("N")}";
             var res = channel.BasicConsume(queue: queueName,
-                                 autoAck: true,
+                                 autoAck: false,
                                  consumer: consumer,
                                  consumerTag: key);
             _consumerDict.Add(key, consumer);

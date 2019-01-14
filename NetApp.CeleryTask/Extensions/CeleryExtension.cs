@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
 using Newtonsoft.Json;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,13 +19,16 @@ namespace NetApp.CeleryTask.Extensions
 {
     public static class CeleryExtension
     {
+        public static string TASK_QUEUE_NAME = "CTASK_QUEUE";
+
+        private static Dictionary<string, CTask> registeredTasks = new Dictionary<string, CTask>();
+
         /// <summary>
         /// 查找当前程序集中已标记[SharedTask]的方法
         /// </summary>
         /// <returns></returns>
-        private static List<CTask> loadRegisteredTask()
+        private static void loadRegisteredTask()
         {
-            var tasks = new List<CTask>();
             var asm = Assembly.GetEntryAssembly();
             foreach (var t in asm.DefinedTypes)
             {
@@ -34,7 +38,7 @@ namespace NetApp.CeleryTask.Extensions
                     var cTaskAttr = m.GetCustomAttribute<SharedTaskAttribute>();
                     if (cTaskAttr != null)
                     {
-                        tasks.Add(new CTask
+                        var task = new CTask
                         {
                             TaskName = cTaskAttr.TaskName ?? m.Name,
                             MethodName = m.Name,
@@ -45,13 +49,17 @@ namespace NetApp.CeleryTask.Extensions
                                 ParamName = p.Name,
                                 Value = p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null
                             }).ToList()
-                        });
+                        };
+                        registeredTasks.Add(task.TaskName, task);
                     }
                 }
             }
-            Console.WriteLine($"found {tasks.Count} tasks");
-            tasks.ForEach(t => Console.WriteLine($"{t.TypeName}"));
-            return tasks;
+            Console.WriteLine($"found {registeredTasks.Count} tasks");
+            registeredTasks.Values.Select(t =>
+            {
+                Console.WriteLine($"{t.TypeName}");
+                return t.TaskName;
+            });
         }
 
         /// <summary>
@@ -78,17 +86,34 @@ namespace NetApp.CeleryTask.Extensions
                 RabbitHelper.Instance.DeclareQueue(t.TaskName);
             }
         }
-
-        private static void registerServerTask(IServiceProvider provider, IEnumerable<CTask> tasks)
+        
+        private static RemoteCTask DeserializeRemoteCTask(byte[] data)
         {
-            foreach (var t in tasks)
+            try
             {
-                RabbitHelper.Instance.RegisterQueue(t.TaskName, data =>
+                using (var rStream = new MemoryStream(data))
                 {
-                    Console.WriteLine($"{t.TaskName} recive {data?.Length} bytes data");
-                    tryActivate(provider, t, data);
-                });
+                    var task = Serializer.Deserialize<RemoteCTask>(rStream);
+                    return task;
+                }
             }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        private static void registerServerTask(IServiceProvider provider)
+        {
+            RabbitHelper.Instance.RegisterQueue(TASK_QUEUE_NAME, data =>
+            {
+                Console.WriteLine($"{TASK_QUEUE_NAME} recive {data?.Length} bytes data");
+                var task = DeserializeRemoteCTask(data);
+                if (task != null)
+                {
+                    tryActivate(provider, task, data);
+                }
+            });
         }
 
         /// <summary>
@@ -96,20 +121,12 @@ namespace NetApp.CeleryTask.Extensions
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="task"></param>
-        private static void tryActivate(IServiceProvider provider, CTask task, byte[] data = null)
+        private static void tryActivate(IServiceProvider provider, RemoteCTask remoteTask, byte[] data = null)
         {
-            //do remote task
-            var remoteTask = new RemoteCTask
+            if (!registeredTasks.TryGetValue(remoteTask.TaskName, out CTask task))
             {
-                TaskName = task.TaskName,
-            };
-            var demoParams = new Dictionary<string, object>();
-            foreach (var p in task.Params)
-            {
-                demoParams.Add(p.ParamName, p.Value);
+                return;
             }
-            remoteTask.ParamsJSON = JsonConvert.SerializeObject(demoParams);
-
             var remoteParam = remoteTask.Params;
             foreach (var p in task.Params)
             {
@@ -149,9 +166,9 @@ namespace NetApp.CeleryTask.Extensions
             }
             RabbitHelper.Instance.Init(broker);
 
-            var tasks = loadRegisteredTask();
-            tasks.ForEach(t => tryActivate(provider, t));
-            updateServerTask(tasks);
+            loadRegisteredTask();
+            //tasks.ForEach(t => tryActivate(provider, t));
+            //updateServerTask(tasks);
             registerServerTask(provider, tasks);
         }
 
