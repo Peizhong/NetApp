@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
-using Newtonsoft.Json;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetApp.CeleryTask.Extensions
 {
@@ -24,7 +21,7 @@ namespace NetApp.CeleryTask.Extensions
         private static Dictionary<string, CTask> registeredTasks = new Dictionary<string, CTask>();
 
         /// <summary>
-        /// 查找当前程序集中已标记[SharedTask]的方法
+        /// 查找当前程序集中已标记[SharedTask]的方法，保存到registeredTasks
         /// </summary>
         /// <returns></returns>
         private static void loadRegisteredTask()
@@ -55,39 +52,13 @@ namespace NetApp.CeleryTask.Extensions
                 }
             }
             Console.WriteLine($"found {registeredTasks.Count} tasks");
-            registeredTasks.Values.Select(t =>
+            foreach(var t in registeredTasks.Values)
             {
                 Console.WriteLine($"{t.TypeName}");
-                return t.TaskName;
-            });
-        }
-
-        /// <summary>
-        /// Declaring rabbitmq queue,
-        /// is idempotent - it will only be created if it doesn't exist already
-        /// </summary>
-        /// <param name="tasks"></param>
-        private static void updateServerTask(IEnumerable<CTask> tasks)
-        {
-            /*
-            using (var stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, tasks);
-                var data = stream.GetBuffer();
-                using (var rStream = new MemoryStream(data))
-                {
-                    var rTasks = Serializer.Deserialize<IEnumerable<CTask>>(rStream);
-                }
-            }
-            */
-
-            foreach (var t in tasks)
-            {
-                RabbitHelper.Instance.DeclareQueue(t.TaskName);
             }
         }
         
-        private static RemoteCTask DeserializeRemoteCTask(byte[] data)
+        private static RemoteCTask deserializeRemoteCTask(byte[] data)
         {
             try
             {
@@ -108,24 +79,34 @@ namespace NetApp.CeleryTask.Extensions
             RabbitHelper.Instance.RegisterQueue(TASK_QUEUE_NAME, data =>
             {
                 Console.WriteLine($"{TASK_QUEUE_NAME} recive {data?.Length} bytes data");
-                var task = DeserializeRemoteCTask(data);
+                var task = deserializeRemoteCTask(data);
                 if (task != null)
                 {
-                    tryActivate(provider, task, data);
+                    var result = activateTask(provider, task, data);
+                    return result;
                 }
+                return new ExcuteResult
+                {
+                    Code = "9999",
+                    Message = "Deserialize remote ctask fail"
+                };
             });
         }
 
         /// <summary>
-        /// 测试用，触发任务
+        /// 触发任务
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="task"></param>
-        private static void tryActivate(IServiceProvider provider, RemoteCTask remoteTask, byte[] data = null)
+        private static ExcuteResult activateTask(IServiceProvider provider, RemoteCTask remoteTask, byte[] data = null)
         {
             if (!registeredTasks.TryGetValue(remoteTask.TaskName, out CTask task))
             {
-                return;
+                return new ExcuteResult
+                {
+                    Code = "9999",
+                    Message = $"Task {remoteTask.TaskName} is not support by worker"
+                };
             }
             var remoteParam = remoteTask.Params;
             foreach (var p in task.Params)
@@ -144,11 +125,14 @@ namespace NetApp.CeleryTask.Extensions
                     p.Value = ptype.IsValueType ? Activator.CreateInstance(ptype) : null;
                 }
             }
-
             var type = Type.GetType(task.TypeName);
             var instance = ActivatorUtilities.CreateInstance(provider, type);
             var method = instance.GetType().GetMethod(task.MethodName);
             var res = method.Invoke(instance, task.Params.Select(p => p.Value).ToArray());
+            return new ExcuteResult
+            {
+                Code = "0000"
+            };
         }
 
         /// <summary>
@@ -167,9 +151,7 @@ namespace NetApp.CeleryTask.Extensions
             RabbitHelper.Instance.Init(broker);
 
             loadRegisteredTask();
-            //tasks.ForEach(t => tryActivate(provider, t));
-            //updateServerTask(tasks);
-            registerServerTask(provider, tasks);
+            registerServerTask(provider);
         }
 
         /// <summary>
@@ -184,13 +166,13 @@ namespace NetApp.CeleryTask.Extensions
 
             var beater = provider.GetRequiredService<TaskBeater>();
             //beater.SayHi(loadRegisteredTask());
-            beater.Run();
+            beater.Run(TASK_QUEUE_NAME);
 
             //beater.Stop();
         }
 
         /// <summary>
-        /// create task to rabbit
+        /// Dependency Injection what beater need
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>

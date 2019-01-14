@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace NetApp.CeleryTask
 {
     public class TaskBeater
     {
+        private string TASK_QUEUE_NAME = "CTASK_QUEUE";
+
         private readonly ILogger<TaskBeater> _logger;
         private readonly IServiceScopeFactory _serviceScope;
 
@@ -26,6 +29,27 @@ namespace NetApp.CeleryTask
         Task beaterTask = null;
         CancellationTokenSource cancelBeater = null;
 
+        private void setDefaultParams(PeriodicTask task)
+        {
+            if (string.IsNullOrEmpty(task.Params))
+            {
+                var dict = new Dictionary<string, object>();
+                switch (task.TaskName)
+                {
+                    case "HelloString":
+                        dict.Add("str", "Hello world");
+                        break;
+                    case "IntAndString":
+                        dict.Add("num", 1);
+                        dict.Add("str", "It is string 哦");
+                        break;
+                    default:
+                        break;
+                }
+                task.Params = JsonConvert.SerializeObject(dict);
+            }
+        }
+
         /// <summary>
         /// write to rabbit
         /// </summary>
@@ -33,13 +57,20 @@ namespace NetApp.CeleryTask
         /// <returns></returns>
         private ExcuteResult createTask(PeriodicTask task)
         {
-            RabbitHelper.Instance.Pubilsh(task);
+#if DEBUG
+            setDefaultParams(task);
+#endif
+            RabbitHelper.Instance.Pubilsh(task, TASK_QUEUE_NAME);
             return new ExcuteResult
             {
                 Code = "0000"
             };
         }
 
+        /// <summary>
+        /// write demo task
+        /// </summary>
+        /// <param name="tasks"></param>
         public void SayHi(List<CTask> tasks)
         {
             var pTasks = tasks.Select(t => new PeriodicTask
@@ -116,9 +147,10 @@ namespace NetApp.CeleryTask
             }
         }
 
-        public ExcuteResult Run()
+        public ExcuteResult Run(string taskQueueName)
         {
-            _logger.LogInformation("Beater Run");
+            _logger.LogInformation($"Beater Run in queue {taskQueueName}");
+            TASK_QUEUE_NAME = taskQueueName;
 
             cancelBeater = new CancellationTokenSource();
             CancellationToken token = cancelBeater.Token;
