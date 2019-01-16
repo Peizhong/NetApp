@@ -11,12 +11,15 @@ namespace NetApp.CeleryTask.Models
     public class RemoteCTask
     {
         [ProtoMember(1)]
-        public string TaskName { get; set; }
-        
+        public string Id { get; set; }
+
         [ProtoMember(2)]
+        public string TaskName { get; set; }
+
+        [ProtoMember(3)]
         public string ParamsJSON { get; set; }
-        
-        public Dictionary<string,string> Params
+
+        public Dictionary<string, string> Params
         {
             get
             {

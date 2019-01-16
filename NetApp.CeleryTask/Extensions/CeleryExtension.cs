@@ -82,10 +82,12 @@ namespace NetApp.CeleryTask.Extensions
                 var task = deserializeRemoteCTask(data);
                 if (task != null)
                 {
-                    var result = activateTask(provider, task, data);
+                    Console.WriteLine($"Start Task {task.TaskName}:[{task.Id}]");
+                    var result = activateTask(provider, task);
+                    Console.WriteLine($"Task [{task.Id}] excute result:[{result.Result}]");
                     return result;
                 }
-                return new ExcuteResult
+                return new TaskExcuteResult
                 {
                     Code = "9999",
                     Message = "Deserialize remote ctask fail"
@@ -98,11 +100,11 @@ namespace NetApp.CeleryTask.Extensions
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="task"></param>
-        private static ExcuteResult activateTask(IServiceProvider provider, RemoteCTask remoteTask, byte[] data = null)
+        private static TaskExcuteResult activateTask(IServiceProvider provider, RemoteCTask remoteTask)
         {
             if (!registeredTasks.TryGetValue(remoteTask.TaskName, out CTask task))
             {
-                return new ExcuteResult
+                return new TaskExcuteResult
                 {
                     Code = "9999",
                     Message = $"Task {remoteTask.TaskName} is not support by worker"
@@ -113,6 +115,7 @@ namespace NetApp.CeleryTask.Extensions
             {
                 var ptype = Type.GetType(p.TypeName);
                 var converter = TypeDescriptor.GetConverter(ptype);
+                //match by name
                 if (remoteParam.TryGetValue(p.ParamName, out var value))
                 {
                     if (!string.IsNullOrEmpty(value))
@@ -129,9 +132,10 @@ namespace NetApp.CeleryTask.Extensions
             var instance = ActivatorUtilities.CreateInstance(provider, type);
             var method = instance.GetType().GetMethod(task.MethodName);
             var res = method.Invoke(instance, task.Params.Select(p => p.Value).ToArray());
-            return new ExcuteResult
+            return new TaskExcuteResult
             {
-                Code = "0000"
+                Code = "0000",
+                Result = res,
             };
         }
 
@@ -160,12 +164,14 @@ namespace NetApp.CeleryTask.Extensions
         /// <param name="provider"></param>
         public static void ConfigCeleryBeater(this IServiceProvider provider)
         {
-            var celeryDbContext = provider.GetRequiredService<CeleryDbContext>();
-            //celeryDbContext.Database.EnsureDeleted();
-            celeryDbContext.Database.EnsureCreated();
+            using (var celeryDbContext = provider.GetRequiredService<CeleryDbContext>())
+            {
+                //celeryDbContext.Database.EnsureDeleted();
+                //celeryDbContext.Database.EnsureCreated();
+            }
 
             var beater = provider.GetRequiredService<TaskBeater>();
-            //beater.SayHi(loadRegisteredTask());
+            //beater.SayHi(registeredTasks.Values);
             beater.Run(TASK_QUEUE_NAME);
 
             //beater.Stop();

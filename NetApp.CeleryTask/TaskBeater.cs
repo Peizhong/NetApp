@@ -37,7 +37,7 @@ namespace NetApp.CeleryTask
                 switch (task.TaskName)
                 {
                     case "HelloString":
-                        dict.Add("str", "Hello world");
+                        dict.Add("world", "Hello world");
                         break;
                     case "IntAndString":
                         dict.Add("num", 1);
@@ -71,7 +71,7 @@ namespace NetApp.CeleryTask
         /// write demo task
         /// </summary>
         /// <param name="tasks"></param>
-        public void SayHi(List<CTask> tasks)
+        public void SayHi(IEnumerable<CTask> tasks)
         {
             var pTasks = tasks.Select(t => new PeriodicTask
             {

@@ -14,7 +14,7 @@ namespace NetApp.CeleryTask
     public class RabbitHelper
     {
         public static readonly RabbitHelper Instance = new RabbitHelper();
-        
+
         private ConnectionFactory _factory;
         private IConnection _connection;
 
@@ -60,13 +60,15 @@ namespace NetApp.CeleryTask
         {
             var remoteTask = new RemoteCTask
             {
+                Id = Guid.NewGuid().ToString(),
                 TaskName = task.TaskName,
                 ParamsJSON = task.Params
             };
             using (var stream = new MemoryStream())
             {
                 Serializer.Serialize(stream, remoteTask);
-                var data = stream.GetBuffer();
+                stream.Seek(0, SeekOrigin.Begin);
+                var data = stream.ToArray();
                 return data;
             }
         }
@@ -76,11 +78,6 @@ namespace NetApp.CeleryTask
             using (var channel = OpenedConnection.CreateModel())
             {
                 var body = getPeriodTaskBytes(task);
-                using (var rStream = new MemoryStream(body))
-                {
-                    var tz = Serializer.Deserialize<RemoteCTask>(rStream);
-                }
-
                 var properties = channel.CreateBasicProperties();
                 properties.Persistent = true;
 
@@ -97,7 +94,7 @@ namespace NetApp.CeleryTask
         /// <param name="queueName"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public string RegisterQueue(string queueName, Func<byte[],ExcuteResult> action)
+        public string RegisterQueue(string queueName, Func<byte[], TaskExcuteResult> action)
         {
             var key = _consumerDict.Keys.FirstOrDefault(k => k.StartsWith(queueName));
             if (!string.IsNullOrWhiteSpace(key))
