@@ -2,17 +2,20 @@
 using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace NetApp.CeleryTask
 {
     public class TaskWorker
     {
+        private string TASK_QUEUE_NAME = "CTASK_QUEUE";
+
         private readonly ILogger<TaskWorker> _logger;
         private readonly IServiceScopeFactory _serviceScope;
 
@@ -57,10 +60,10 @@ namespace NetApp.CeleryTask
                     }
                 }
             }
-            Console.WriteLine($"found {registeredTasks.Count} tasks");
+            _logger.LogInformation($"found {registeredTasks.Count} tasks");
             foreach (var t in registeredTasks.Values)
             {
-                Console.WriteLine($"{t.TypeName}");
+                _logger.LogInformation($"{t.TypeName}");
             }
         }
 
@@ -98,7 +101,7 @@ namespace NetApp.CeleryTask
                 }
             }
             var type = Type.GetType(task.TypeName);
-            using(var scope = _serviceScope.CreateScope())
+            using (var scope = _serviceScope.CreateScope())
             {
                 var instance = ActivatorUtilities.CreateInstance(scope.ServiceProvider, type);
                 var method = instance.GetType().GetMethod(task.MethodName);
@@ -111,9 +114,7 @@ namespace NetApp.CeleryTask
             }
         }
 
-        public static string TASK_QUEUE_NAME = "CTASK_QUEUE";
-
-        private static RemoteCTask deserializeRemoteCTask(byte[] data)
+        private RemoteCTask deserializeRemoteCTask(byte[] data)
         {
             try
             {
@@ -125,21 +126,22 @@ namespace NetApp.CeleryTask
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message);
                 return null;
             }
         }
 
-        private static void registerServerTask(IServiceProvider provider)
+        private void registerServerTask()
         {
             RabbitHelper.Instance.RegisterQueue(TASK_QUEUE_NAME, data =>
             {
-                Console.WriteLine($"{TASK_QUEUE_NAME} recive {data?.Length} bytes data");
+                _logger.LogInformation($"{TASK_QUEUE_NAME} recive {data?.Length} bytes data");
                 var task = deserializeRemoteCTask(data);
                 if (task != null)
                 {
-                    Console.WriteLine($"Start Task {task.TaskName}:[{task.Id}]");
-                    var result = activateTask(provider, task);
-                    Console.WriteLine($"Task [{task.Id}] excute result:[{result.Result}]");
+                    _logger.LogInformation($"Start Task {task.TaskName}:[{task.Id}]");
+                    var result = activateTask(task);
+                    _logger.LogInformation($"Task [{task.Id}] excute result:[{result.Result}]");
                     return result;
                 }
                 return new TaskExcuteResult
@@ -148,6 +150,16 @@ namespace NetApp.CeleryTask
                     Message = "Deserialize remote ctask fail"
                 };
             });
+        }
+
+        public void Init(string taskQueueName)
+        {
+            _logger.LogInformation($"Worker Init in queue {taskQueueName}");
+
+            TASK_QUEUE_NAME = taskQueueName;
+
+            loadRegisteredTask();
+            registerServerTask();
         }
     }
 }

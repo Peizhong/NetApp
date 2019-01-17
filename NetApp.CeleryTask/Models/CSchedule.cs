@@ -18,18 +18,17 @@ namespace NetApp.CeleryTask.Models
         public bool IsActive { get; set; }
 
         public DateTime? StartTime { get; set; }
-
-        [NotMapped]
+        
         public DateTime? NextTime { get; set; }
 
         public DateTime? Expires { get; set; }
 
-        public CrontabSchedule CrontabSchedule { get; set; }
+        public CTaskCrontabSchedule CrontabSchedule { get; set; }
 
-        public IntervalSchedule IntervalSchedule { get; set; }
+        public CTaskIntervalSchedule IntervalSchedule { get; set; }
     }
 
-    public class CrontabSchedule 
+    public class CTaskCrontabSchedule 
     {
         [Key]
         public string Id { get; set; }
@@ -44,6 +43,8 @@ namespace NetApp.CeleryTask.Models
         public string DayOfWeek { get; set; }
 
         public string DayOfMonth { get; set; }
+
+        public string MonthOfYear { get; set; }
     }
 
     public enum EnumPeriod
@@ -54,7 +55,7 @@ namespace NetApp.CeleryTask.Models
         Seconds = 4,
     }
 
-    public class IntervalSchedule
+    public class CTaskIntervalSchedule
     {
         [Key]
         public string Id { get; set; }

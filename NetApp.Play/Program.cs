@@ -61,9 +61,18 @@ namespace NetApp.Play
             .AddJsonFile("appsettings.json");
             var config = builder.Build();
 
+
+            var taskQueueName = "CTASK_QUEUE";
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IConfiguration>(config)
-                .AddCeleryBeater()
+                .AddCeleryWorker(cfg=>
+                {
+                    cfg.QueueName = taskQueueName;
+                })
+                .AddCeleryBeater(cfg=>
+                {
+                    cfg.QueueName = taskQueueName;
+                })
                 .BuildServiceProvider();
 
             serviceProvider.ConfigCeleryWorker();

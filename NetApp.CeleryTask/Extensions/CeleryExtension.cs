@@ -4,11 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NetApp.CeleryTask.Attributes;
 using NetApp.CeleryTask.Models;
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -16,8 +13,9 @@ namespace NetApp.CeleryTask.Extensions
 {
     public static class CeleryExtension
     {
+        private static BeaterConfig beaterConfig = new BeaterConfig();
+        private static WorkerConfig workerConfig = new WorkerConfig();
 
-        
         /// <summary>
         /// collect task from rabbit then do it
         /// </summary>
@@ -33,8 +31,39 @@ namespace NetApp.CeleryTask.Extensions
             }
             RabbitHelper.Instance.Init(broker);
 
-            loadRegisteredTask();
-            registerServerTask(provider);
+            var worker = provider.GetRequiredService<TaskWorker>();
+            worker.Init(workerConfig.QueueName);
+        }
+
+        private static List<CTask> loadRegisteredTask()
+        {
+            var registeredTasks = new List<CTask>();
+            var asm = Assembly.GetEntryAssembly();
+            foreach (var t in asm.DefinedTypes)
+            {
+                var methods = t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                foreach (var m in methods)
+                {
+                    var cTaskAttr = m.GetCustomAttribute<SharedTaskAttribute>();
+                    if (cTaskAttr != null)
+                    {
+                        var task = new CTask
+                        {
+                            TaskName = cTaskAttr.TaskName ?? m.Name,
+                            MethodName = m.Name,
+                            TypeName = m.DeclaringType.AssemblyQualifiedName,
+                            Params = m.GetParameters().Select(p => new CTaskParam
+                            {
+                                TypeName = p.ParameterType.AssemblyQualifiedName,
+                                ParamName = p.Name,
+                                Value = p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null
+                            }).ToList()
+                        };
+                        registeredTasks.Add(task);
+                    }
+                }
+            }
+            return registeredTasks;
         }
 
         /// <summary>
@@ -46,14 +75,25 @@ namespace NetApp.CeleryTask.Extensions
             using (var celeryDbContext = provider.GetRequiredService<CeleryDbContext>())
             {
                 //celeryDbContext.Database.EnsureDeleted();
-                celeryDbContext.Database.EnsureCreated();
+                //celeryDbContext.Database.EnsureCreated();
             }
 
             var beater = provider.GetRequiredService<TaskBeater>();
-            //beater.SayHi(registeredTasks.Values);
-            beater.Run(TASK_QUEUE_NAME);
+            //beater.SayHi(loadRegisteredTask());
+            beater.Run(beaterConfig.QueueName, beaterConfig.IntervalMilliseconds);
 
             //beater.Stop();
+        }
+
+        public static IServiceCollection AddCeleryWorker(this IServiceCollection services, Action<WorkerConfig> config = null)
+        {
+            services.AddLogging(cfg =>
+            {
+                cfg.AddConsole();
+            });
+            services.AddScoped<TaskWorker>();
+            config.Invoke(workerConfig);
+            return services;
         }
 
         /// <summary>
@@ -61,7 +101,7 @@ namespace NetApp.CeleryTask.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddCeleryBeater(this IServiceCollection services)
+        public static IServiceCollection AddCeleryBeater(this IServiceCollection services, Action<BeaterConfig> config = null)
         {
             services.AddDbContext<CeleryDbContext>(opt =>
             {
@@ -72,6 +112,7 @@ namespace NetApp.CeleryTask.Extensions
                 cfg.AddConsole();
             });
             services.AddScoped<TaskBeater>();
+            config.Invoke(beaterConfig);
             return services;
         }
     }

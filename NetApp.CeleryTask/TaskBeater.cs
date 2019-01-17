@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NCrontab;
 using NetApp.CeleryTask.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +19,8 @@ namespace NetApp.CeleryTask
         private readonly ILogger<TaskBeater> _logger;
         private readonly IServiceScopeFactory _serviceScope;
 
-        public int IntervalMilliseconds { get; set; } = 1000;
+        private int intervalMilliseconds = 1000;
+        private int overdueMilliseconds = 0;
 
         public TaskBeater(ILogger<TaskBeater> logger, IServiceScopeFactory serviceScope)
         {
@@ -80,13 +82,22 @@ namespace NetApp.CeleryTask
                 IsActive = true,
                 StartTime = DateTime.Now,
                 Params = "",
-                IntervalSchedule = new IntervalSchedule
+                IntervalSchedule = new CTaskIntervalSchedule
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Every = 2,
+                    Every = 10,
                     Period = EnumPeriod.Seconds,
                 }
             }).ToList();
+            pTasks[0].IntervalSchedule = null;
+            pTasks[0].CrontabSchedule = new CTaskCrontabSchedule
+            {
+                Minute = "0",
+                Hour = "3",
+                DayOfWeek = "*",
+                DayOfMonth = "*",
+                MonthOfYear = "*"
+            };
             using (var scope = _serviceScope.CreateScope())
             {
                 using (var context = scope.ServiceProvider.GetRequiredService<CeleryDbContext>())
@@ -97,10 +108,9 @@ namespace NetApp.CeleryTask
             }
         }
 
-        private void setNextTime(PeriodicTask task)
+        private DateTime getNextInterval(PeriodicTask task)
         {
-            var now = DateTime.Now;
-            Func<IntervalSchedule, int> convertMilliseconds = (schedule) =>
+            Func<CTaskIntervalSchedule, int> convertMilliseconds = (schedule) =>
             {
                 int seconds = 1;
                 switch (schedule.Period)
@@ -122,35 +132,49 @@ namespace NetApp.CeleryTask
                 }
                 return seconds * schedule.Every;
             };
+            var next = task.NextTime.Value.AddSeconds(convertMilliseconds(task.IntervalSchedule));
+            return next;
+        }
+
+        private DateTime getNextCrontab(PeriodicTask task)
+        {
+            var crontabStr = string.Join(" ",
+                new[]
+                {
+                    task.CrontabSchedule.Minute,
+                    task.CrontabSchedule.Hour,
+                    task.CrontabSchedule.DayOfWeek,
+                    task.CrontabSchedule.DayOfMonth,
+                    task.CrontabSchedule.MonthOfYear
+                }
+            );
+            var s = CrontabSchedule.Parse(crontabStr);
+            var next = s.GetNextOccurrence(task.NextTime.Value);
+            return next;
+        }
+
+        private void setNextTime(PeriodicTask task)
+        {
+            if (!task.NextTime.HasValue)
+            {
+                task.NextTime = DateTime.Now;
+            }
             if (task.IntervalSchedule != null)
             {
-                task.NextTime = now.AddSeconds(convertMilliseconds(task.IntervalSchedule));
+                task.NextTime = getNextInterval(task);
             }
             else if (task.CrontabSchedule != null)
             {
-                if (task.CrontabSchedule.DayOfMonth == "*")
-                {
-
-                }
-                if (task.CrontabSchedule.DayOfWeek == "*")
-                {
-
-                }
-                if (task.CrontabSchedule.Hour == "*")
-                {
-
-                }
-                if (task.CrontabSchedule.Minute == "*")
-                {
-
-                }
+                task.NextTime = getNextCrontab(task);
             }
         }
 
-        public ExcuteResult Run(string taskQueueName)
+        public ExcuteResult Run(string taskQueueName, int interval = 1000, int overdue = 0)
         {
             _logger.LogInformation($"Beater Run in queue {taskQueueName}");
             TASK_QUEUE_NAME = taskQueueName;
+            intervalMilliseconds = interval;
+            overdueMilliseconds = overdue;
 
             cancelBeater = new CancellationTokenSource();
             CancellationToken token = cancelBeater.Token;
@@ -163,7 +187,8 @@ namespace NetApp.CeleryTask
                         while (!token.IsCancellationRequested)
                         {
                             var now = DateTime.Now;
-                            var todos = context.PeriodicTasks.Where(t => t.IsActive).ToList();
+                            var todos = await context.PeriodicTasks.Include(p => p.IntervalSchedule).Include(p => p.CrontabSchedule).Where(p => p.IsActive).ToListAsync();
+                            bool changed = false;
                             foreach (var todo in todos)
                             {
                                 if (todo.StartTime.HasValue && todo.StartTime > now)
@@ -178,10 +203,16 @@ namespace NetApp.CeleryTask
                                 {
                                     continue;
                                 }
+                                changed = true;
                                 createTask(todo);
                                 setNextTime(todo);
+                                todo.IsActive = todo.NextTime.HasValue;
                             }
-                            await Task.Delay(IntervalMilliseconds);
+                            if (changed)
+                            {
+                                context.SaveChanges();
+                            }
+                            await Task.Delay(intervalMilliseconds);
                         }
                     }
                 }
