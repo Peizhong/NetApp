@@ -17,6 +17,9 @@ namespace NetApp.CeleryTask.Models
         public string TaskName { get; set; }
 
         [ProtoMember(3)]
+        public DateTime CreateTime { get; set; }
+
+        [ProtoMember(4)]
         public string ParamsJSON { get; set; }
 
         public Dictionary<string, string> Params

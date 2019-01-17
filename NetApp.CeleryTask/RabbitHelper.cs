@@ -61,6 +61,7 @@ namespace NetApp.CeleryTask
             var remoteTask = new RemoteCTask
             {
                 Id = Guid.NewGuid().ToString(),
+                CreateTime= DateTime.Now,
                 TaskName = task.TaskName,
                 ParamsJSON = task.Params
             };
