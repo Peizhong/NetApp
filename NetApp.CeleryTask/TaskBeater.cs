@@ -203,6 +203,17 @@ namespace NetApp.CeleryTask
                                 {
                                     continue;
                                 }
+                                if (todo.NextTime.HasValue && todo.NextTime < now)
+                                {
+                                    if (overdueMilliseconds > 0)
+                                    {
+                                        //原计划执行时间 超过了设置的超时时间，丢弃前面的任务
+                                        if ((now - todo.NextTime.Value).TotalMilliseconds > overdueMilliseconds)
+                                        {
+                                            todo.NextTime = now;
+                                        }
+                                    }
+                                }
                                 changed = true;
                                 createTask(todo);
                                 setNextTime(todo);
