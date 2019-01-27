@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NetApp.CeleryTask\NetApp.CeleryTask.csproj" />
     <ProjectReference Include="..\NetApp.Repository\NetApp.Repository.csproj" />
+    <ProjectReference Include="..\StackExchange.Redis\StackExchange.Redis.csproj" />
   </ItemGroup>
 
   <ItemGroup>

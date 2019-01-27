@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NetApp.Common.Extensions;
+using System.Text;
 
 namespace NetApp.Play
 {
@@ -52,27 +53,21 @@ namespace NetApp.Play
 
     class Program
     {
-        static void Main(string[] args)
+        static void DoCelery()
         {
-            var ass = Enumerable.Range(1, 100).Select(n => new B
-            {
-                CName = n.ToString()
-            }).ToList();
-            var order = ass.OrderByBatch("-CName,-Name");
-
             var builder = new ConfigurationBuilder()
-            .SetBasePath(Path.Combine(AppContext.BaseDirectory))
-            .AddJsonFile("appsettings.json");
+               .SetBasePath(Path.Combine(AppContext.BaseDirectory))
+               .AddJsonFile("appsettings.json");
             var config = builder.Build();
-            
+
             var taskQueueName = "CTASK_QUEUE";
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IConfiguration>(config)
-                .AddCeleryWorker(cfg=>
+                .AddCeleryWorker(cfg =>
                 {
                     cfg.QueueName = taskQueueName;
                 })
-                .AddCeleryBeater(cfg=>
+                .AddCeleryBeater(cfg =>
                 {
                     cfg.QueueName = taskQueueName;
                     cfg.OverdueMilliseconds = 1000;
@@ -81,7 +76,50 @@ namespace NetApp.Play
 
             serviceProvider.ConfigCeleryWorker();
             serviceProvider.ConfigCeleryBeater();
+        }
 
+        static void DoExpression()
+        {
+
+        }
+
+        static void DoRedis()
+        {
+            var redis = new Misc.Redis();
+            redis.Hello();
+        }
+
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                var questions = new StringBuilder();
+                questions.AppendLine("What do you want?");
+                questions.AppendLine("0.Quit");
+                questions.AppendLine("1.Do Redis");
+                questions.AppendLine("2.Do Celery");
+                questions.AppendLine("3.Do Expression");
+                Console.Write(questions.ToString());
+                var answer = Console.ReadLine();
+                switch (answer)
+                {
+                    case "0":
+                        return;
+                    case "1":
+                        DoRedis();
+                        break;
+                    case "3":
+                        DoExpression();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            var ass = Enumerable.Range(1, 100).Select(n => new B
+            {
+                CName = n.ToString()
+            }).ToList();
+            var order = ass.OrderByBatch("-CName,-Name");
             Console.ReadLine();
         }
     }
