@@ -89,6 +89,12 @@ namespace NetApp.Play
             redis.Hello();
         }
 
+        static void DoMySQL()
+        {
+            var mysq = new Book.Database();
+            mysq.CallProcedure();
+        }
+
         static void Main(string[] args)
         {
             while (true)
@@ -99,6 +105,7 @@ namespace NetApp.Play
                 questions.AppendLine("1.Do Redis");
                 questions.AppendLine("2.Do Celery");
                 questions.AppendLine("3.Do Expression");
+                questions.AppendLine("5.Do MySQL");
                 Console.Write(questions.ToString());
                 var answer = Console.ReadLine();
                 switch (answer)
@@ -110,6 +117,9 @@ namespace NetApp.Play
                         break;
                     case "3":
                         DoExpression();
+                        break;
+                    case "5":
+                        DoMySQL();
                         break;
                     default:
                         break;

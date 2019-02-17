@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetApp.Repository;
+using NetApp.Services.Lib.Attributes;
 
 namespace NetApp.Services.Basket.Controllers
 {
@@ -32,6 +33,7 @@ namespace NetApp.Services.Basket.Controllers
             });
         }
 
+        [MyAttribute]
         [HttpGet]
         public async Task<string> DoActionBlock(string message)
         {
