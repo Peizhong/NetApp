@@ -7,26 +7,27 @@ using System.IO;
 using System.Linq;
 using NetApp.Common.Extensions;
 using System.Text;
+using System.Reflection;
 
 namespace NetApp.Play
 {
     // Contravariant interface.
     // 父类可以赋给子类
-    interface IContravariant<in A> 
+    interface IContravariant<in T> 
     {
         string whoareyou();
     }
 
     // Implementing contravariant interface.
-    class Sample<A> : IContravariant<A> where A : class, new()
+    class Sample<T> : IContravariant<T> where T : class, new()
     {
-        private List<A> _as = new List<A>();
+        private List<T> _as = new List<T>();
 
         public Sample()
         {
             for (int n = 0; n < 3; n++)
             {
-                _as.Add(new A());
+                _as.Add(new T());
             }
         }
 
@@ -36,23 +37,24 @@ namespace NetApp.Play
             {
 
             }
-            return typeof(A).Name;
+            return typeof(T).Name;
         }
     }
 
-    class A
-    {
-        public virtual string Name => "A";
-    }
-
-    class B : A
-    {
-        public override string Name => "B";
-        public string CName { get; set; } = "A_B";
-    }
 
     class Program
     {
+        class A
+        {
+            public virtual string Name => "A";
+        }
+
+        class B : A
+        {
+            public override string Name => "B";
+            public string CName { get; set; } = "A_B";
+        }
+
         static void DoCelery()
         {
             var builder = new ConfigurationBuilder()
@@ -80,7 +82,11 @@ namespace NetApp.Play
 
         static void DoExpression()
         {
-
+            var ass = Enumerable.Range(1, 100).Select(n => new B
+            {
+                CName = n.ToString()
+            }).ToList();
+            var order = ass.OrderByBatch("-CName,-Name");
         }
 
         static void DoRedis()
@@ -95,42 +101,55 @@ namespace NetApp.Play
             mysq.CallProcedure();
         }
 
+        static void DoCPP()
+        {
+            using (var handler = new Book.CPPHandler("A"))
+            {
+                handler.GetInfo();
+            }
+            var handler2 = new Book.CPPHandler("B");
+            var weakHandler2 = new WeakReference<Book.CPPHandler>(handler2);
+            GC.Collect();
+            if (weakHandler2.TryGetTarget(out var target))
+            {
+                target.GetInfo();
+            }
+            GC.Collect();
+        }
+
         static void Main(string[] args)
         {
+            var actions = new List<Action>
+            {
+                DoRedis,
+                DoCelery,
+                DoExpression,
+                DoMySQL,
+                DoCPP
+            };
             while (true)
             {
-                var questions = new StringBuilder();
-                questions.AppendLine("What do you want?");
+                var questions = new StringBuilder(124);
+                questions.AppendLine("do what you want");
                 questions.AppendLine("0.Quit");
-                questions.AppendLine("1.Do Redis");
-                questions.AppendLine("2.Do Celery");
-                questions.AppendLine("3.Do Expression");
-                questions.AppendLine("5.Do MySQL");
+                int index = 1;
+                actions.ForEach(a => questions.AppendLine($"{index++}.{a.Method.Name}"));
                 Console.Write(questions.ToString());
-                var answer = Console.ReadLine();
-                switch (answer)
+                var str = Console.ReadLine();
+                if (int.TryParse(str, out int selection))
                 {
-                    case "0":
+                    if (selection <= 0)
+                    {
                         return;
-                    case "1":
-                        DoRedis();
-                        break;
-                    case "3":
-                        DoExpression();
-                        break;
-                    case "5":
-                        DoMySQL();
-                        break;
-                    default:
-                        break;
+                    }
+                    if (selection <= actions.Count)
+                    {
+                        var action = actions[selection - 1];
+                        action.Invoke();
+                    }
                 }
+                Console.WriteLine("--------");
             }
-            var ass = Enumerable.Range(1, 100).Select(n => new B
-            {
-                CName = n.ToString()
-            }).ToList();
-            var order = ass.OrderByBatch("-CName,-Name");
-            Console.ReadLine();
         }
     }
 }
