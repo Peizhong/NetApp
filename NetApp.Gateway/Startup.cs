@@ -42,6 +42,7 @@ namespace NetApp.Gateway
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseHttpsRedirection();
 
             app.UseOcelot().Wait();
         }

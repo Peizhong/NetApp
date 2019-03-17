@@ -30,6 +30,7 @@ namespace NetApp.Services.Lib.Extensions
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(3),//服务启动多久后注册
                 Interval = TimeSpan.FromSeconds(30),
                 HTTP = $"{hostUrl.AbsoluteUri}health",//健康检查地址
+                TLSSkipVerify = true,
                 Timeout = TimeSpan.FromSeconds(5)
             };
 
