@@ -19,6 +19,15 @@ namespace NetApp.Services.Catalog
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Warning);
+                }).ConfigureKestrel((context, options) =>
+                {
+                    // Set properties and call methods on options
+                    //options.Limits.MaxConcurrentConnections = 201;
+                });
     }
 }

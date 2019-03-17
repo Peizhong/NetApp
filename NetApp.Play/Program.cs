@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NetApp.CeleryTask.Extensions;
+using NetApp.Common.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NetApp.Common.Extensions;
 using System.Text;
-using System.Reflection;
 
 namespace NetApp.Play
 {
@@ -55,6 +54,13 @@ namespace NetApp.Play
             public string CName { get; set; } = "A_B";
         }
 
+        static void DoAvmt()
+        {
+            Utils.MirgrateAvmt mirgrate = new Utils.MirgrateAvmt();
+            //mirgrate.GetClassifies();
+            mirgrate.GetDevices();
+        }
+
         static void DoCelery()
         {
             var builder = new ConfigurationBuilder()
@@ -76,8 +82,8 @@ namespace NetApp.Play
                 })
                 .BuildServiceProvider();
 
-            serviceProvider.ConfigCeleryWorker();
-            serviceProvider.ConfigCeleryBeater();
+            //serviceProvider.ConfigCeleryWorker();
+            //serviceProvider.ConfigCeleryBeater();
         }
 
         static void DoExpression()
@@ -121,6 +127,7 @@ namespace NetApp.Play
         {
             var actions = new List<Action>
             {
+                DoAvmt,
                 DoRedis,
                 DoCelery,
                 DoExpression,

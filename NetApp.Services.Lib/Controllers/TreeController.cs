@@ -12,7 +12,7 @@ using NetApp.Models.Abstractions;
 
 namespace NetApp.Services.Lib.Controllers
 {
-    public abstract class TreeController<T> : ListController<T> where T : ITreeNode<T>
+    public abstract class TreeController<T> : ListController<T> where T : ITreeNode<T>, new()
     {
         public class LiteTreeNode
         {

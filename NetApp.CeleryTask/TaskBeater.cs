@@ -176,9 +176,10 @@ namespace NetApp.CeleryTask
             intervalMilliseconds = interval;
             overdueMilliseconds = overdue;
 
+            // create a long running task thread
             cancelBeater = new CancellationTokenSource();
             CancellationToken token = cancelBeater.Token;
-            beaterTask = Task.Run(async () =>
+            beaterTask = Task.Factory.StartNew(async () =>
             {
                 using (var scope = _serviceScope.CreateScope())
                 {
@@ -207,7 +208,7 @@ namespace NetApp.CeleryTask
                                 {
                                     if (overdueMilliseconds > 0)
                                     {
-                                        //原计划执行时间 超过了设置的超时时间，丢弃前面的任务
+                                        // 原计划执行时间 超过了设置的超时时间，丢弃前面的任务
                                         if ((now - todo.NextTime.Value).TotalMilliseconds > overdueMilliseconds)
                                         {
                                             todo.NextTime = now;
@@ -227,8 +228,7 @@ namespace NetApp.CeleryTask
                         }
                     }
                 }
-            }, token);
-
+            }, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             return new ExcuteResult
             {
                 Code = "0000"

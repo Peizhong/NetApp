@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NetApp.Common.Abstractions;
-using NetApp.Models;
 using NetApp.EventBus;
 using NetApp.EventBus.Abstractions;
+using NetApp.Models;
 using NetApp.Repository;
 using NetApp.Services.Catalog.Events;
 using NetApp.Services.Lib.Extensions;
@@ -47,7 +47,7 @@ namespace NetApp.Services.Catalog
             var redisConnectionString = Configuration.GetConnectionString("Redis");
             services.AddDistributedRedisCache(opt =>
             {
-                opt.InstanceName = "CatalogService";
+                //opt.InstanceName = "CatalogService";
                 opt.Configuration = redisConnectionString;
             });
 
@@ -125,7 +125,7 @@ namespace NetApp.Services.Catalog
 
             app.EnableMySwaggerWithUI("Catalog API", "v0");
 
-            app.RegisterConsul(Configuration,lifetime);
+            app.RegisterConsul(Configuration, lifetime);
 
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
             eventBus.Subscribe<ProductPriceChangedIntegrationEvent, ProductPriceChangedIntegrationEventHandler>();

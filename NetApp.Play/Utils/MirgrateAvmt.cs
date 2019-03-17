@@ -81,7 +81,7 @@ namespace NetApp.Play.Utils
         {
             IList<Classify> classifies = null;
             var sqliteBuilder = new DbContextOptionsBuilder();
-            sqliteBuilder.UseSqlite("data source=C:/Users/Peizhong/Desktop/avmt.db");
+            sqliteBuilder.UseSqlite("data source=C:/Users/wxyz/Desktop/avmt.db");
             using (var context = new AvmtContext(sqliteBuilder.Options))
             {
                 try
@@ -111,7 +111,7 @@ namespace NetApp.Play.Utils
                 var mapper = classifyToCategory.CreateMapper();
 
                 var mysqlBuilder = new DbContextOptionsBuilder<MallDBContext>();
-                mysqlBuilder.UseMySql("Server=;Database=malldb;User=root;Password=;");
+                mysqlBuilder.UseMySql("Server=192.168.3.19;Database=malldb;User=sqladmin;Password=123456");
                 using (var context = new MallDBContext(mysqlBuilder.Options))
                 {
                     var categories = mapper.Map<IList<Models.Category>>(classifies);
@@ -126,7 +126,7 @@ namespace NetApp.Play.Utils
         {
             IList<Device> devices = null;
             var sqliteBuilder = new DbContextOptionsBuilder<AvmtContext>();
-            sqliteBuilder.UseSqlite("data source=C:/Users/Peizhong/Desktop/avmt.db");
+            sqliteBuilder.UseSqlite("data source=C:/Users/wxyz/Desktop/avmt.db");
             using (var context = new AvmtContext(sqliteBuilder.Options))
             {
                 try
@@ -146,7 +146,7 @@ namespace NetApp.Play.Utils
                 var classifyToCategory = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Device, Models.Product>()
-                    .ForMember(c => c.ProductId, opt => opt.MapFrom(src => src.Id))
+                    .ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id))
                     .ForMember(c => c.Name, opt => opt.MapFrom(src => src.DeviceName))
                     .ForMember(c => c.CategoryId, opt => opt.MapFrom(src => src.ClassifyId))
                     //.ForMember(c => c.ManufacturerId, opt => opt.MapFrom(src => src.ManufacturerId))
@@ -162,7 +162,7 @@ namespace NetApp.Play.Utils
                 var mapper = classifyToCategory.CreateMapper();
 
                 var mysqlBuilder = new DbContextOptionsBuilder<MallDBContext>();
-                mysqlBuilder.UseMySql("Server=;Database=malldb;User=root;Password=;");
+                mysqlBuilder.UseMySql("Server=192.168.3.19;Database=malldb;User=sqladmin;Password=123456");
                 using (var context = new MallDBContext(mysqlBuilder.Options))
                 {
                     var products = mapper.Map<IList<Models.Product>>(devices);

@@ -13,7 +13,7 @@ namespace NetApp.Services.Lib.Controllers
     [Route("api/[controller]")]
     [Produces("application/json")]
     [ApiController]
-    public abstract class ListController<T> : CacheController where T : IBase
+    public abstract class ListController<T> : CacheController where T : IBase, new()
     {
         protected readonly IListRepo<T> _repo;
 
@@ -33,7 +33,7 @@ namespace NetApp.Services.Lib.Controllers
         {
             var page = new PageableQuery<T>
             {
-                PageSize = q.PageSize > 0 ? q.PageSize : 100
+                PageSize = q.PageSize > 0 ? q.PageSize : 50
             };
             Func<Task<PageableQueryResult<T>>> query = async () =>
             {

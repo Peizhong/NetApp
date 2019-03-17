@@ -17,53 +17,35 @@ namespace NetApp.CeleryTask.Extensions
         private static WorkerConfig workerConfig = new WorkerConfig();
 
         /// <summary>
-        /// collect task from rabbit then do it
+        /// Dependency Injection what beater need
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="services"></param>
         /// <returns></returns>
-        public static void ConfigCeleryWorker(this IServiceProvider provider)
+        public static IServiceCollection AddCeleryBeater(this IServiceCollection services, Action<BeaterConfig> config = null)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var broker = configuration["celery_broker"];
-            if (string.IsNullOrEmpty(broker))
+            services.AddDbContext<CeleryDbContext>(opt =>
             {
-                broker = "localhost";
-            }
-            RabbitHelper.Instance.Init(broker);
-
-            var worker = provider.GetRequiredService<TaskWorker>();
-            worker.Init(workerConfig.QueueName);
+                opt.UseSqlite("Data Source=celery.db");
+            });
+            services.AddLogging(cfg =>
+            {
+                cfg.AddConsole();
+            });
+            MongoLogger.Instance.TestConnectionAsync().GetAwaiter().GetResult();
+            services.AddScoped<TaskBeater>();
+            config.Invoke(beaterConfig);
+            return services;
         }
 
-        private static List<CTask> loadRegisteredTask()
+        public static IServiceCollection AddCeleryWorker(this IServiceCollection services, Action<WorkerConfig> config = null)
         {
-            var registeredTasks = new List<CTask>();
-            var asm = Assembly.GetEntryAssembly();
-            foreach (var t in asm.DefinedTypes)
+            services.AddLogging(cfg =>
             {
-                var methods = t.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-                foreach (var m in methods)
-                {
-                    var cTaskAttr = m.GetCustomAttribute<SharedTaskAttribute>();
-                    if (cTaskAttr != null)
-                    {
-                        var task = new CTask
-                        {
-                            TaskName = cTaskAttr.TaskName ?? m.Name,
-                            MethodName = m.Name,
-                            TypeName = m.DeclaringType.AssemblyQualifiedName,
-                            Params = m.GetParameters().Select(p => new CTaskParam
-                            {
-                                TypeName = p.ParameterType.AssemblyQualifiedName,
-                                ParamName = p.Name,
-                                Value = p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null
-                            }).ToList()
-                        };
-                        registeredTasks.Add(task);
-                    }
-                }
-            }
-            return registeredTasks;
+                cfg.AddConsole();
+            });
+            services.AddScoped<TaskWorker>();
+            config.Invoke(workerConfig);
+            return services;
         }
 
         /// <summary>
@@ -85,35 +67,24 @@ namespace NetApp.CeleryTask.Extensions
             //beater.Stop();
         }
 
-        public static IServiceCollection AddCeleryWorker(this IServiceCollection services, Action<WorkerConfig> config = null)
+        /// <summary>
+        /// collect task from rabbit then do it
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        public static void ConfigCeleryWorker(this IServiceProvider provider)
         {
-            services.AddLogging(cfg =>
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var broker = configuration["celery_broker"];
+            if (string.IsNullOrEmpty(broker))
             {
-                cfg.AddConsole();
-            });
-            services.AddScoped<TaskWorker>();
-            config.Invoke(workerConfig);
-            return services;
+                broker = "localhost";
+            }
+            RabbitHelper.Instance.Init(broker);
+
+            var worker = provider.GetRequiredService<TaskWorker>();
+            worker.Init(workerConfig.QueueName);
         }
 
-        /// <summary>
-        /// Dependency Injection what beater need
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddCeleryBeater(this IServiceCollection services, Action<BeaterConfig> config = null)
-        {
-            services.AddDbContext<CeleryDbContext>(opt =>
-            {
-                opt.UseSqlite("Data Source=celery.db");
-            });
-            services.AddLogging(cfg =>
-            {
-                cfg.AddConsole();
-            });
-            services.AddScoped<TaskBeater>();
-            config.Invoke(beaterConfig);
-            return services;
-        }
     }
 }
