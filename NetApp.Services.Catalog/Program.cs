@@ -23,7 +23,7 @@ namespace NetApp.Services.Catalog
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Warning);
+                    //logging.SetMinimumLevel(LogLevel.Warning);
                 }).ConfigureKestrel((context, options) =>
                 {
                     // Set properties and call methods on options

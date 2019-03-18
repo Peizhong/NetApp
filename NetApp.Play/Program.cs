@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NetApp.Play
 {
@@ -123,6 +124,12 @@ namespace NetApp.Play
             GC.Collect();
         }
 
+        static void DoBenchmark()
+        {
+            var benchmark = new Book.Benchmark();
+            benchmark.Attack(() => {; }, 150, 5000);
+        }
+
         static void Main(string[] args)
         {
             var actions = new List<Action>
@@ -132,7 +139,8 @@ namespace NetApp.Play
                 DoCelery,
                 DoExpression,
                 DoMySQL,
-                DoCPP
+                DoCPP,
+                DoBenchmark
             };
             while (true)
             {

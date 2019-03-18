@@ -121,7 +121,7 @@ namespace NetApp.Services.Catalog
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseCors("default");
 
@@ -133,7 +133,6 @@ namespace NetApp.Services.Catalog
             app.EnableMySwaggerWithUI("Catalog API", "v0");
 
             app.RegisterConsul(Configuration, lifetime);
-
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
             eventBus.Subscribe<ProductPriceChangedIntegrationEvent, ProductPriceChangedIntegrationEventHandler>();
         }

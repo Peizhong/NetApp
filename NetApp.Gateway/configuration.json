@@ -5,7 +5,7 @@
     // API: Browse Service
     {
       "DownstreamPathTemplate": "/api/{url}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "UpstreamPathTemplate": "/ClientService/{url}",
       "UpstreamHttpMethod": [ "Get", "Post", "OPTIONS" ],
       "ServiceName": "NetApp.Services.Catalog", //http://consul:8500/v1/catalog/service/NetApp.Services.Catalog
@@ -13,10 +13,10 @@
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
-      "FileCacheOptions": {
-        "TtlSeconds": 15,
-        "Region": "somename"
-      },
+      //"FileCacheOptions": {
+      //  "TtlSeconds": 15,
+      //  "Region": "somename"
+      //},
       "UseServiceDiscovery": true // use Consul service discovery
     }
   ],

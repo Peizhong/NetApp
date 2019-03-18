@@ -20,6 +20,11 @@ namespace NetApp.Gateway
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    //logging.SetMinimumLevel(LogLevel.Warning);
+                })
                 .ConfigureAppConfiguration((hostingContext, builder) =>
                 {
                     builder.AddJsonFile("configuration.json", false, true);

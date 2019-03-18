@@ -32,8 +32,8 @@ namespace NetApp.Services.Lib.Controllers
             //semaphoreSlim.Wait();
             //semaphoreSlim.Release();
             int threadCnt = threadCount;
-            Interlocked.Increment(ref threadCount);
-            Console.WriteLine($"{threadCnt} at {Thread.CurrentThread.ManagedThreadId}");
+            //Interlocked.Increment(ref threadCount);
+            //Console.WriteLine($"{threadCnt} at {Thread.CurrentThread.ManagedThreadId}");
 
             TValue result;
             string key = $"{Request.Path}{Request.QueryString}";
@@ -52,7 +52,7 @@ namespace NetApp.Services.Lib.Controllers
                 await _cache.SetStringAsync(key, raw);
             }
             result = JsonConvert.DeserializeObject<TValue>(raw);
-            Console.WriteLine($"{threadCnt} complete {fromCache} length:{raw.Length}");
+            //Console.WriteLine($"{threadCnt} complete {fromCache} length:{raw.Length}");
             /*
             if (memoryCache.TryGetValue(key, out var raw))
             {
@@ -65,7 +65,8 @@ namespace NetApp.Services.Lib.Controllers
                 memoryCache.TryAdd(key, raw);
             }
             result = JsonConvert.DeserializeObject<TValue>(raw);
-            Console.WriteLine($"{threadCnt} complete {fromCache} length:{raw.Length}");
+
+            //Console.WriteLine($"{threadCnt} complete {fromCache} length:{raw.Length}");
             if (memoryCacheRaw.TryGetValue(key, out var raw))
             {
                 fromCache = true;
@@ -76,7 +77,8 @@ namespace NetApp.Services.Lib.Controllers
                 memoryCacheRaw.TryAdd(key, raw);
             }
             result = (TValue)raw;
-            Console.WriteLine($"{threadCnt} complete {fromCache}");*/
+            //Console.WriteLine($"{threadCnt} complete {fromCache}");
+            */
             return result;
         }
     }
