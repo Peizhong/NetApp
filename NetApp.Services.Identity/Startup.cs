@@ -77,6 +77,9 @@ namespace NetApp.Services.Identity
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())//客户机密码验证
+                // 自定义数据实现验证和claim的逻辑
+                //.AddResourceOwnerValidator()
+                //.AddProfileService()
                 .AddAspNetIdentity<IdentityUser>();
         }
 

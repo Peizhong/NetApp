@@ -10,6 +10,7 @@ using NetApp.Common.Abstractions;
 using NetApp.Services.Lib.Controllers;
 using Microsoft.Extensions.Caching.Distributed;
 using NetApp.Services.Catalog.Events;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NetApp.Services.Catalog.Controllers
 {
@@ -61,6 +62,14 @@ namespace NetApp.Services.Catalog.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [Authorize(Roles = "superuser")]
+        [HttpGet("[action]")]
+        public async Task<Product> Secret()
+        {
+            await Task.Delay(1);
+            return new Product { };
         }
     }
 }

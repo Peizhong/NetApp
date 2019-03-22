@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetApp.PlayASP.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,8 +9,16 @@ namespace NetApp.PlayASP.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IProductRepository _productRepository;
+
+        public HomeController(IProductRepository repo)
+        {
+            _productRepository = repo;
+        }
+
         public ActionResult Index()
         {
+            var data = _productRepository.Products();
             return View();
         }
 
