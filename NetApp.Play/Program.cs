@@ -130,6 +130,13 @@ namespace NetApp.Play
             benchmark.Attack(() => {; }, 150, 5000);
         }
 
+        static void DoADONET()
+        {
+            var ado = new Utils.MirgrateAvmt();
+            ado.RawCopyAsync(@"Data Source=(LocalDb)\MSSQLLocalDB;AttachDbFilename=C:\Users\wxyz\source\repos\NetApp\NetApp.PlayASP\App_Data\aspnet-NetApp.PlayASP-20190319112700.mdf;Integrated Security=True",
+                @"data source=C:/Users/wxyz/Desktop/avmt.db").GetAwaiter().GetResult();
+        }
+
         static void Main(string[] args)
         {
             var actions = new List<Action>
@@ -140,6 +147,7 @@ namespace NetApp.Play
                 DoExpression,
                 DoMySQL,
                 DoCPP,
+                DoADONET,
                 DoBenchmark
             };
             while (true)

@@ -5,7 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NetApp.Play.Utils
 {
@@ -172,6 +176,87 @@ namespace NetApp.Play.Utils
                 }
             }
             return devices;
+        }
+
+
+        public async Task RawCopyAsync(string sqlserver,string sqlite)
+        {
+            string[] tablesToCopy = new[] {
+                "dm_workspace",
+                "dm_function_location",
+                "dm_device",
+                "dm_fl_asset",
+                "dm_baseinfo_config",
+                "dm_techparam",
+                "dm_classify_techparam",
+                "sp_pd_data_check_rule",
+                "sp_pd_data_check_item",
+            };
+            using (SqlConnection dstDb = new SqlConnection(sqlserver))
+            {
+                if (dstDb.State == System.Data.ConnectionState.Closed)
+                {
+                    dstDb.Open();
+                }
+                foreach (var table in tablesToCopy)
+                {
+                    using (SqlCommand sqlCommand = new SqlCommand($"delete from {table}", dstDb))
+                    {
+                        await sqlCommand.ExecuteNonQueryAsync();
+                    }
+                }
+                using (SQLiteConnection srcDb = new SQLiteConnection(sqlite))
+                {
+                    if (srcDb.State == System.Data.ConnectionState.Closed)
+                    {
+                        srcDb.Open();
+                    }
+                    foreach (var table in tablesToCopy)
+                    {
+                        var sqliteCommand = new SQLiteCommand($"select * from {table}", srcDb);
+                        /*
+                        SQLiteDataAdapter sQLiteDataAdapter = new SQLiteDataAdapter(sqliteCommand);
+                        using (DataSet srcSet = new DataSet())
+                        {
+                            sQLiteDataAdapter.Fill(srcSet, "sp_pd_data_check_rule");
+                            using (DataTable srcTable = srcSet.Tables[0])
+                            {
+                                using (SqlTransaction dstTran = dstDb.BeginTransaction())
+                                {
+                                    try
+                                    {
+                                        SqlBulkCopy sqlbulkcopy = new SqlBulkCopy(dstDb, SqlBulkCopyOptions.Default, dstTran);
+                                        sqlbulkcopy.DestinationTableName = "sp_pd_data_check_rule";
+                                        await sqlbulkcopy.WriteToServerAsync(srcTable);
+                                        dstTran.Commit();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        dstTran.Rollback();
+                                    }
+                                }
+                            }
+                        }*/
+                        using (var reader = await sqliteCommand.ExecuteReaderAsync())
+                        {
+                            using (SqlTransaction dstTran = dstDb.BeginTransaction())
+                            {
+                                try
+                                {
+                                    SqlBulkCopy sqlbulkcopy = new SqlBulkCopy(dstDb, SqlBulkCopyOptions.Default, dstTran);
+                                    sqlbulkcopy.DestinationTableName = table;
+                                    await sqlbulkcopy.WriteToServerAsync(reader);
+                                    dstTran.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    dstTran.Rollback();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

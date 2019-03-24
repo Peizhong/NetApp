@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="NetApp.PlayASPAPI.Services.NetAppWCF" CodeBehind="NetAppWCF.svc.cs" %>

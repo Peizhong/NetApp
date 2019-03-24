@@ -19,6 +19,10 @@ namespace NetApp.PlayASP.Controllers
         public ActionResult Index()
         {
             var data = _productRepository.Products();
+            using (var wcfClient = new NetAppWCFService.NetAppWCFClient())
+            {
+                var res = wcfClient.Products(0, 100);
+            }
             return View();
         }
 

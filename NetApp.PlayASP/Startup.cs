@@ -33,7 +33,8 @@ namespace NetApp.PlayASP
                 new Product { Name = "Running shoes", Price = 95 }
             });
             //builder.Register(ctx => mock.Object);
-            builder.RegisterType<DPProductRepository>().As<IProductRepository>();
+            builder.RegisterInstance(mock.Object).As<IProductRepository>().SingleInstance();
+            //builder.RegisterType<DPProductRepository>().As<IProductRepository>();
 
             // Run other optional steps, like registering model binders,
             // web abstractions, etc., then set the dependency resolver
