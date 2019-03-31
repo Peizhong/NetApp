@@ -10,6 +10,7 @@ using NetApp.Models;
 using NetApp.Workflow;
 using NetApp.Workflow.Models;
 using Newtonsoft.Json;
+using WorkflowCore.Interface;
 
 namespace NetApp.Controllers
 {
@@ -18,15 +19,18 @@ namespace NetApp.Controllers
         private readonly ILogger<FlowController> _logger;
         private readonly WorkflowFactory _workflowFactory;
         private readonly NetAppDbContext _netAppDbContext;
+        private readonly IWorkflowHost _workflowHost;
 
         public FlowController(
             ILogger<FlowController> logger,
             NetAppDbContext netAppDbContext,
-            WorkflowFactory workflowFactory)
+            WorkflowFactory workflowFactory,
+            IWorkflowHost workflowHost)
         {
             _logger = logger;
             _netAppDbContext = netAppDbContext;
             _workflowFactory = workflowFactory;
+            _workflowHost = workflowHost;
         }
 
         // GET: Flow
@@ -165,6 +169,12 @@ namespace NetApp.Controllers
         {
             var flowRef = await _netAppDbContext.WorkflowRefs.FirstOrDefaultAsync(w => w.ObjectId == id);
             return PartialView(flowRef);
+        }
+
+        public IActionResult HelloWorld()
+        {
+            _workflowHost.StartWorkflow("HelloWorld");
+            return Ok("棒棒哒");
         }
     }
 }

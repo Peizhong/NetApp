@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using NetApp.Models;
 using NetApp.Workflow;
+using NetApp.Workflow.Extensions;
 
 namespace NetApp
 {
@@ -47,6 +48,8 @@ namespace NetApp
             });
             
             services.AddHttpClient();
+
+            services.AddMyWorkflow();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +64,11 @@ namespace NetApp
 
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
+
+            app.UseMyWorkflow(cfg =>
+            {
+                cfg.RegisterWorkflow<Workflow.Workflows.HelloWorldWorkflow>();
+            });
         }
     }
 }
